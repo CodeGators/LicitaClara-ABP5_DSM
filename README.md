@@ -1,2 +1,2 @@
-# Sentinela-ABP5_DSM
-Desenvolvimento de aplicação web para o mapeamento automático de cicatrizes de queimadas em imagens de satélite
+# Licita Clara-ABP5_DSM
+Desenvolvimento de aplicação web para Detecção de Anomalias em Licitações Públicas
