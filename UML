@@ -1,0 +1,58 @@
+classDiagram
+    class DatasetComprasnet {
+        +String id_licitacao
+        +String fornecedor_cnpj
+        +String orgao_comprador
+        +Float valor_total
+        +Float preco_unitario
+        +Date data_contrato
+        +carregarDados()
+        +limparAtributos()
+    }
+
+    class FeatureEngineering {
+        +Float z_score_preco
+        +Float desvio_padrao_categoria
+        +Int frequencia_vitorias_fornecedor
+        +gerarFeaturesMetricas()
+        +normalizarDados()
+    }
+
+    class AnomalyDetectionModel {
+        +String nome_modelo
+        +Float contaminacao
+        +treinarModelo(data)
+        +preverAnomalias(data) Float[]
+        +gerarScoreAnomalia()
+    }
+
+    class IsolationForestModel {
+        +Int n_estimators
+        +fitPredict()
+    }
+
+    class AutoencoderModel {
+        +Int encoding_dim
+        +calcularReconstructionError()
+    }
+
+    class LicitacaoAnomala {
+        +String id_licitacao
+        +Float anomaly_score
+        +String nivel_risco
+        +String justificativa_suspeita
+        +exportarRelatorio()
+    }
+
+    class ComplianceAuditService {
+        +LicitacaoAnomala[] auditarLicitacoes()
+        +filtrarPorOrgao(String orgao)
+        +filtrarPorFornecedor(String cnpj)
+    }
+
+    DatasetComprasnet --> FeatureEngineering : Processado por
+    FeatureEngineering --> AnomalyDetectionModel : Alimenta
+    AnomalyDetectionModel <|-- IsolationForestModel : Implementa
+    AnomalyDetectionModel <|-- AutoencoderModel : Implementa
+    AnomalyDetectionModel --> LicitacaoAnomala : Identifica
+    LicitacaoAnomala --> ComplianceAuditService : Exibido via
