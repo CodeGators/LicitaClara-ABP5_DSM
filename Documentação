@@ -1,1 +1,76 @@
 
+🏛️ LicitaClara - Auditoria Cidadã e Compliance
+O LicitaClara é uma plataforma desenvolvida para proporcionar transparência, governança e eficiência na análise de compras e processos de licitação pública. O sistema atribui pontuações de prioridade (score) para indicar processos que necessitam de revisão e auditoria humana.
+📂 Estrutura do Repositório:
+
+LICITACLARA-ABP5_DSM-MAIN/
+├── licita-clara/
+│   └── Frontend-licita-clara/    # Aplicação Frontend em React + Vite
+│       ├── public/               # Ativos estáticos e marcas (CodeGators, LicitaClara)
+│       ├── src/
+│       │   ├── components/       # Componentes React reutilizáveis
+│       │   │   ├── AjudaModal.jsx
+│       │   │   ├── Layout.jsx
+│       │   │   ├── Logo.jsx
+│       │   │   └── ui.jsx
+│       │   ├── pages/            # Páginas e rotas da aplicação
+│       │   │   ├── Painel.jsx
+│       │   │   ├── Processos.jsx
+│       │   │   ├── Detalhe.jsx
+│       │   │   ├── Fornecedores.jsx
+│       │   │   └── Relatorios.jsx
+│       │   ├── App.jsx           # Mapeamento de rotas (React Router)
+│       │   ├── data.js           # Dados simulados e utilitários
+│       │   ├── main.jsx          # Ponto de entrada React
+│       │   └── styles.css        # Estilos globais e tema CSS
+│       ├── package.json          # Dependências e scripts do Node
+│       └── vite.config.js        # Configurações do Vite
+└── Prototipo/                    # Arquivos e recursos de prototipagem e design
+
+🛠️ Tecnologias Utilizadas
+•	React 18 - Biblioteca principal para construção das interfaces.
+•	Vite - Tooling e bundler de alta performance.
+•	React Router DOM - Navegação e gerenciamento de rotas.
+•	Lucide React - Conjunto moderno de ícones vetoriais.
+•	CSS Customizado - Estilização responsiva com suporte a temas (Dark/Light Mode).
+🧩 Componentes do Frontend (src/components)
+1. Componentes Estruturais e de Layout
+•	Layout.jsx: Esqueleto principal da aplicação. Gerencia o menu lateral móvel (sidebar), cabeçalho com breadcrumbs, navegação ativa, modal de ajuda e o gancho (useTema) para alternar entre modo claro e escuro.
+•	Logo.jsx (Mark): Renderiza a marca visual do LicitaClara. Desenha um gráfico vetorial SVG com um colchete e colunas analíticas, adaptando-se automaticamente a fundos claros ou escuros.
+2. Modais e Interatividade
+•	AjudaModal.jsx: Modal guiado contendo três abas:
+o	Como funciona: Tutorial passo a passo (wizard) sobre o cálculo do score e análise de prioridade.
+o	Glossário: Termos técnicos do universo de compras e licitações públicas.
+o	Créditos: Apresentação da equipe CodeGators da FATEC Jacareí, com avatares e links dos integrantes.
+•	Avatar: Subcomponente que carrega a foto do perfil do GitHub do integrante e fornece um fallback com as iniciais do nome em caso de erro na imagem.
+3. Elementos Reutilizáveis de UI (ui.jsx)
+•	Head: Cabeçalho padrão de página com suporte a rótulo superior (kicker), título (h1), subtítulo e ações.
+•	Score: Indicador numérico de prioridade formatado dinamicamente com cores baseadas no grau de urgência.
+•	Prioridade: Etiqueta visual (pill) traduzindo o nível do score (Baixa, Média, Alta).
+•	Revisao: Indicador visual do status operacional do processo (Em análise ou Revisado).
+•	Aviso: Caixa de alerta com informações de conformidade (compliance), destacando que pontuações estatísticas não são provas diretas de irregularidade.
+•	Progress: Barra de progresso horizontal configurável.
+•	Tip: Balão de dica (tooltip) interativo ativado ao passar o mouse ou focar com o teclado.
+📄 Visões da Aplicação (src/pages)
+1.	Painel Geral (Painel.jsx): Dashboard com indicadores gerais e métricas resumidas.
+2.	Processos Sinalizados (Processos.jsx): Tabela e filtros de licitações agrupadas por nível de risco.
+3.	Detalhes do Processo (Detalhe.jsx): Visão aprofundada das cotações, itens e histórico de um certame.
+4.	Fornecedores (Fornecedores.jsx): Consulta de cadastros e contratos de fornecedores.
+5.	Relatórios (Relatorios.jsx): Síntese de dados financeiros e análises de auditoria.
+
+🚀 Como Rodar o Projeto
+1.	Navegue até a pasta do frontend:
+cd licita-clara/Frontend-licita-clara
+
+2.	Instale as dependências:
+npm install
+
+3.	Inicie o ambiente de desenvolvimento:
+npm run dev;
+
+1.	Acesse no navegador: Abra a URL gerada pelo Vite (ex: http://localhost:5173).
+👥 Autores e Créditos
+Projeto acadêmico desenvolvido na FATEC Jacareí para a disciplina de Governança e Compliance / ABP5.
+•	Equipe de Desenvolvimento: CodeGators
+•	Curso: Desenvolvimento de Software Multiplataforma (DSM)
+
