@@ -55,6 +55,3 @@ Projeto desenvolvido por estudantes como parte da disciplina de Aprendizagem Bas
 
 ---
 
-## 📄 Licença
-
-Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](./LICENSE) para mais detalhes.
