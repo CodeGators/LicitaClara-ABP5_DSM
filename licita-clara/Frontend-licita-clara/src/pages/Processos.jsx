@@ -41,7 +41,7 @@ export default function Processos() {
           <span style={{ color: 'var(--secundario)', display: 'flex', gap: 8 }}><ArrowDownWideNarrow size={16} /> Ordenado por score: maior primeiro</span>
         </div>
         <table className="tbl">
-          <thead><tr><th>Processo / Categoria</th><th>Órgão / Fornecedor</th><th>Homologado</th><th><Tip text='Quantas vezes o preço é maior que a mediana de itens similares.'>Preço / med.</Tip></th><th>Particip.</th><th><Tip text='Nota de 0 a 100 de prioridade de análise. Não é probabilidade de fraude.'>Score ↓</Tip></th><th>Prioridade</th><th>Revisão</th></tr></thead>
+          <thead><tr><th> Itens </th><th>Órgão / Fornecedor</th><th>Homologado</th><th><Tip text='Quantas vezes o preço é maior que a mediana de itens similares.'>Preço / med.</Tip></th><th>Particip.</th><th><Tip text='Nota de 0 a 100 de prioridade de análise. Não é probabilidade de fraude.'>Score ↓</Tip></th><th>Prioridade</th><th>Revisão</th></tr></thead>
           <tbody>
             {lista.map(p => (
               <tr key={p.id} className={`click ${p.id === sel ? 'sel' : ''}`} onClick={() => setSel(p.id)} onDoubleClick={() => nav(`/processos/${p.id}`)}>
