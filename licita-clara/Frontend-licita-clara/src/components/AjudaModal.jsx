@@ -43,7 +43,7 @@ export default function AjudaModal({ onClose }) {
 
         {aba === 'como' && (
           <div className="modal-body">
-            <p>O Licita Clara ajuda a decidir <b>por onde começar a análise</b> de compras públicas. Cada processo recebe um score de 0 a 100: quanto maior, mais urgente a revisão.</p>
+            <p>O Licita Clara ajuda a decidir <b>por onde começar a análise</b> de compras públicas. Cada item comprado recebe um score de 0 a 100: quanto maior, mais urgente a revisão.</p>
             <div className="aviso" style={{ margin: '16px 0' }}><ShieldAlert size={18} /><div>O score não é prova de irregularidade. Os dados são simulados e toda conclusão exige revisão humana.</div></div>
             <div className="wizard">
               <div className="dots" aria-label={`Passo ${i + 1} de ${passos.length}`}>

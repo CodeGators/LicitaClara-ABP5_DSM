@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { LayoutGrid, ListFilter, Building2, FileText, Layers, ScanSearch, CircleHelp, Menu, X, Sun, Moon } from 'lucide-react'
+import { LayoutGrid, ListFilter, Building2, FileText, Layers, ScanSearch, CircleHelp, Menu, Sun, Moon } from 'lucide-react'
 import Logo from './Logo.jsx'
 import AjudaModal from './AjudaModal.jsx'
+import useTheme from '../useTheme.js'
 
 const nav = [
   { to: '/', label: 'Painel geral', icon: LayoutGrid, end: true },
@@ -12,45 +13,27 @@ const nav = [
 ]
 const names = { '': 'Painel geral', processos: 'Processos sinalizados', fornecedores: 'Fornecedores', relatorios: 'Relatórios' }
 
-const lerLS = k => { try { return localStorage.getItem(k) } catch { return null } }
-const gravarLS = (k, v) => { try { localStorage.setItem(k, v) } catch { /* modo privado */ } }
-
-function useTema() {
-  const [tema, setTema] = useState(() => document.documentElement.getAttribute('data-theme') || 'light')
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', tema)
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', tema === 'dark' ? '#0A1824' : '#102D46')
-  }, [tema])
-  const alternar = () => setTema(t => { const n = t === 'dark' ? 'light' : 'dark'; gravarLS('lc_tema', n); return n })
-  return [tema, alternar]
-}
-
 export default function Layout() {
   const { pathname } = useLocation()
   const parts = pathname.split('/').filter(Boolean)
-  const [ajuda, setAjuda] = useState(() => !lerLS('lc_ajuda_vista'))
+  const [tema, alternar] = useTheme()
   const [menu, setMenu] = useState(false)
-  const [tema, alternarTema] = useTema()
-  const fechar = () => { gravarLS('lc_ajuda_vista', '1'); setAjuda(false) }
+  const [ajuda, setAjuda] = useState(() => !localStorage.getItem('lc_ajuda_vista'))
+  const fechar = () => { localStorage.setItem('lc_ajuda_vista', '1'); setAjuda(false) }
 
-  useEffect(() => { setMenu(false) }, [pathname])
+  useEffect(() => setMenu(false), [pathname])
   useEffect(() => {
-    if (!menu) return
-    const k = e => e.key === 'Escape' && setMenu(false)
-    window.addEventListener('keydown', k)
-    document.body.style.overflow = 'hidden'
-    return () => { window.removeEventListener('keydown', k); document.body.style.overflow = '' }
-  }, [menu])
+    const esc = e => e.key === 'Escape' && setMenu(false)
+    window.addEventListener('keydown', esc)
+    return () => window.removeEventListener('keydown', esc)
+  }, [])
 
   return (
     <div className="app">
       {ajuda && <AjudaModal onClose={fechar} />}
-      <div className={`scrim${menu ? ' show' : ''}`} onClick={() => setMenu(false)} aria-hidden="true" />
-      <aside className={`side${menu ? ' open' : ''}`} id="menu-lateral">
-        <div className="side-head">
-          <Logo />
-          <button className="side-close" onClick={() => setMenu(false)} aria-label="Fechar menu"><X size={18} /></button>
-        </div>
+      {menu && <div className="scrim" onClick={() => setMenu(false)} />}
+      <aside className={`side ${menu ? 'open' : ''}`}>
+        <Logo />
         <div>
           <div className="eyebrow">Espaço de análise</div>
           <nav className="nav">
@@ -75,13 +58,16 @@ export default function Layout() {
       </aside>
       <div className="main">
         <header className="top">
-          <button className="menu-btn" onClick={() => setMenu(true)} aria-label="Abrir menu" aria-controls="menu-lateral" aria-expanded={menu}><Menu size={18} /></button>
-          <div className="crumb"><Layers size={18} /> Auditoria cidadã / {names[parts[0] || '']}</div>
+          <div className="crumb">
+            <button className="icon-btn menu-btn" onClick={() => setMenu(true)} aria-label="Abrir menu"><Menu size={20} /></button>
+            <Layers size={18} className="hide-sm" />
+            <span><span className="hide-sm">Auditoria cidadã / </span>{names[parts[0] || '']}</span>
+          </div>
           <div className="chips">
-            <button className="help-btn" onClick={() => setAjuda(true)} aria-label="Como funciona"><CircleHelp size={16} /> <span>Como funciona</span></button>
-            <span className="demo">Dados simulados • Protótipo acadêmico</span>
-            <button className="theme-btn" onClick={alternarTema} aria-label={tema === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'} title={tema === 'dark' ? 'Tema claro' : 'Tema escuro'}>
-              {tema === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            <span className="demo">Dados simulados<span className="hide-sm"> • Protótipo acadêmico</span></span>
+            <button className="help-btn" onClick={() => setAjuda(true)} aria-label="Como funciona"><CircleHelp size={16} /><span className="hide-sm">Como funciona</span></button>
+            <button className="help-btn" onClick={alternar} aria-label={tema === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'} title={tema === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+              {tema === 'dark' ? <Sun size={16} /> : <Moon size={16} />}<span className="hide-sm">{tema === 'dark' ? 'Claro' : 'Escuro'}</span>
             </button>
           </div>
         </header>

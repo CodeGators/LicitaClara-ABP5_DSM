@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Calendar, Files, Wallet, TriangleAlert, ScanSearch } from 'lucide-react'
 import { Head, Score, Aviso, Tip } from '../components/ui.jsx'
-import { processos, distribuicao, evolucao, brl } from '../data.js'
+import { itens, distribuicao, evolucao, brl } from '../data.js'
 
 const cor = i => (i < 5 ? 'var(--baixa)' : i < 8 ? 'var(--media)' : 'var(--alta)')
 const faixas = ['0–9','10–19','20–29','30–39','40–49','50–59','60–69','70–79','80–89','90–100']
@@ -42,15 +42,15 @@ export default function Painel() {
       <Head kicker="Visão consolidada / Jan–Jun 2026" title="Clareza para priorizar a análise." sub="Acompanhe sinais estatísticos de compras públicas em um único lugar."
         action={<button className="btn ghost"><Calendar size={16} /> Jan–Jun 2026</button>} />
       <div className="grid g4">
-        <Kpi label="Processos no recorte" value="1.248" sub="8 órgãos fictícios · 146 fornecedores" icon={Files} to="/processos?aba=todos" />
+        <Kpi label="Itens no recorte" value="1.248" sub="8 órgãos fictícios · 146 fornecedores" icon={Files} to="/processos?aba=todos" />
         <Kpi label="Valor homologado" value="R$ 86,4 mi" sub="Compras e contratos do semestre" icon={Wallet} to="/fornecedores" />
-        <Kpi label="Alta prioridade" value="96" cls="t-alta" sub="7,7% do recorte · score de 80 a 100" icon={TriangleAlert} to="/processos?aba=alta" tip="Processos com score de 80 a 100, que merecem revisão primeiro." />
-        <Kpi label="Em revisão humana" value="24" sub="Dos 96 processos de alta prioridade" icon={ScanSearch} to="/processos?aba=sinalizados" />
+        <Kpi label="Alta prioridade" value="96" cls="t-alta" sub="7,7% dos itens · score de 80 a 100" icon={TriangleAlert} to="/processos?aba=alta" tip="Processos com score de 80 a 100, que merecem revisão primeiro." />
+        <Kpi label="Em revisão humana" value="24" sub="Dos 96 itens de alta prioridade" icon={ScanSearch} to="/processos?aba=sinalizados" />
       </div>
       <div className="grid g-1-1">
         <div className="card">
           <h2>Distribuição de scores</h2><p className="sub">Score de 0 a 100 · prioridade de análise, não probabilidade de fraude</p>
-          <div className="bars">
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--dg)', height: 150, marginTop: 24, borderBottom: '1px solid var(--divisoria)' }}>
             {distribuicao.map((v, i) => (
               <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                 <small style={{ color: 'var(--secundario)', fontSize: 11 }}>{v}</small>
@@ -58,34 +58,34 @@ export default function Painel() {
               </div>
             ))}
           </div>
-          <div className="bars-lbl">{faixas.map(f => <small key={f} style={{ flex: 1, textAlign: 'center', fontSize: 10, color: 'var(--secundario)' }}>{f}</small>)}</div>
+          <div style={{ display: 'flex', gap: 'var(--dg)', marginTop: 6 }}>{faixas.map(f => <small key={f} style={{ flex: 1, textAlign: 'center', fontSize: 'var(--fs-dl)', color: 'var(--secundario)' }}>{f}</small>)}</div>
           <div className="hint" style={{ justifyContent: 'flex-start', gap: 16, marginTop: 16 }}>
             <span className="t-baixa">● Baixa · 940</span><span className="t-media">● Média · 212</span><span className="t-alta">● Alta · 96</span>
           </div>
         </div>
         <div className="card">
           <div className="mini"><h2>Evolução da alta prioridade</h2><span className="pill baixa">Simulação</span></div>
-          <p className="sub">Quantidade de processos por mês de homologação</p>
+          <p className="sub">Quantidade de itens por mês de homologação</p>
           <div style={{ marginTop: 16 }}><Linha /></div>
-          <p className="hint" style={{ marginTop: 8 }}>96 processos de alta prioridade no semestre · score ≥ 80</p>
+          <p className="hint" style={{ marginTop: 8 }}>96 itens de alta prioridade no semestre · score ≥ 80</p>
         </div>
       </div>
-      <div className="grid g-19-1">
+      <div className="grid stack-md" style={{ gridTemplateColumns: '1.9fr 1fr' }}>
         <div className="card">
           <div className="mini"><h2>Por onde começar</h2><Link to="/processos" className="link-a">Ver todos →</Link></div>
-          <p className="sub">Maiores scores do recorte · ordenados por prioridade</p>
+          <p className="sub">Itens com os maiores scores do recorte · ordenados por prioridade</p>
           <table className="tbl">
-            <thead><tr><th>Processo</th><th>Órgão / Fornecedor</th><th>Homologado</th><th>Score</th></tr></thead>
-            <tbody>{processos.slice(0, 3).map((p, i) => (
+            <thead><tr><th>Itens</th><th>Órgão / Fornecedor</th><th>Homologado</th><th>Score</th></tr></thead>
+            <tbody>{itens.slice(0, 3).map((p, i) => (
               <tr key={p.id} className={i === 0 ? 'sel' : ''}>
-                <td><Link className="link" to={`/processos/${p.id}`}>{p.id}</Link><small>{p.cat}</small></td>
+                <td><Link className="link" to={`/processos/${p.id}`}>{p.nome}</Link><small>{p.cat}</small></td>
                 <td><b>{p.orgao}</b><small>{p.forn}</small></td><td>{brl(p.valor)}</td><td><Score v={p.score} /></td>
               </tr>))}</tbody>
           </table>
         </div>
         <div className="card">
           <h2>Leitura dos modelos</h2><p className="sub">Comparação ilustrativa · não validada</p>
-          <p style={{ margin: '16px 0 12px' }}>Exemplo selecionado: LC-2026-0142</p>
+          <p style={{ margin: '16px 0 12px' }}>Exemplo selecionado: {itens[0].nome}</p>
           {[['Isolation Forest', '92'], ['Autoencoder', '88']].map(([n, v]) => (
             <div key={n} className="mini" style={{ padding: '8px 0' }}><span>{n}</span><span className="t-pet">{v} / 100</span></div>
           ))}

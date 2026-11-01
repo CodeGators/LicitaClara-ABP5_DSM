@@ -2,14 +2,14 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, FileOutput, Building2, Landmark, ScanSearch, ChevronDown } from 'lucide-react'
 import { Head, Score, Prioridade, Revisao, Aviso, Progress, Tip } from '../components/ui.jsx'
-import { fornecedores, participacao, processos, brl } from '../data.js'
+import { fornecedores, participacao, itens, brl } from '../data.js'
 
 export default function Fornecedores() {
   const [q, setQ] = useState('')
   const [sel, setSel] = useState(fornecedores[0].nome)
   const lista = useMemo(() => fornecedores.filter(f => f.nome.toLowerCase().includes(q.toLowerCase())), [q])
   const f = fornecedores.find(x => x.nome === sel)
-  const rel = processos.filter(p => p.forn === sel)
+  const rel = itens.filter(p => p.forn === sel)
   const K = ({ l, v, s, i: I }) => <div className="card kpi"><div className="row"><span>{l}</span><I size={18} color="var(--petroleo)" /></div><strong>{v}</strong><small>{s}</small></div>
   return (
     <>
@@ -18,12 +18,12 @@ export default function Fornecedores() {
       <div className="grid g3">
         <K l="Fornecedores no recorte" v="146" s="Entidades fictícias · base demonstrativa" i={Building2} />
         <K l="Órgãos contratantes" v="8" s="Concentração calculada por órgão" i={Landmark} />
-        <K l="Com processos de alta prioridade" v="38" s="Fornecedores com pelo menos um score ≥ 80" i={ScanSearch} />
+        <K l="Com itens de alta prioridade" v="38" s="Fornecedores com pelo menos um score ≥ 80" i={ScanSearch} />
       </div>
-      <div className="grid g-15-1">
+      <div className="grid stack-md" style={{ gridTemplateColumns: '1.5fr 1fr', alignItems: 'start' }}>
         <div className="card">
-          <h2>Ranking de fornecedores</h2><p className="sub">Ordenação: maior score entre os processos do fornecedor</p>
-          <div className="grid g-12-1">
+          <h2>Ranking de fornecedores</h2><p className="sub">Ordenação: maior score entre os itens do fornecedor</p>
+          <div className="grid stack-sm" style={{ gridTemplateColumns: '1.2fr 1fr', gap: 12, marginTop: 16 }}>
             <div className="field"><label>Fornecedor</label><div className="input"><input placeholder="Buscar por razão social" value={q} onChange={e => setQ(e.target.value)} /><Search size={16} color="var(--secundario)" /></div></div>
             <div className="field"><label>Órgão</label><div className="select"><span>Todos os órgãos</span><ChevronDown size={16} /></div></div>
           </div>
@@ -31,7 +31,7 @@ export default function Fornecedores() {
             <thead><tr><th>Fornecedor</th><th>Contratos</th><th>Homologado</th><th>Maior score</th></tr></thead>
             <tbody>{lista.map(x => (
               <tr key={x.nome} className={`click ${x.nome === sel ? 'sel' : ''}`} onClick={() => setSel(x.nome)}>
-                <td><span className={x.nome === sel ? 'link' : ''}>{x.nome}</span><small>{x.orgaos} órgãos · {x.altos} processos com score ≥ 80</small></td>
+                <td><span className={x.nome === sel ? 'link' : ''}>{x.nome}</span><small>{x.orgaos} órgãos · {x.altos} itens com score ≥ 80</small></td>
                 <td>{x.contratos}</td><td>{x.valor}</td><td><Score v={x.score} /></td></tr>))}</tbody>
           </table>
           <div className="mini" style={{ marginTop: 16 }}><span className="hint">1–{lista.length} de 146 fornecedores fictícios</span><a className="link-a">Próxima página →</a></div>
@@ -59,11 +59,11 @@ export default function Fornecedores() {
         </div>
       </div>
       <div className="card">
-        <div className="mini"><h2>Processos relacionados à {f.nome.split(' ')[0]}</h2><a className="link-a">Ver os {f.contratos} contratos →</a></div>
-        <p className="sub">{rel.length ? 'Exemplos de alta prioridade' : 'Nenhum processo de alta prioridade neste fornecedor'}</p>
+        <div className="mini"><h2>Itens relacionados à {f.nome.split(' ')[0]}</h2><a className="link-a">Ver os {f.contratos} contratos →</a></div>
+        <p className="sub">{rel.length ? 'Exemplos de itens de alta prioridade' : 'Nenhum item de alta prioridade neste fornecedor'}</p>
         {!!rel.length && <table className="tbl">
-          <thead><tr><th>Processo / Categoria</th><th>Homologado</th><th>Score</th><th>Prioridade</th><th>Revisão</th></tr></thead>
-          <tbody>{rel.map(p => <tr key={p.id}><td><Link className="link" to={`/processos/${p.id}`}>{p.id}</Link><small>{p.cat}</small></td><td>{brl(p.valor)}</td><td><Score v={p.score} /></td><td><Prioridade v={p.score} /></td><td><Revisao v={p.rev} /></td></tr>)}</tbody>
+          <thead><tr><th>Item / Categoria</th><th>Homologado</th><th>Score</th><th>Prioridade</th><th>Revisão</th></tr></thead>
+          <tbody>{rel.map(p => <tr key={p.id}><td><Link className="link" to={`/processos/${p.id}`}>{p.nome}</Link><small>{p.cat}</small></td><td>{brl(p.valor)}</td><td><Score v={p.score} /></td><td><Prioridade v={p.score} /></td><td><Revisao v={p.rev} /></td></tr>)}</tbody>
         </table>}
       </div>
       <Aviso />
