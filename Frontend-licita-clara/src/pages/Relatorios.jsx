@@ -9,10 +9,11 @@ const Sec = ({ children }) => <h4 style={{ margin: 0, fontSize: 16, fontWeight: 
 
 export default function Relatorios() {
   const [params] = useSearchParams()
-  const p = itens.find(x => x.id === params.get('item')) || itens[0]
-  const d = derivar(p)
+  const p = params.get('item') ? itens.find(x => x.id === params.get('item')) : itens[0]
+  const d = p ? derivar(p) : null
   const [titulo, setTitulo] = useState('Prioridade de análise')
   const [fmt, setFmt] = useState('PDF')
+  if (!p) return <div className="card" role="alert"><h1>Relatório indisponível</h1><p className="sub">Esta demonstração não gera relatórios dos itens reais. A emissão estará disponível após a integração dos relatórios.</p></div>
   const marca = p.forn.split(' ')[0]
   const rows = [
     ['Preço unitário / mediana', razaoTxt(p.razao), `${brl(d.unitHom)} / ${brl(d.unitMed)}`],

@@ -4,6 +4,8 @@ Implementado em 20/10/2026. API de leitura de dados importados no PostgreSQL, in
 
 Atualização de 03/11/2026: a etapa 02 do plano de conclusão acrescentou `/itens` e `/itens/{item_id}`, com contexto do processo e total do próprio item. As sete rotas originais mantêm seus contratos. Ver [contratos de itens/processos](CONTRATOS_ITENS_PROCESSOS.md) para filtros, navegação e instruções de teste. As evidências da etapa 06 abaixo continuam sendo o registro histórico de 20/10/2026.
 
+A etapa 03 integra essas consultas ao frontend e acrescenta `/fornecedores/opcoes` para o seletor paginado. O nome do fornecedor vem do resultado não cancelado mais recente na base, com desempate pelo ID; a busca é aplicada sobre esse nome selecionado. Essa rota não é ranking nem calcula concentração. Ver [frontend integrado](FRONTEND_CONSULTAS_REAIS.md).
+
 ## Executar
 
 Na raiz do repositório, com `.env` configurado e PostgreSQL migrado em execução:
@@ -31,6 +33,7 @@ Todas usam prefixo `/api/v1`.
 | GET | `/processos/{processo_id}/documentos` | Metadados de anexos da compra e de contratos explicitamente vinculados |
 | GET | `/itens` | Itens paginados da base, cada um com contexto do processo, todos os resultados e total dos resultados não cancelados |
 | GET | `/itens/{item_id}` | Detalhe do item pelo UUID estável, limitado à base selecionada |
+| GET | `/fornecedores/opcoes` | IDs/nomes de fornecedores com resultados não cancelados, busca e paginação na base selecionada |
 
 `/health` e `/ready` continuam disponíveis. Não foram criadas rotas de escrita, coleta ou treinamento.
 

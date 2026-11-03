@@ -8,11 +8,12 @@ const Info = ({ l, v, s }) => <div><small>{l}</small><strong>{v}</strong>{s && <
 
 export default function Detalhe() {
   const { id } = useParams()
-  const p = itens.find(x => x.id === id) || itens[0]
-  const d = derivar(p)
+  const p = itens.find(x => x.id === id)
+  const d = p ? derivar(p) : null
   const [aba, setAba] = useState('sinais')
-  const [status, setStatus] = useState(p.rev)
+  const [status, setStatus] = useState(p?.rev || '')
   const [log, setLog] = useState([])
+  if (!p) return <div className="card" role="alert"><h1>Exemplo não encontrado</h1><Link className="link-a" to="/itens">Consultar dados oficiais</Link></div>
   const marca = p.forn.split(' ')[0]
   const cmp = [['Mediana dos similares', d.unitMed, 'var(--petroleo)'], ['Estimado do item', d.unitEst, 'var(--secundario)'], ['Homologado do item', d.unitHom, 'var(--alta)']]
   const contrib = [

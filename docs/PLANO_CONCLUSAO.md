@@ -22,21 +22,21 @@ Este é o ponto de entrada para continuar o projeto. Ler este arquivo antes de i
 
 ## Estado confirmado em 03/11/2026
 
-- `main` local está em `1d847bd`, após merge autorizado da etapa 01. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O envio ao GitHub continua pendente por permissão de escrita; a última referência remota consultada estava em `e2a5a84`.
+- `main` local está em `e1945f2`, após merges autorizados das etapas 01 e 02. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O envio ao GitHub continua pendente por permissão de escrita; a última referência remota consultada estava em `e2a5a84`.
 - A organização local difere do GitHub: frontend em `Frontend-licita-clara/` e protótipos em `docs/prototipo/`.
 - No início da revisão, backend, coletor, ML, shared, infraestrutura, docs e CI estavam sem rastreamento no Git. A etapa 01 consolidou esses arquivos e a reorganização em branch própria e já foi integrada à `main` local. As branches de entrega foram preservadas.
 - Backup anterior à atualização: `../abp-backup-antes-atualizacao-20261103-092407/`. Contém arquivos locais, diff e estado do Git; não é backup completo do banco/datasets ignorados.
 - PostgreSQL local saudável, com duas bases validadas de setembro/2026. Cada versão tem 7 processos, 10 itens e 130 referências; não somar versões como cobertura adicional.
 - Banco possui 34 tabelas de aplicação e quatro migrações documentadas. Ter tabela não significa ter serviço implementado.
 - Tabelas de modelos, execuções de análise, scores, avaliações, revisões e relatórios estavam vazias. Participações e contratos também sem registros no piloto.
-- API possui nove rotas de consulta, além de health/readiness: a etapa 02 acrescenta lista e detalhe global de itens com contexto do processo. Análise permanece `nao_publicada`, score e prioridade nulos.
-- Frontend React/Vite atualizado compila, mas as telas usam `src/data.js`, valores fixos e dados simulados. Não há integração HTTP com o backend.
-- Lista visual trabalha com itens; as novas consultas `/itens` e `/itens/{item_id}` alinham esse contrato. A integração visual usará essas rotas na etapa 03, preservando processo e resultados de cada fornecedor.
-- Filtros de data, valor e modalidade e controles de paginação ainda possuem elementos apenas visuais. Revisão usa estado React e não persiste. Exportar PDF/CSV chama `window.print()`.
+- API possui dez rotas de consulta, além de health/readiness: inclui lista/detalhe global de itens e `/fornecedores/opcoes` para o seletor. Análise permanece `nao_publicada`, score e prioridade nulos.
+- Frontend real integrado: entrada `/itens`, detalhe de item/processo, documentos, filtros e paginação HTTP. A base é fixada na URL. Essas telas não consomem os registros de `src/data.js`.
+- Demonstrações preservadas em `/demonstracao/painel`, `/demonstracao/itens`, `/fornecedores` e `/relatorios`, com aviso explícito de dados fictícios. IDs reais não são substituídos por exemplos.
+- Revisão persistente e exportações reais seguem pendentes; controles antigos continuam somente nas demonstrações. A consulta real mostra indisponibilidade dessas funções e análise não publicada.
 - Isolation Forest tem ensaios separados do fluxo operacional, com artefatos reproduzíveis; não há inferência publicada no PostgreSQL. Autoencoder não implementado.
 - Ensaio corretivo: 140 referências de treino e 35 de avaliação; replicação histórica: 177/107. Estabilidade aprovada nesses ensaios não comprova utilidade de auditoria.
 - Há divergências documentais de especificação e limitações temporais registradas. O dossiê independente tem 18 casos, todos com parecer `pendente` na conferência atual.
-- Validação mais recente (etapa 02): **113 testes Python aprovados, sem skips**, lint e formatação aprovados (94 arquivos). HTTP real conferiu dez itens do piloto; OpenAPI anterior preservado. Build Vite foi aprovado na etapa 01; não houve mudança frontend nesta etapa. Isso não testa o fluxo completo ainda inexistente.
+- Validação mais recente (etapa 03): **115 testes Python**, **6 testes de cliente**, **13 testes browser com fixtures** e **1 teste browser com API/PostgreSQL reais**, todos aprovados sem skips. Lint/formatação e instalação/build frontend aprovados. Capturas desktop/mobile inspecionadas; isso não comprova fidelidade ao Figma nem o fluxo completo das etapas futuras.
 - Ainda não há implantação remota confirmada.
 
 ## Figma e referências
@@ -54,15 +54,16 @@ Documentos de apoio:
 - [Checklist técnico anterior](TODO_IMPLEMENTACAO_BACKEND_E_DADOS.md): preserva histórico, mas tem instruções antigas; este plano organiza a conclusão atual.
 - [Contrato implementado da API](API_CONSULTAS.md): prevalece sobre exemplos antigos propostos no contexto.
 - [Contratos de itens/processos](CONTRATOS_ITENS_PROCESSOS.md): decisão da etapa 02, navegação, valores e testes manuais.
+- [Frontend integrado](FRONTEND_CONSULTAS_REAIS.md): execução com proxy Vite, caminhos reais/demonstrativos e testes no navegador.
 - [Banco](BANCO_DE_DADOS.md) e [importação](PREPARACAO_E_IMPORTACAO.md).
 - [Revisão do núcleo](validacao_nucleo/REVISAO_E_CONFIRMACAO.md), [achados](validacao_nucleo/ACHADOS_DOCUMENTAIS.md) e [guia independente](validacao_nucleo/GUIA_REVISAO_INDEPENDENTE.md).
 - [Backend](../backend/README.md), [ML](../ml/README.md), [coletor](../collector/README.md) e [infraestrutura](../infra/README.md).
 
 ## Etapa atual e próximo passo
 
-**Etapa atual:** 02 — contratos e consultas de itens concluídos e validados localmente, branch `feat/02-contratos-itens-processos`; pronta para revisão.
+**Etapa atual:** 03 — consultas reais integradas e verificadas, branch `feat/03-frontend-consultas-reais`; pronta para revisão.
 
-**Próxima etapa:** 03 — integrar consultas reais ao frontend, após integração autorizada da etapa 02. Não houve merge desta etapa na `main` nem novo envio ao GitHub; a permissão remota não impede desenvolvimento local.
+**Próxima etapa:** 04 — base operacional e atributos analíticos, após integração autorizada da etapa 03. Não houve merge desta etapa na `main` nem envio ao GitHub; a permissão remota não impede desenvolvimento local.
 
 **Pendências externas:** acesso ao Figma; pareceres humanos independentes; definição/provisionamento da hospedagem. Não impedem iniciar consolidação, contratos e consultas reais.
 
@@ -71,7 +72,7 @@ Documentos de apoio:
 - [x] 00 — Criar contexto, checklist, branches e critérios de teste.
 - [x] 01 — Consolidar código local, organização e documentação no Git.
 - [x] 02 — Definir contratos de itens, processos, resultados e análises.
-- [ ] 03 — Integrar consultas reais ao frontend.
+- [x] 03 — Integrar consultas reais ao frontend.
 - [ ] 04 — Preparar base analítica operacional e atributos reproduzíveis.
 - [ ] 05 — Concluir avaliação do Isolation Forest e revisão independente.
 - [ ] 06 — Implementar e comparar Autoencoder.
@@ -83,7 +84,7 @@ Documentos de apoio:
 - [ ] 12 — Hospedar e automatizar operação com recuperação.
 - [ ] 13 — Validar fluxo completo e preparar entrega acadêmica reproduzível.
 
-As branches 00, 01 e 02 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
+As branches 00–03 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
 
 ## Entregas, branches e aceitação
 
@@ -124,10 +125,10 @@ Branch: `feat/02-contratos-itens-processos`. Dependência: 01.
 
 Branch: `feat/03-frontend-consultas-reais`. Dependência: 02.
 
-- [ ] Criar cliente HTTP configurável e integrar lista, detalhe, itens, documentos e dados de apoio.
-- [ ] Implementar filtros, busca, ordenação e paginação reais, mantendo a base selecionada.
-- [ ] Tratar carregamento, erro, vazio, ID inexistente, nulos e análise indisponível.
-- [ ] Remover mocks das telas migradas; se mantiver demonstração, identificá-la explicitamente.
+- [x] Criar cliente HTTP configurável e integrar lista, detalhe, itens, documentos e dados de apoio.
+- [x] Implementar filtros, busca, ordenação e paginação reais, mantendo a base selecionada.
+- [x] Tratar carregamento, erro, vazio, ID inexistente, nulos e análise indisponível.
+- [x] Remover mocks das telas migradas; demonstrações preservadas em rotas separadas e identificadas explicitamente.
 
 **Como testar:** navegar com API e PostgreSQL locais; comparar resultados ao Swagger; trocar páginas/filtros; abrir ID inexistente; simular API indisponível. **Conclusão:** consultas funcionam sem `data.js` e sem scores fabricados. Painel analítico e ranking final continuam em 08.
 
@@ -325,3 +326,15 @@ Checklist atualizado:
 - Não verificado/fora do escopo: integração de telas, browser, publicação de scores e CI remoto. Nenhuma migração ou importação executada, nenhum score fabricado. Servidor temporário de validação encerrado.
 - Resultado: **OK para contratos e consultas de itens**. As telas ainda consomem mocks até a etapa 03.
 - Próxima etapa: integrar esta entrega localmente mediante autorização e iniciar 03 em branch própria. O acesso de escrita remoto continua pendente.
+
+### Entrega 03 — 03/11/2026
+
+- Branch: `feat/03-frontend-consultas-reais`; título do commit: `feat: integrar consultas reais de itens processos e documentos no frontend`.
+- Mudança: entrada real `/itens`, cliente HTTP configurável, seleção da base na URL, filtros, paginação, detalhe do item e processo, documentos oficiais, nulos e estados de falha/ausência. Acrescentada consulta paginada de opções de fornecedores; demonstrações permanecem identificadas e separadas.
+- Pré-requisitos/passos: [execução e testes do frontend](FRONTEND_CONSULTAS_REAIS.md). API local na porta 8000 e Vite normalmente em 5173; configuração por proxy, sem credenciais de banco no navegador.
+- Verificações: 115 testes Python, 6 testes do cliente, 13 cenários browser controlados e 1 fluxo browser real aprovados, sem skips. `npm ci`, build Vite, lint e formatação aprovados. Navegação real via proxy Vite/API/PostgreSQL com Chrome headless; screenshots desktop/mobile inspecionadas.
+- Cobertura de teste: filtros enviados como strings, base fixa mesmo após mudança da mais recente, cancelamento de respostas antigas, IDs inválidos/inexistentes, vazio/sem base, indisponibilidade/retentativa, documentos, nulos e separação das demonstrações.
+- Evidência: [resultado da etapa 03](diagnostico/conclusao_etapa03.json).
+- Não verificado/fora do escopo: CI remoto, produção, fidelidade ao Figma, demais navegadores, revisão completa de acessibilidade e funcionalidades analíticas/de escrita futuras. Não houve migração/importação ou publicação de score. Dados/configuração preservados; servidores temporários de validação encerrados.
+- Resultado: **OK para consultas reais no frontend**. A validação acadêmica do modelo e os indicadores finais ainda dependem das etapas 04–08.
+- Próxima etapa: 04, após integração local autorizada desta entrega.

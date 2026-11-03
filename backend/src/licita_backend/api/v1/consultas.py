@@ -15,6 +15,7 @@ from licita_backend.schemas.consultas import (
     ItemFilters,
     ItemResponse,
     ItemSummary,
+    Lookup,
     LookupFilters,
     Modality,
     Organization,
@@ -54,6 +55,12 @@ def modalities(session: DB, params: Annotated[LookupFilters, Query()]):
 def processes(session: DB, params: Annotated[ProcessFilters, Query()]):
     repository = QueryRepository(session)
     return repository.processes(repository.base(params.base_id)["id"], params)
+
+
+@router.get("/fornecedores/opcoes", response_model=Page[Lookup])
+def supplier_options(session: DB, params: Annotated[LookupFilters, Query()]):
+    repository = QueryRepository(session)
+    return repository.lookups(repository.base(params.base_id)["id"], params, "fornecedores")
 
 
 @router.get("/processos/{processo_id}", response_model=ProcessResponse)

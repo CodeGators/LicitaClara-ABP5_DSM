@@ -755,3 +755,37 @@ def test_item_openapi_identifies_granularity_and_rejects_fake_path_id(settings):
         assert operation["responses"][code]["content"]["application/json"]["schema"] == {
             "$ref": "#/components/schemas/ErrorResponse"
         }
+
+
+@pytest.mark.integration
+def test_supplier_options_use_active_results_historical_names_and_selected_base(query_client):
+    client, data = query_client
+    current = client.get("/api/v1/fornecedores/opcoes").json()
+    assert current["meta"]["total"] == 2
+    assert [s["nome"] for s in current["dados"]] == ["Fornecedor Alfa", "Fornecedor Beta"]
+    old = client.get("/api/v1/fornecedores/opcoes", params={"base_id": data["old"]}).json()
+    assert old["dados"] == [{"id": data["supplier"], "nome": "Nome antigo"}]
+    found = client.get("/api/v1/fornecedores/opcoes?busca=alfa").json()
+    assert found["dados"] == [{"id": data["supplier"], "nome": "Fornecedor Alfa"}]
+    assert client.get("/api/v1/fornecedores/opcoes?busca=%25").json()["dados"] == []
+    first = client.get("/api/v1/fornecedores/opcoes?tamanho_pagina=1").json()
+    second = client.get("/api/v1/fornecedores/opcoes?tamanho_pagina=1&pagina=2").json()
+    assert first["meta"]["total_paginas"] == 2
+    assert first["dados"][0]["id"] != second["dados"][0]["id"]
+
+
+@pytest.mark.integration
+def test_supplier_options_exclude_suppliers_with_only_cancelled_results(query_client):
+    client, data = query_client
+    with data["engine"].begin() as cn:
+        cn.execute(
+            p.resultados_itens.update()
+            .where(
+                p.resultados_itens.c.base_id == data["base"],
+                p.resultados_itens.c.fornecedor_id == data["other_supplier"],
+            )
+            .values(cancelado=True)
+        )
+    assert client.get("/api/v1/fornecedores/opcoes").json()["dados"] == [
+        {"id": data["supplier"], "nome": "Fornecedor Alfa"}
+    ]

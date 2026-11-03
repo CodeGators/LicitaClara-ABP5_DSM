@@ -3,7 +3,7 @@
 Documento de referência para implementar os componentes que não pertencem ao frontend.
 Atualizado em 20/10/2026. Descreve decisões de arquitetura e propostas; não comprova que os serviços estejam implementados ou provisionados.
 
-Revisão de comandos e contratos em 03/11/2026. Para o acompanhamento atual, usar o [plano de conclusão](PLANO_CONCLUSAO.md); as notas datadas preservam a evolução técnica. O frontend atualizado em 01/11/2026 continua com dados simulados.
+Revisão de comandos e contratos em 03/11/2026. Para o acompanhamento atual, usar o [plano de conclusão](PLANO_CONCLUSAO.md); as notas datadas preservam a evolução técnica. A [etapa 03 de conclusão](FRONTEND_CONSULTAS_REAIS.md) integra consultas de itens, processo e documentos; painel e demais funcionalidades demonstrativas continuam explicitamente separadas.
 
 ## 1. Objetivo e escopo
 

@@ -61,8 +61,8 @@ export default function Processos() {
             <th><Tip text="Nota de 0 a 100 de prioridade de análise. Não é probabilidade de fraude.">Score ↓</Tip></th><th>Prioridade</th><th>Revisão</th></tr></thead>
           <tbody>
             {lista.map(p => (
-              <tr key={p.id} className={`click ${p.id === atual?.id ? 'sel' : ''}`} onClick={() => setSel(p.id)} onDoubleClick={() => nav(`/processos/${p.id}`)}>
-                <td><Link className="link" to={`/processos/${p.id}`}>{p.nome}</Link><small>{p.cat}</small></td>
+              <tr key={p.id} className={`click ${p.id === atual?.id ? 'sel' : ''}`} onClick={() => setSel(p.id)} onDoubleClick={() => nav(`/demonstracao/itens/${p.id}`)}>
+                <td><Link className="link" to={`/demonstracao/itens/${p.id}`}>{p.nome}</Link><small>{p.cat}</small></td>
                 <td>{p.forn}</td><td>{brl(p.valor)}</td><td>{razaoTxt(p.razao)}</td><td>{p.part}</td>
                 <td><Score v={p.score} /></td><td><Prioridade v={p.score} /></td><td><Revisao v={p.rev} /></td>
               </tr>
@@ -79,7 +79,7 @@ export default function Processos() {
         <div className="sel-bar">
           <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}><ScanSearch color="var(--petroleo)" />
             <div><b>Selecionado: {atual.nome} · {atual.forn}</b><p className="sub" style={{ marginTop: 2 }}>Score {atual.score} · preço {Math.round((atual.razao - 1) * 100)}% acima da mediana · {atual.part} participantes · revisão pendente</p></div></div>
-          <Link to={`/processos/${atual.id}`} className="btn primary"><ArrowRight size={16} /> Ver detalhe do item</Link>
+          <Link to={`/demonstracao/itens/${atual.id}`} className="btn primary"><ArrowRight size={16} /> Ver detalhe do item</Link>
         </div>
       )}
       <Aviso />

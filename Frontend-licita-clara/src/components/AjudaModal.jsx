@@ -43,8 +43,8 @@ export default function AjudaModal({ onClose }) {
 
         {aba === 'como' && (
           <div className="modal-body">
-            <p>O Licita Clara ajuda a decidir <b>por onde começar a análise</b> de compras públicas. Cada item comprado recebe um score de 0 a 100: quanto maior, mais urgente a revisão.</p>
-            <div className="aviso" style={{ margin: '16px 0' }}><ShieldAlert size={18} /><div>O score não é prova de irregularidade. Os dados são simulados e toda conclusão exige revisão humana.</div></div>
+            <p>Em “Consultar itens”, explore os dados oficiais importados, filtre a lista e abra resultados e documentos. As análises ainda não foram publicadas. As outras telas identificadas como demonstração usam dados fictícios.</p>
+            <div className="aviso" style={{ margin: '16px 0' }}><ShieldAlert size={18} /><div>Anomalia não comprova irregularidade. Os scores das telas demonstrativas são simulados; não representam os itens reais.</div></div>
             <div className="wizard">
               <div className="dots" aria-label={`Passo ${i + 1} de ${passos.length}`}>
                 {passos.map((x, k) => <button key={x.t} className={k === i ? 'on' : k < i ? 'done' : ''} onClick={() => setI(k)} aria-label={`Ir ao passo ${k + 1}`} />)}

@@ -167,3 +167,7 @@ venv/
 /ml/models/
 /ml/artifacts/
 .ipynb_checkpoints/
+
+# Browser test output
+/Frontend-licita-clara/test-results/
+/Frontend-licita-clara/playwright-report/

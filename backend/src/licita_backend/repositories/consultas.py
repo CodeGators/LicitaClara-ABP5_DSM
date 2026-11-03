@@ -288,6 +288,18 @@ class QueryRepository:
             )
             query = sa.select(selected)
             name = selected.c.nome
+        elif kind == "fornecedores":
+            selected = (
+                sa.select(RI.c.fornecedor_id.label("id"), RI.c.fornecedor_nome.label("nome"))
+                .where(RI.c.base_id == base_id, RI.c.cancelado.is_(False))
+                .distinct(RI.c.fornecedor_id)
+                .order_by(
+                    RI.c.fornecedor_id, RI.c.data_resultado.desc().nulls_last(), RI.c.id.desc()
+                )
+                .subquery()
+            )
+            query = sa.select(selected)
+            name = selected.c.nome
         else:
             query = sa.select(p.modalidades).where(
                 sa.select(1)

@@ -21,4 +21,7 @@ jobs:
           cache: npm
           cache-dependency-path: Frontend-licita-clara/package-lock.json
       - run: npm ci --no-audit --no-fund
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
       - run: npm run build

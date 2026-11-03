@@ -63,7 +63,7 @@ export default function Fornecedores() {
         <p className="sub">{rel.length ? 'Exemplos de itens de alta prioridade' : 'Nenhum item de alta prioridade neste fornecedor'}</p>
         {!!rel.length && <table className="tbl">
           <thead><tr><th>Item / Categoria</th><th>Homologado</th><th>Score</th><th>Prioridade</th><th>Revisão</th></tr></thead>
-          <tbody>{rel.map(p => <tr key={p.id}><td><Link className="link" to={`/processos/${p.id}`}>{p.nome}</Link><small>{p.cat}</small></td><td>{brl(p.valor)}</td><td><Score v={p.score} /></td><td><Prioridade v={p.score} /></td><td><Revisao v={p.rev} /></td></tr>)}</tbody>
+          <tbody>{rel.map(p => <tr key={p.id}><td><Link className="link" to={`/demonstracao/itens/${p.id}`}>{p.nome}</Link><small>{p.cat}</small></td><td>{brl(p.valor)}</td><td><Score v={p.score} /></td><td><Prioridade v={p.score} /></td><td><Revisao v={p.rev} /></td></tr>)}</tbody>
         </table>}
       </div>
       <Aviso />

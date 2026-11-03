@@ -49,11 +49,11 @@ export const desenvolvedores = [
   { nome: 'Rodrigo Augusto', papel: 'Desenvolvedor', user: 'rodrigoaslima' },
 ]
 export const passos = [
-  { t: 'Comece pelo Painel geral', to: '/', d: 'Veja a visão do semestre: quantos itens há no recorte, a distribuição dos scores e a evolução da alta prioridade. Clique nos cards do topo para abrir a lista correspondente.' },
-  { t: 'Abra a lista de Processos sinalizados', to: '/processos', d: 'Filtre por item ou fornecedor, use a busca e as abas (Alta, Média, Todos) para achar os itens de maior score. Clique em uma linha para selecioná-la e em "Ver detalhe do item" para abrir.' },
-  { t: 'Leia o Detalhe do item', to: '/processos/LC-2026-0142', d: 'Compare o preço com itens similares e veja quais atributos mais pesaram para o sinal. Passe o mouse nos ícones ? para ver o significado dos termos.' },
+  { t: 'Comece pelo Painel geral', to: '/demonstracao/painel', d: 'Veja a visão do semestre: quantos itens há no recorte, a distribuição dos scores e a evolução da alta prioridade. Clique nos cards do topo para abrir a lista correspondente.' },
+  { t: 'Explore os itens demonstrativos', to: '/demonstracao/itens', d: 'Filtre por item ou fornecedor, use a busca e as abas (Alta, Média, Todos) para achar os itens de maior score. Clique em uma linha para selecioná-la e em "Ver detalhe do item" para abrir.' },
+  { t: 'Leia o Detalhe do item', to: '/demonstracao/itens/LC-2026-0142', d: 'Compare o preço com itens similares e veja quais atributos mais pesaram para o sinal. Passe o mouse nos ícones ? para ver o significado dos termos.' },
   { t: 'Explore os Fornecedores', to: '/fornecedores', d: 'Veja contratos, valores e a participação de cada fornecedor no gasto dos órgãos. Clique em um fornecedor da lista para ver os detalhes dele.' },
-  { t: 'Registre a revisão humana', to: '/processos/LC-2026-0142', d: 'No fim do detalhe, escolha o status da análise e clique em "Registrar revisão". O histórico fica na aba "Registro da revisão".' },
+  { t: 'Conheça a revisão demonstrativa', to: '/demonstracao/itens/LC-2026-0142', d: 'No fim do detalhe, escolha o status da análise e clique em "Registrar revisão". O histórico fica na aba "Registro da revisão".' },
   { t: 'Prepare o Relatório', to: '/relatorios', d: 'Escolha título, formato e seções, confira a prévia ao lado e exporte. O relatório já inclui síntese, sinais e limitações, e o aviso de revisão humana sempre permanece.' },
 ]
 export const glossario = [

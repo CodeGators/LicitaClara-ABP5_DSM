@@ -4,6 +4,8 @@ Ambiente local, endpoints operacionais, consultas versionadas de processos/itens
 
 A etapa 02 do plano de conclusão acrescenta `GET /api/v1/itens` e `GET /api/v1/itens/{item_id}`. Esses endpoints retornam uma linha por item, contexto do processo e resultados por fornecedor, sem modificar as sete rotas originais. Ver [contratos de itens/processos e testes manuais](../docs/CONTRATOS_ITENS_PROCESSOS.md).
 
+A etapa 03 integra a interface e acrescenta `GET /api/v1/fornecedores/opcoes` para o filtro, com busca/paginação e nome histórico da base. [Configuração e testes do frontend integrado](../docs/FRONTEND_CONSULTAS_REAIS.md).
+
 ## Instalar e executar
 
 Usar Python 3.12.x, Docker Compose e uv 0.13.2. Executar a partir da raiz do repositório:
@@ -75,7 +77,7 @@ O dicionário implementado, chaves, snapshots e permissões estão em [BANCO_DE_
 
 ## Consultas de dados reais
 
-As sete rotas de leitura da [etapa 06](../docs/API_CONSULTAS.md) estão disponíveis no Swagger. Aceitam seleção de base por UUID; sem seleção explícita, usam a base validada mais recente. O frontend ainda não está integrado. Para preservar as dependências do ensaio ML no mesmo ambiente, executar:
+As consultas de leitura estão disponíveis no [Swagger e contrato da API](../docs/API_CONSULTAS.md). Aceitam seleção de base por UUID; sem seleção explícita, usam a base validada mais recente. A interface real fixa essa base na URL para as requisições relacionadas. Para preservar as dependências do ensaio ML no mesmo ambiente, executar:
 
 ```bash
 uv run --locked --all-packages --extra validation uvicorn licita_backend.main:create_app --factory --reload --host 127.0.0.1 --port 8000 --no-access-log

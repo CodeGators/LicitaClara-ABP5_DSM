@@ -42,10 +42,10 @@ export default function Painel() {
       <Head kicker="Visão consolidada / Jan–Jun 2026" title="Clareza para priorizar a análise." sub="Acompanhe sinais estatísticos de compras públicas em um único lugar."
         action={<button className="btn ghost"><Calendar size={16} /> Jan–Jun 2026</button>} />
       <div className="grid g4">
-        <Kpi label="Itens no recorte" value="1.248" sub="8 órgãos fictícios · 146 fornecedores" icon={Files} to="/processos?aba=todos" />
+        <Kpi label="Itens no recorte" value="1.248" sub="8 órgãos fictícios · 146 fornecedores" icon={Files} to="/demonstracao/itens?aba=todos" />
         <Kpi label="Valor homologado" value="R$ 86,4 mi" sub="Compras e contratos do semestre" icon={Wallet} to="/fornecedores" />
-        <Kpi label="Alta prioridade" value="96" cls="t-alta" sub="7,7% dos itens · score de 80 a 100" icon={TriangleAlert} to="/processos?aba=alta" tip="Processos com score de 80 a 100, que merecem revisão primeiro." />
-        <Kpi label="Em revisão humana" value="24" sub="Dos 96 itens de alta prioridade" icon={ScanSearch} to="/processos?aba=sinalizados" />
+        <Kpi label="Alta prioridade" value="96" cls="t-alta" sub="7,7% dos itens · score de 80 a 100" icon={TriangleAlert} to="/demonstracao/itens?aba=alta" tip="Processos com score de 80 a 100, que merecem revisão primeiro." />
+        <Kpi label="Em revisão humana" value="24" sub="Dos 96 itens de alta prioridade" icon={ScanSearch} to="/demonstracao/itens?aba=sinalizados" />
       </div>
       <div className="grid g-1-1">
         <div className="card">
@@ -72,13 +72,13 @@ export default function Painel() {
       </div>
       <div className="grid stack-md" style={{ gridTemplateColumns: '1.9fr 1fr' }}>
         <div className="card">
-          <div className="mini"><h2>Por onde começar</h2><Link to="/processos" className="link-a">Ver todos →</Link></div>
+          <div className="mini"><h2>Por onde começar</h2><Link to="/demonstracao/itens" className="link-a">Ver todos →</Link></div>
           <p className="sub">Itens com os maiores scores do recorte · ordenados por prioridade</p>
           <table className="tbl">
             <thead><tr><th>Itens</th><th>Órgão / Fornecedor</th><th>Homologado</th><th>Score</th></tr></thead>
             <tbody>{itens.slice(0, 3).map((p, i) => (
               <tr key={p.id} className={i === 0 ? 'sel' : ''}>
-                <td><Link className="link" to={`/processos/${p.id}`}>{p.nome}</Link><small>{p.cat}</small></td>
+                <td><Link className="link" to={`/demonstracao/itens/${p.id}`}>{p.nome}</Link><small>{p.cat}</small></td>
                 <td><b>{p.orgao}</b><small>{p.forn}</small></td><td>{brl(p.valor)}</td><td><Score v={p.score} /></td>
               </tr>))}</tbody>
           </table>

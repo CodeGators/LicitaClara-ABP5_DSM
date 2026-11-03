@@ -8,13 +8,13 @@ Anomalia estatística não comprova irregularidade.
 
 O [plano de conclusão](docs/PLANO_CONCLUSAO.md) é o ponto de entrada para continuar o trabalho: contém etapas, branches, critérios de aceitação e instruções de teste. A [consolidação do repositório](docs/CONSOLIDACAO_REPOSITORIO.md) registra o inventário e a verificação da instalação em uma cópia limpa.
 
-O frontend foi atualizado com a entrega de 01/11/2026 e continua demonstrativo. A API já consulta dados reais importados; interface e API ainda não estão integradas. Autenticação, revisão persistente, relatórios reais, Autoencoder e publicação de análises permanecem pendentes. Clonar o repositório não importa automaticamente os dados locais nem instala modelos treinados.
+O frontend incorporou a entrega de 01/11/2026 e a [integração de consultas reais](docs/FRONTEND_CONSULTAS_REAIS.md): entrada em `/itens`, detalhe do item/processo e documentos. Painel e fornecedores analíticos continuam demonstrativos e identificados. Autenticação, revisão persistente, relatórios reais, Autoencoder e publicação de análises permanecem pendentes. Clonar o repositório não importa automaticamente os dados locais nem instala modelos treinados.
 
 ## Estrutura
 
 | Diretório | Conteúdo |
 | --- | --- |
-| `Frontend-licita-clara/` | Interface React com Vite e dados simulados |
+| `Frontend-licita-clara/` | React/Vite, consultas reais e demonstrações identificadas |
 | `backend/` | FastAPI, consultas versionadas de processos/itens/documentos e endpoints operacionais |
 | `collector/` | Coleta versionada do Compras.gov.br e diagnósticos |
 | `shared/` | Contrato e adaptadores de armazenamento compartilhados |
@@ -61,6 +61,7 @@ A suíte completa usa PostgreSQL e `TEST_DATABASE_URL` em banco descartável ter
 - [Preparação e importação de dados](docs/PREPARACAO_E_IMPORTACAO.md).
 - [Índice da documentação](docs/README.md).
 - [Contratos de itens/processos e testes no Swagger](docs/CONTRATOS_ITENS_PROCESSOS.md).
+- [Frontend integrado: configuração e teste no navegador](docs/FRONTEND_CONSULTAS_REAIS.md).
 - [Comandos de coleta e armazenamento](collector/README.md).
 - [Checklist de implementação](docs/TODO_IMPLEMENTACAO_BACKEND_E_DADOS.md).
 - [Contexto da arquitetura](docs/CONTEXTO_BACKEND_E_DADOS.md).
