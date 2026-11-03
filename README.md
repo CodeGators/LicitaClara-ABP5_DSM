@@ -8,7 +8,7 @@ Anomalia estatística não comprova irregularidade.
 
 O [plano de conclusão](docs/PLANO_CONCLUSAO.md) é o ponto de entrada para continuar o trabalho: contém etapas, branches, critérios de aceitação e instruções de teste. A [consolidação do repositório](docs/CONSOLIDACAO_REPOSITORIO.md) registra o inventário e a verificação da instalação em uma cópia limpa.
 
-O frontend incorporou a entrega de 01/11/2026 e a [integração de consultas reais](docs/FRONTEND_CONSULTAS_REAIS.md): entrada em `/itens`, detalhe do item/processo e documentos. Painel e fornecedores analíticos continuam demonstrativos e identificados. Autenticação, revisão persistente, relatórios reais, Autoencoder e publicação de análises permanecem pendentes. Clonar o repositório não importa automaticamente os dados locais nem instala modelos treinados.
+O frontend incorporou a entrega de 01/11/2026 e a [integração de consultas reais](docs/FRONTEND_CONSULTAS_REAIS.md): entrada em `/itens`, detalhe do item/processo e documentos. Painel e fornecedores analíticos continuam demonstrativos e identificados. Autenticação, revisão persistente, relatórios reais e publicação de análises permanecem pendentes. O Autoencoder está implementado para comparação experimental; a utilidade dos modelos continua inconclusiva. Clonar o repositório não importa automaticamente os dados locais nem instala modelos treinados.
 
 ## Estrutura
 
@@ -97,3 +97,5 @@ Projeto desenvolvido por estudantes como parte da disciplina de Aprendizagem Bas
 Consulte a [base e atributos analíticos](docs/ATRIBUTOS_ANALITICOS.md) para aquisição histórica registrada, preparo versionado, critérios e testes da etapa 04.
 
 A [avaliação versionada do Isolation Forest](docs/AVALIACAO_ISOLATION_FOREST.md) consome o dataset analítico, compara regras e prepara revisão documental; utilidade ainda inconclusiva.
+
+A [comparação Autoencoder/Isolation Forest](docs/COMPARACAO_AUTOENCODER.md) usa a mesma coorte e regras de referência, sem vencedor validado ou publicação de scores.

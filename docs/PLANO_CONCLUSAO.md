@@ -22,7 +22,7 @@ Este é o ponto de entrada para continuar o projeto. Ler este arquivo antes de i
 
 ## Estado confirmado em 03/11/2026
 
-- `main` local está em `3d7923c`, após merges autorizados das etapas 01–04. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O envio ao GitHub continua pendente por permissão de escrita; a última referência remota consultada estava em `e2a5a84`.
+- `main` local está em `0fafea5`, após merges autorizados das entregas técnicas 01–05. A revisão humana de 05 permanece pendente. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O envio ao GitHub continua pendente por permissão de escrita; a última referência remota consultada estava em `e2a5a84`.
 - A organização local difere do GitHub: frontend em `Frontend-licita-clara/` e protótipos em `docs/prototipo/`.
 - No início da revisão, backend, coletor, ML, shared, infraestrutura, docs e CI estavam sem rastreamento no Git. A etapa 01 consolidou esses arquivos e a reorganização em branch própria e já foi integrada à `main` local. As branches de entrega foram preservadas.
 - Backup anterior à atualização: `../abp-backup-antes-atualizacao-20261103-092407/`. Contém arquivos locais, diff e estado do Git; não é backup completo do banco/datasets ignorados.
@@ -33,9 +33,10 @@ Este é o ponto de entrada para continuar o projeto. Ler este arquivo antes de i
 - Frontend real integrado: entrada `/itens`, detalhe de item/processo, documentos, filtros e paginação HTTP. A base é fixada na URL. Essas telas não consomem os registros de `src/data.js`.
 - Demonstrações preservadas em `/demonstracao/painel`, `/demonstracao/itens`, `/fornecedores` e `/relatorios`, com aviso explícito de dados fictícios. IDs reais não são substituídos por exemplos.
 - Revisão persistente e exportações reais seguem pendentes; controles antigos continuam somente nas demonstrações. A consulta real mostra indisponibilidade dessas funções e análise não publicada.
-- Isolation Forest tem ensaios separados do fluxo operacional, com artefatos reproduzíveis; não há inferência publicada no PostgreSQL. Autoencoder não implementado.
+- Isolation Forest e Autoencoder têm avaliação técnica versionada sobre o dataset analítico, com artefatos reproduzíveis e ensaios antigos preservados. Não há inferência/modelo/score publicados no PostgreSQL nem utilidade aprovada; revisão humana permanece pendente.
 - Ensaio corretivo: 140 referências de treino e 35 de avaliação; replicação histórica: 177/107. Estabilidade aprovada nesses ensaios não comprova utilidade de auditoria.
 - Há divergências documentais de especificação e limitações temporais registradas. O dossiê independente tem 18 casos, todos com parecer `pendente` na conferência atual.
+- Etapa 06: 143 testes Python aprovados sem skips, lint/formatação aprovados (109 arquivos), cinco treinos AE com recarga exata e comparação real/reutilização verificadas. Utilidade inconclusiva; nenhum vencedor validado.
 - Etapa 05: 135 testes Python aprovados sem skips, lint/formatação aprovados (105 arquivos), grade real de 40 ajustes e recarga exata. Revisão humana pendente; utilidade inconclusiva.
 - Etapa 04: 131 testes Python aprovados sem skips, lint/formatação aprovados; aquisição e preparo reais reexecutados com preservação das bases. [Política e comandos](ATRIBUTOS_ANALITICOS.md).
 - Validação frontend (etapa 03): **115 testes Python**, **6 testes de cliente**, **13 testes browser com fixtures** e **1 teste browser com API/PostgreSQL reais**, todos aprovados sem skips. Lint/formatação e instalação/build frontend aprovados. Capturas desktop/mobile inspecionadas; isso não comprova fidelidade ao Figma nem o fluxo completo das etapas futuras.
@@ -59,14 +60,15 @@ Documentos de apoio:
 - [Frontend integrado](FRONTEND_CONSULTAS_REAIS.md): execução com proxy Vite, caminhos reais/demonstrativos e testes no navegador.
 - [Banco](BANCO_DE_DADOS.md) e [importação](PREPARACAO_E_IMPORTACAO.md).
 - [Revisão do núcleo](validacao_nucleo/REVISAO_E_CONFIRMACAO.md), [achados](validacao_nucleo/ACHADOS_DOCUMENTAIS.md) e [guia independente](validacao_nucleo/GUIA_REVISAO_INDEPENDENTE.md).
+- [Comparação com Autoencoder](COMPARACAO_AUTOENCODER.md): arquitetura, resultados, sensibilidade e decisão da etapa 06.
 - [Avaliação versionada do IF](AVALIACAO_ISOLATION_FOREST.md): comandos, revisão e alternativa sem revisor independente.
 - [Backend](../backend/README.md), [ML](../ml/README.md), [coletor](../collector/README.md) e [infraestrutura](../infra/README.md).
 
 ## Etapa atual e próximo passo
 
-**Etapa atual:** 05 — avaliação técnica versionada do Isolation Forest, branch `feat/05-validacao-isolation-forest`. Revisão documental humana permanece pendente; utilidade inconclusiva.
+**Etapa atual:** 06 — Autoencoder e comparação técnica concluídos na branch `feat/06-autoencoder-comparacao`, pronta para teste do usuário. Utilidade continua inconclusiva por ausência de revisão humana independente.
 
-**Próxima etapa:** após testar e integrar a entrega técnica de 05, comparar Autoencoder (06), mantendo explícita a ausência de validação independente. A entrega 05 não foi integrada à `main` nem enviada ao GitHub.
+**Próxima etapa:** após testar e integrar 06 mediante autorização, implementar inferência/publicação (07), incluindo registro correto da base de treino e decisão explícita de eventual demonstração experimental. Nenhum algoritmo foi aprovado como prioridade validada de auditoria. A etapa 06 não foi integrada à `main` nem enviada ao GitHub.
 
 **Pendências externas:** acesso ao Figma; pareceres humanos independentes (usuário não tem revisor confirmado; alternativa técnica documentada sem aprovar utilidade); definição/provisionamento da hospedagem. Não impedem iniciar consolidação, contratos e consultas reais.
 
@@ -78,7 +80,7 @@ Documentos de apoio:
 - [x] 03 — Integrar consultas reais ao frontend.
 - [x] 04 — Preparar base analítica operacional e atributos reproduzíveis.
 - [ ] 05 — Concluir avaliação do Isolation Forest e revisão independente.
-- [ ] 06 — Implementar e comparar Autoencoder.
+- [x] 06 — Implementar e comparar Autoencoder (comparação técnica; utilidade inconclusiva).
 - [ ] 07 — Implementar inferência, explicações e publicação versionada.
 - [ ] 08 — Completar painel, ranking e fornecedores integrados.
 - [ ] 09 — Implementar autenticação, autorização e revisão persistente.
@@ -87,7 +89,7 @@ Documentos de apoio:
 - [ ] 12 — Hospedar e automatizar operação com recuperação.
 - [ ] 13 — Validar fluxo completo e preparar entrega acadêmica reproduzível.
 
-As branches 00–05 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
+As branches 00–06 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
 
 ## Entregas, branches e aceitação
 
@@ -163,10 +165,10 @@ Branch: `feat/05-validacao-isolation-forest`. Dependência: 04.
 
 Branch: `feat/06-autoencoder-comparacao`. Dependências: 04 e protocolo de 05.
 
-- [ ] Definir framework e arquitetura compatíveis com os recursos e a suficiência dos dados.
-- [ ] Ajustar pré-processamento no treino; registrar sementes, parâmetros e dependências.
-- [ ] Avaliar ambos os modelos sob o mesmo protocolo e comparar também com regras simples.
-- [ ] Documentar decisão do ranking, limites e explicabilidade, sem média arbitrária dos scores.
+- [x] Definir framework e arquitetura compatíveis com os recursos e a suficiência dos dados.
+- [x] Ajustar pré-processamento no treino; registrar sementes, parâmetros e dependências.
+- [x] Avaliar ambos os modelos sob o mesmo protocolo e comparar também com regras simples.
+- [x] Documentar decisão do ranking, limites e explicabilidade, sem média arbitrária dos scores.
 
 **Como testar:** recarregar artefatos e reproduzir inferência; comparar cortes, estabilidade, recursos e revisão qualitativa. **Conclusão:** comparação dos dois algoritmos reproduzível e sustentada pela base disponível.
 
@@ -174,10 +176,10 @@ Branch: `feat/06-autoencoder-comparacao`. Dependências: 04 e protocolo de 05.
 
 Branch: `feat/07-inferencia-publicacao`. Dependências: 04, 05; decisão final de comparação em 06.
 
-- [ ] Criar comandos de inferência em lote e registrar base, modelo, código, parâmetros e cobertura.
+- [ ] Criar comandos de inferência em lote e registrar base, modelo, código, parâmetros e cobertura; registrar a base real de treino antes de associar modelos em SQL.
 - [ ] Persistir scores brutos, política de normalização/prioridade e comparações rastreáveis.
 - [ ] Calcular explicações adequadas ou retornar indisponibilidade; retirar pesos fictícios.
-- [ ] Publicar lote completo atomicamente, preservando execuções anteriores e impedindo mistura de bases.
+- [ ] Publicar lote completo atomicamente, preservando execuções anteriores e impedindo mistura de bases. A comparação 06 não aprovou utilidade; distinguir demonstração experimental de prioridade validada, sem publicar automaticamente pela estabilidade.
 - [ ] Expor análises/execuções e definir eventual agregação item → processo.
 
 **Como testar:** recarga, repetição, falha no meio do lote e troca de versão ativa; reconciliar score exibido com artefato e origem. **Conclusão:** análise consultável e rastreável; publicação respeita a decisão de validação.
@@ -365,3 +367,14 @@ Checklist atualizado:
 - O usuário informou não ter revisor confirmado. Alternativa: concluir comparação técnica com utilidade inconclusiva e identificar qualquer conferência própria como interna. O assistente não substitui pareceres humanos.
 - Registro SQL do modelo/base de treino fica para integração da inferência: o manifesto identifica o histórico real; não foi usado o UUID do piloto como base de treino. Não houve migração ou publicação.
 - Próximo passo: teste do usuário, integração autorizada da entrega técnica e etapa 06 em branch própria, com limitações preservadas.
+
+### Entrega 06 — 03/11/2026
+
+- Branch: `feat/06-autoencoder-comparacao`; título do commit: `feat: comparar autoencoder e isolation forest em base versionada`.
+- Integração anterior: etapa técnica 05 em `0fafea5` na `main` local por autorização; branch preservada, sem push. O merge não encerrou a pendência de revisão humana.
+- Mudança: Autoencoder neural 2→1→2 com sete parâmetros, mediana/padronização apenas no treino, cinco sementes, recarga exata e erro de reconstrução decomposto. Comandos `comparar-modelos` e `revisao-comparacao`, com hashes e universos explícitos.
+- Como testar: [comparação acadêmica](COMPARACAO_AUTOENCODER.md), na raiz com objetos/configuração existentes. Repetir retorna `reutilizada: true`. As planilhas conjuntas mantêm 20 casos do treino e 14 da avaliação sem método/score.
+- Resultado real: 140/35 referências, top-k 4; AE convergente e estável, 75% de sobreposição com IF multivariado. Sensibilidade ao preço 3× foi limitada (score aumentou em 5/12, deslocamento mediano negativo); não esconder esse resultado nem concluir superioridade.
+- Verificações: **143 testes Python aprovados sem falhas/skips**, incluindo 8 focados no AE/comparação; lint/formatação aprovados (109 arquivos). Evidência: [resultado agregado da etapa 06](diagnostico/conclusao_etapa06.json). Preservados bases de consulta, modelos/ensaios anteriores, planilhas e configuração. Não houve migração, registro SQL de modelo, inferência operacional ou publicação de score. Frontend inalterado; browser/build e CI remoto não repetidos.
+- **Resultado: OK para comparação técnica/experimental.** Sem vencedor validado, sem combinação arbitrária de scores e utilidade inconclusiva. Revisão humana de 05 e confirmação temporal continuam pendentes; esta conclusão não aprova ranking como prioridade de auditoria.
+- Próximo passo: teste do usuário, integração autorizada e 07 em branch própria, mantendo as limitações e o vínculo correto de treino/modelo.

@@ -24,3 +24,5 @@ O PDF da proposta acadêmica é preservado como documento original; fonte efetiv
 Consulte a [base e atributos analíticos](ATRIBUTOS_ANALITICOS.md) para aquisição histórica registrada, preparo versionado, critérios e testes da etapa 04.
 
 A [avaliação versionada do Isolation Forest](AVALIACAO_ISOLATION_FOREST.md) consome o dataset analítico, compara regras e prepara revisão documental; utilidade ainda inconclusiva.
+
+A [comparação Autoencoder/Isolation Forest](COMPARACAO_AUTOENCODER.md) usa a mesma coorte e regras de referência, sem vencedor validado ou publicação de scores.

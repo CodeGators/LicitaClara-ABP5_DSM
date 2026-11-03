@@ -1,0 +1,535 @@
+{
+  "etapa": 6,
+  "branch": "feat/06-autoencoder-comparacao",
+  "data": "2026-11-03",
+  "main_local_apos_merge_autorizado_etapa05": "0fafea5",
+  "branch_etapa05_preservada": true,
+  "primeira_execucao": {
+    "status": "inconclusivo_por_revisao",
+    "reutilizada": false,
+    "fingerprint": "0bb0b4ed27d165a1df33b28f3360778fb64f2722a579896851be07bc49aad98f",
+    "manifesto": "validacao/comparacao/0bb0b4ed27d165a1df33b28f3360778fb64f2722a579896851be07bc49aad98f/manifesto.json",
+    "sha256_manifesto": "50ed84657addcc7f05ef104ae0df373eca0ef0ea689c6a7672820fb32bfe7e64",
+    "grupos": 1,
+    "revisoes": {
+      "c2c61e3e795a3068": {
+        "treino_pendente": 20,
+        "avaliacao_pendente": 14
+      }
+    },
+    "medicoes": {
+      "duracao_segundos": 0.702,
+      "rss_pico_mib": 210.46
+    }
+  },
+  "reexecucao": {
+    "status": "inconclusivo_por_revisao",
+    "reutilizada": true,
+    "fingerprint": "0bb0b4ed27d165a1df33b28f3360778fb64f2722a579896851be07bc49aad98f",
+    "manifesto": "validacao/comparacao/0bb0b4ed27d165a1df33b28f3360778fb64f2722a579896851be07bc49aad98f/manifesto.json",
+    "sha256_manifesto": "50ed84657addcc7f05ef104ae0df373eca0ef0ea689c6a7672820fb32bfe7e64",
+    "grupos": 1
+  },
+  "testes": {
+    "python_aprovados": 143,
+    "falhas": 0,
+    "skips": 0,
+    "autoencoder_focados_aprovados": 8,
+    "ruff_check": "aprovado",
+    "ruff_format": "109 arquivos formatados",
+    "frontend": "inalterado; browser/build não repetidos"
+  },
+  "grupos": [
+    {
+      "autoencoder": {
+        "ajustes": [
+          {
+            "artefato_chave": "validacao/comparacao/0bb0b4ed27d165a1df33b28f3360778fb64f2722a579896851be07bc49aad98f/c2c61e3e795a3068/modelos/autoencoder-11.joblib",
+            "avisos_convergencia": [],
+            "convergiu": true,
+            "iteracoes": 60,
+            "perda_treino": 0.14134294648641704,
+            "replay_exato": true,
+            "seed": 11,
+            "sha256": "fa3124ed5db31de7228e5525eb666a6d717aa55eb2433e3e93583f331e82d463"
+          },
+          {
+            "artefato_chave": "validacao/comparacao/0bb0b4ed27d165a1df33b28f3360778fb64f2722a579896851be07bc49aad98f/c2c61e3e795a3068/modelos/autoencoder-23.joblib",
+            "avisos_convergencia": [],
+            "convergiu": true,
+            "iteracoes": 54,
+            "perda_treino": 0.1413534080580988,
+            "replay_exato": true,
+            "seed": 23,
+            "sha256": "8bb806660210b79bf3640819ca6571d049de3067f138376554574190142b0432"
+          },
+          {
+            "artefato_chave": "validacao/comparacao/0bb0b4ed27d165a1df33b28f3360778fb64f2722a579896851be07bc49aad98f/c2c61e3e795a3068/modelos/autoencoder-42.joblib",
+            "avisos_convergencia": [],
+            "convergiu": true,
+            "iteracoes": 65,
+            "perda_treino": 0.1413662190641246,
+            "replay_exato": true,
+            "seed": 42,
+            "sha256": "a7373d18e608e9cf36ac9495076640c17380c5f62db4fc00f3feb0b1fce80955"
+          },
+          {
+            "artefato_chave": "validacao/comparacao/0bb0b4ed27d165a1df33b28f3360778fb64f2722a579896851be07bc49aad98f/c2c61e3e795a3068/modelos/autoencoder-71.joblib",
+            "avisos_convergencia": [],
+            "convergiu": true,
+            "iteracoes": 92,
+            "perda_treino": 0.14141731530610308,
+            "replay_exato": true,
+            "seed": 71,
+            "sha256": "b459381948bc7df4e0b9118e571335a342b8083d24ce8f460d6dae57e95d248f"
+          },
+          {
+            "artefato_chave": "validacao/comparacao/0bb0b4ed27d165a1df33b28f3360778fb64f2722a579896851be07bc49aad98f/c2c61e3e795a3068/modelos/autoencoder-101.joblib",
+            "avisos_convergencia": [],
+            "convergiu": true,
+            "iteracoes": 107,
+            "perda_treino": 0.14143408901888743,
+            "replay_exato": true,
+            "seed": 101,
+            "sha256": "68a45f0f6598480697adec2b5f6938de30f29cb555f9e777812d843c00a94316"
+          }
+        ],
+        "ancora_seed": 42,
+        "aprovado_tecnicamente": true,
+        "arquitetura": [
+          2,
+          1,
+          2
+        ],
+        "convergencia_todas_seeds": true,
+        "duracao_segundos": 0.358,
+        "estabilidade_aprovada": true,
+        "features": [
+          "log_preco_mediana",
+          "log_quantidade"
+        ],
+        "jaccard_topk_mediana": 1.0,
+        "mediana_treino": "0.87000000",
+        "parametros": {
+          "activation": "tanh",
+          "alpha": 0.001,
+          "early_stopping": false,
+          "hidden_layer_sizes": [
+            1
+          ],
+          "max_fun": 50000,
+          "max_iter": 2000,
+          "solver": "lbfgs",
+          "tol": 1e-05
+        },
+        "parametros_treinaveis": 7,
+        "preprocessamento": {
+          "escala_treino": [
+            1.0065932783556781,
+            1.9234729700338011
+          ],
+          "media_treino": [
+            0.35489553023290826,
+            5.485299656449084
+          ],
+          "n_treino": 140
+        },
+        "score_max": 1.5481594908163379,
+        "score_min": 5.650210348000357e-05,
+        "seeds": [
+          11,
+          23,
+          42,
+          71,
+          101
+        ],
+        "sensibilidade_sintetica": [
+          {
+            "deslocamento_mediano": -0.1496810449914322,
+            "fracao_score_aumentou": 0.4166666666666667,
+            "multiplicador": 3,
+            "n": 12
+          },
+          {
+            "deslocamento_mediano": 0.36989006511153744,
+            "fracao_score_aumentou": 0.8333333333333334,
+            "multiplicador": 10,
+            "n": 12
+          }
+        ],
+        "spearman_mediana_seeds": 1.0,
+        "top_ids": [
+          "b033776b69e5dcfd76c0",
+          "01c07d7c28af0c52089c",
+          "227a527f2809824295e7",
+          "925a22a4beac251304a0"
+        ],
+        "utilidade_comprovada": false
+      },
+      "avaliacao": 35,
+      "comparacoes": [
+        {
+          "a": "ae",
+          "b": "if_preco_quantidade",
+          "jaccard_topk": 0.6,
+          "sobreposicao_topk": 0.75,
+          "spearman": 0.4099187447464276
+        },
+        {
+          "a": "ae",
+          "b": "if_preco",
+          "jaccard_topk": 0.0,
+          "sobreposicao_topk": 0.0,
+          "spearman": 0.08280715537749121
+        },
+        {
+          "a": "ae",
+          "b": "unilateral",
+          "jaccard_topk": 0.0,
+          "sobreposicao_topk": 0.0,
+          "spearman": 0.24701795502438062
+        },
+        {
+          "a": "ae",
+          "b": "bilateral",
+          "jaccard_topk": 0.0,
+          "sobreposicao_topk": 0.0,
+          "spearman": -0.14091251525254436
+        },
+        {
+          "a": "if_preco_quantidade",
+          "b": "if_preco",
+          "jaccard_topk": 0.14285714285714285,
+          "sobreposicao_topk": 0.25,
+          "spearman": 0.5903167720639458
+        },
+        {
+          "a": "if_preco_quantidade",
+          "b": "unilateral",
+          "jaccard_topk": 0.14285714285714285,
+          "sobreposicao_topk": 0.25,
+          "spearman": 0.17038624852249887
+        },
+        {
+          "a": "if_preco_quantidade",
+          "b": "bilateral",
+          "jaccard_topk": 0.14285714285714285,
+          "sobreposicao_topk": 0.25,
+          "spearman": 0.4586674301248158
+        },
+        {
+          "a": "if_preco",
+          "b": "unilateral",
+          "jaccard_topk": 0.14285714285714285,
+          "sobreposicao_topk": 0.25,
+          "spearman": 0.2716535433070866
+        },
+        {
+          "a": "if_preco",
+          "b": "bilateral",
+          "jaccard_topk": 0.14285714285714285,
+          "sobreposicao_topk": 0.25,
+          "spearman": 0.501968503937008
+        },
+        {
+          "a": "unilateral",
+          "b": "bilateral",
+          "jaccard_topk": 1.0,
+          "sobreposicao_topk": 1.0,
+          "spearman": -0.15523059617547807
+        }
+      ],
+      "grupo": "c2c61e3e795a3068",
+      "isolation_forest": {
+        "preco": {
+          "ancora_predefinida": {
+            "contamination": "auto",
+            "max_samples": 140,
+            "n_estimators": 200,
+            "seed": 42
+          },
+          "artefato_chave": "validacao/isolation-forest/96ad887aa58bf0869845f784f2540f91512e41dbffd0cd29977832c253a0bcdc/c2c61e3e795a3068/modelos/preco.joblib",
+          "configuracoes": [
+            {
+              "jaccard_topk_mediana": 0.6,
+              "max_samples": 64,
+              "n_estimators": 200,
+              "seeds": [
+                11,
+                23,
+                42,
+                71,
+                101
+              ],
+              "spearman_mediana": 0.9502249718785152
+            },
+            {
+              "jaccard_topk_mediana": 1.0,
+              "max_samples": 140,
+              "n_estimators": 200,
+              "seeds": [
+                11,
+                23,
+                42,
+                71,
+                101
+              ],
+              "spearman_mediana": 0.8882170978627673
+            },
+            {
+              "jaccard_topk_mediana": 0.6,
+              "max_samples": 64,
+              "n_estimators": 500,
+              "seeds": [
+                11,
+                23,
+                42,
+                71,
+                101
+              ],
+              "spearman_mediana": 0.9558492688413949
+            },
+            {
+              "jaccard_topk_mediana": 1.0,
+              "max_samples": 140,
+              "n_estimators": 500,
+              "seeds": [
+                11,
+                23,
+                42,
+                71,
+                101
+              ],
+              "spearman_mediana": 0.8737345331833521
+            }
+          ],
+          "estabilidade_aprovada": true,
+          "features": [
+            "log_preco_mediana"
+          ],
+          "possivel_redundancia_sobrepreco": false,
+          "replay_exato": true,
+          "score_max": 0.5649811141494381,
+          "score_min": 0.4206828638555363,
+          "sensibilidade_sintetica": [
+            {
+              "deslocamento_mediano": 0.07577986237759718,
+              "fracao_score_aumentou": 1.0,
+              "multiplicador": 3,
+              "n": 12
+            },
+            {
+              "deslocamento_mediano": 0.0809339900107594,
+              "fracao_score_aumentou": 1.0,
+              "multiplicador": 10,
+              "n": 12
+            }
+          ],
+          "sha256_artefato": "9a1be4d818c3fae399c3171b101b39ebda261163ffd9163ccdcaacff1817b7dd",
+          "sobreposicao_topk_baseline_bilateral": 0.25,
+          "sobreposicao_topk_baseline_sobrepreco": 0.25,
+          "spearman_baseline_bilateral": 0.501968503937008,
+          "spearman_baseline_sobrepreco": 0.2716535433070866,
+          "spearman_mediana_entre_configuracoes": 0.9541619797525309,
+          "top_ids": [
+            "7dc3ea0853045e35d52d",
+            "39a33c57cc71462b7fb4",
+            "2a5ddab14ca3a36815e0",
+            "0a7efb8673b25e82ca19"
+          ],
+          "utilidade_real_comprovada": false
+        },
+        "preco_quantidade": {
+          "ancora_predefinida": {
+            "contamination": "auto",
+            "max_samples": 140,
+            "n_estimators": 200,
+            "seed": 42
+          },
+          "artefato_chave": "validacao/isolation-forest/96ad887aa58bf0869845f784f2540f91512e41dbffd0cd29977832c253a0bcdc/c2c61e3e795a3068/modelos/preco_quantidade.joblib",
+          "configuracoes": [
+            {
+              "jaccard_topk_mediana": 1.0,
+              "max_samples": 64,
+              "n_estimators": 200,
+              "seeds": [
+                11,
+                23,
+                42,
+                71,
+                101
+              ],
+              "spearman_mediana": 0.9712804707200897
+            },
+            {
+              "jaccard_topk_mediana": 1.0,
+              "max_samples": 140,
+              "n_estimators": 200,
+              "seeds": [
+                11,
+                23,
+                42,
+                71,
+                101
+              ],
+              "spearman_mediana": 0.9826281871672737
+            },
+            {
+              "jaccard_topk_mediana": 1.0,
+              "max_samples": 64,
+              "n_estimators": 500,
+              "seeds": [
+                11,
+                23,
+                42,
+                71,
+                101
+              ],
+              "spearman_mediana": 0.9824880919024936
+            },
+            {
+              "jaccard_topk_mediana": 1.0,
+              "max_samples": 140,
+              "n_estimators": 500,
+              "seeds": [
+                11,
+                23,
+                42,
+                71,
+                101
+              ],
+              "spearman_mediana": 0.9929952367609975
+            }
+          ],
+          "estabilidade_aprovada": true,
+          "features": [
+            "log_preco_mediana",
+            "log_quantidade"
+          ],
+          "possivel_redundancia_sobrepreco": false,
+          "replay_exato": true,
+          "score_max": 0.6016386068804841,
+          "score_min": 0.4005336870608651,
+          "sensibilidade_sintetica": [
+            {
+              "deslocamento_mediano": 0.06690007507718504,
+              "fracao_score_aumentou": 1.0,
+              "multiplicador": 3,
+              "n": 12
+            },
+            {
+              "deslocamento_mediano": 0.09662603315954499,
+              "fracao_score_aumentou": 1.0,
+              "multiplicador": 10,
+              "n": 12
+            }
+          ],
+          "sha256_artefato": "515b94f7bf1a3fb990c8a1c98c622740af794d34a7ea8dec5692a762c18b33cc",
+          "sobreposicao_topk_baseline_bilateral": 0.25,
+          "sobreposicao_topk_baseline_sobrepreco": 0.25,
+          "spearman_baseline_bilateral": 0.4586674301248158,
+          "spearman_baseline_sobrepreco": 0.17038624852249887,
+          "spearman_mediana_entre_configuracoes": 0.969599327542729,
+          "top_ids": [
+            "2a5ddab14ca3a36815e0",
+            "01c07d7c28af0c52089c",
+            "227a527f2809824295e7",
+            "b033776b69e5dcfd76c0"
+          ],
+          "utilidade_real_comprovada": false
+        }
+      },
+      "top_k": 4,
+      "treino": 140
+    }
+  ],
+  "revisao_planilhas": {
+    "manifesto_sha256": "50ed84657addcc7f05ef104ae0df373eca0ef0ea689c6a7672820fb32bfe7e64",
+    "grupo": "c2c61e3e795a3068",
+    "planilhas_sha256": {
+      "treino": "b61e3eb82aa0f010e8f1ea9ef08084d0cc9001b6c0e83b88dfe849b07e3bf501",
+      "avaliacao": "ad9706c35bb47ce2c5d0643d140c6a4b9d3405f63317caf5adc52cb52045f8b5"
+    },
+    "treino": {
+      "status": "revisao_pendente",
+      "total": 20,
+      "contagens": {
+        "pendente": 20
+      },
+      "por_ranking": {},
+      "utilidade_aprovada_automaticamente": false,
+      "limite": "Pareceres declarados por terceiros; independência não verificável pelo software."
+    },
+    "avaliacao": {
+      "status": "revisao_pendente",
+      "total": 14,
+      "contagens": {
+        "pendente": 14
+      },
+      "por_ranking": {
+        "ae": {
+          "denominador_original": 4,
+          "pareceres": {
+            "pendente": 4
+          }
+        },
+        "bilateral": {
+          "denominador_original": 4,
+          "pareceres": {
+            "pendente": 4
+          }
+        },
+        "if_preco": {
+          "denominador_original": 4,
+          "pareceres": {
+            "pendente": 4
+          }
+        },
+        "if_preco_quantidade": {
+          "denominador_original": 4,
+          "pareceres": {
+            "pendente": 4
+          }
+        },
+        "unilateral": {
+          "denominador_original": 4,
+          "pareceres": {
+            "pendente": 4
+          }
+        }
+      },
+      "utilidade_aprovada_automaticamente": false,
+      "limite": "Pareceres declarados por terceiros; independência não verificável pelo software."
+    },
+    "publicacao_autorizada": false,
+    "vencedor_validado": null
+  },
+  "preservacao": {
+    "tabelas_contagens_preservadas": 34,
+    "arquivos_ensaios_preservados": 233,
+    "objetos_if_e_copias_anteriores_preservados": 18,
+    "env_preservado": true,
+    "bases_consulta": 2,
+    "modelos_sql": 0,
+    "scores_sql": 0
+  },
+  "decisao": "inconclusivo_por_revisao",
+  "vencedor_validado": null,
+  "scores_combinados": false,
+  "publicacao_autorizada": false,
+  "utilidade_comprovada": false,
+  "confirmacao_temporal": "inconclusiva_sem_lote_posterior_elegivel",
+  "snapshot_ponto_no_tempo": false,
+  "politica_ranking": "sem escolha de vencedor validado; somente comparação experimental",
+  "limitacao_sensibilidade": "Triplicar preço aumentou score em 5/12 cópias; deslocamento mediano negativo. AE não é monotônico em sobrepreço.",
+  "nao_executado": [
+    "parecer humano independente",
+    "registro SQL base de treino/modelo",
+    "inferência operacional",
+    "publicação de score",
+    "migrações",
+    "CI remoto",
+    "push",
+    "merge da etapa06 na main"
+  ]
+}

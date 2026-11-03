@@ -39,6 +39,15 @@ def main():
     review.add_argument("--grupo", required=True)
     review.add_argument("--treino", required=True)
     review.add_argument("--avaliacao", required=True)
+    comparison = commands.add_parser("comparar-modelos")
+    comparison.add_argument("--manifesto-if", required=True)
+    comparison.add_argument("--sha256-if", required=True)
+    comparison_review = commands.add_parser("revisao-comparacao")
+    comparison_review.add_argument("--manifesto", required=True)
+    comparison_review.add_argument("--sha256", required=True)
+    comparison_review.add_argument("--grupo", required=True)
+    comparison_review.add_argument("--treino", required=True)
+    comparison_review.add_argument("--avaliacao", required=True)
     args = parser.parse_args()
     engine = None
     try:
@@ -51,7 +60,18 @@ def main():
             pool_pre_ping=True,
             connect_args={"connect_timeout": 10},
         )
-        if args.command in {"validar-if", "revisao-if"}:
+        if args.command in {"comparar-modelos", "revisao-comparacao"}:
+            from licita_ml.comparison.pipeline import ComparisonPipeline
+
+            comparison_pipeline = ComparisonPipeline(storage(settings))
+            if args.command == "comparar-modelos":
+                with Repository(engine).locked():
+                    result = comparison_pipeline.run(args.manifesto_if, args.sha256_if)
+            else:
+                result = comparison_pipeline.review(
+                    args.manifesto, args.sha256, args.grupo, args.treino, args.avaliacao
+                )
+        elif args.command in {"validar-if", "revisao-if"}:
             from licita_ml.validation.pipeline import ValidationPipeline
 
             validation_pipeline = ValidationPipeline(storage(settings))
