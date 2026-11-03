@@ -60,6 +60,7 @@ A suíte completa usa PostgreSQL e `TEST_DATABASE_URL` em banco descartável ter
 
 - [Preparação e importação de dados](docs/PREPARACAO_E_IMPORTACAO.md).
 - [Índice da documentação](docs/README.md).
+- [Contratos de itens/processos e testes no Swagger](docs/CONTRATOS_ITENS_PROCESSOS.md).
 - [Comandos de coleta e armazenamento](collector/README.md).
 - [Checklist de implementação](docs/TODO_IMPLEMENTACAO_BACKEND_E_DADOS.md).
 - [Contexto da arquitetura](docs/CONTEXTO_BACKEND_E_DADOS.md).

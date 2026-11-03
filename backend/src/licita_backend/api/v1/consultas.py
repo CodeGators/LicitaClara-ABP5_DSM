@@ -12,6 +12,9 @@ from licita_backend.schemas.consultas import (
     Document,
     ErrorResponse,
     Item,
+    ItemFilters,
+    ItemResponse,
+    ItemSummary,
     LookupFilters,
     Modality,
     Organization,
@@ -70,3 +73,16 @@ def items(processo_id: UUID, session: DB, params: Annotated[Pagination, Query()]
 def documents(processo_id: UUID, session: DB, params: Annotated[Pagination, Query()]):
     repository = QueryRepository(session)
     return repository.documents(repository.base(params.base_id)["id"], processo_id, params)
+
+
+@router.get("/itens", response_model=Page[ItemSummary])
+def catalog_items(session: DB, params: Annotated[ItemFilters, Query()]):
+    repository = QueryRepository(session)
+    return repository.catalog_items(repository.base(params.base_id)["id"], params)
+
+
+@router.get("/itens/{item_id}", response_model=ItemResponse)
+def item(item_id: UUID, session: DB, params: Annotated[BaseSelection, Query()]):
+    repository = QueryRepository(session)
+    base_id = repository.base(params.base_id)["id"]
+    return {"base_id": base_id, "item": repository.item(base_id, item_id)}

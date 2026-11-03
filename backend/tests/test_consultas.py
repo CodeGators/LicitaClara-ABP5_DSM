@@ -227,6 +227,10 @@ def populated(query_database):
         "supplier": str(supplier),
         "other_supplier": str(other_supplier),
         "modality": str(modality),
+        "item_first": str(item_ids[0]),
+        "item_second": str(item_ids[1]),
+        "item_version_first": str(i1),
+        "item_version_second": str(i2),
     }
 
 
@@ -378,6 +382,7 @@ def test_no_base_is_explicit_and_does_not_look_like_database_outage(query_databa
         assert response.json()["status"] == "sem_base"
         assert response.json()["cobertura"] is None
         assert client.get("/api/v1/processos").status_code == 404
+        assert client.get("/api/v1/itens").status_code == 404
 
 
 @pytest.mark.parametrize(
@@ -462,3 +467,291 @@ def test_unknown_result_amount_does_not_become_a_partial_total(query_client):
     assert process["valor_homologado_itens_recorte"] is None
     assert process["resultados_sem_valor_total_recorte"] == 1
     assert process["valor_homologado_processo"] == "200.00000001"
+
+
+@pytest.mark.integration
+def test_item_contract_keeps_process_context_and_all_results(query_client):
+    client, data = query_client
+    page = client.get("/api/v1/itens?ordenacao=descricao_asc&tamanho_pagina=1").json()
+    assert page["meta"]["total"] == 2
+    assert page["meta"]["total_paginas"] == 2
+    item = page["dados"][0]
+    assert item["id"] == data["item_first"]
+    assert item["item_versao_id"] == data["item_version_first"]
+    assert item["chave_oficial"] == "1"
+    assert item["quantidade"] == "3.00000001"
+    assert item["valor_unitario_estimado"] is None
+    assert item["valor_homologado_item"] == "0.30000001"
+    assert item["resultados_ativos"] == 2
+    assert item["resultados_sem_valor_total"] == 0
+    assert item["ultima_data_resultado"] == "2026-09-12"
+    assert len(item["resultados"]) == 3
+    assert item["resultados"][2]["cancelado"] is True
+    assert item["processo"]["id"] == data["first"]
+    assert item["processo"]["chave_oficial"] == "000001"
+    assert item["processo"]["orgao_nome"] == "Órgão snapshot"
+    assert item["analise"] == {"status": "nao_publicada", "score": None, "prioridade": None}
+    detail = client.get(f"/api/v1/itens/{item['id']}", params={"base_id": data["base"]})
+    assert detail.status_code == 200
+    assert detail.json() == {"base_id": data["base"], "item": item}
+    process = client.get(f"/api/v1/processos/{item['processo']['id']}").json()["processo"]
+    assert process["processo_versao_id"] == item["processo"]["processo_versao_id"]
+    assert process["valor_homologado_processo"] == "200.00000001"
+    assert process["valor_homologado_itens_recorte"] == "0.60000001"
+    legacy = client.get(f"/api/v1/processos/{data['first']}/itens").json()["dados"][0]
+    for field, value in legacy.items():
+        assert item[field] == value
+
+
+@pytest.mark.integration
+def test_item_ids_are_stable_but_snapshots_and_results_are_base_specific(query_client):
+    client, data = query_client
+    current = client.get(f"/api/v1/itens/{data['item_first']}").json()["item"]
+    old_response = client.get(
+        f"/api/v1/itens/{data['item_first']}", params={"base_id": data["old"]}
+    ).json()
+    old = old_response["item"]
+    assert old_response["base_id"] == data["old"]
+    assert old["id"] == current["id"]
+    assert old["item_versao_id"] != current["item_versao_id"]
+    assert old["processo"]["processo_versao_id"] != current["processo"]["processo_versao_id"]
+    assert old["unidade_medida"] == "CX"
+    assert old["valor_homologado_item"] == "500.00000000"
+    assert [r["fornecedor_nome"] for r in old["resultados"]] == ["Nome antigo"]
+    assert client.get("/api/v1/itens", params={"base_id": data["old"]}).json()["meta"]["total"] == 1
+    missing = client.get(f"/api/v1/itens/{data['item_second']}", params={"base_id": data["old"]})
+    assert missing.status_code == 404
+    assert missing.json()["erro"]["codigo"] == "item_nao_encontrado"
+
+
+@pytest.mark.integration
+def test_item_filters_do_not_match_a_supplier_on_another_item_or_result(query_client):
+    client, data = query_client
+    params = {
+        "processo_id": data["first"],
+        "orgao_id": data["org"],
+        "modalidade_id": data["modality"],
+        "fornecedor_id": data["supplier"],
+        "homologacao_inicio": "2026-09-15",
+        "homologacao_fim": "2026-09-15",
+    }
+    assert client.get("/api/v1/itens", params=params).json()["dados"] == []
+    params["fornecedor_id"] = data["other_supplier"]
+    items = client.get("/api/v1/itens", params=params).json()["dados"]
+    assert [i["id"] for i in items] == [data["item_second"]]
+    params["homologacao_inicio"] = params["homologacao_fim"] = "2026-09-20"
+    assert client.get("/api/v1/itens", params=params).json()["dados"] == []
+    for field in ["processo_id", "orgao_id", "modalidade_id", "fornecedor_id"]:
+        assert client.get("/api/v1/itens", params={field: str(uuid4())}).json()["dados"] == []
+    with data["engine"].begin() as cn:
+        # Outro vencedor ativo no mesmo item, com data diferente dos resultados Alfa.
+        add(
+            cn,
+            p.resultados_itens,
+            base_id=data["base"],
+            item_versao_id=data["item_version_first"],
+            fornecedor_id=data["other_supplier"],
+            fornecedor_nome="Outro vencedor",
+            sequencial_resultado=4,
+            chave_origem="resultado-adicional",
+            situacao="Informado",
+            cancelado=False,
+            valor_total_homologado=Decimal("1"),
+            data_resultado=date(2026, 9, 15),
+        )
+    no_match = {
+        "fornecedor_id": data["supplier"],
+        "homologacao_inicio": "2026-09-15",
+        "homologacao_fim": "2026-09-15",
+    }
+    assert client.get("/api/v1/itens", params=no_match).json()["dados"] == []
+    selected = client.get("/api/v1/itens", params={"fornecedor_id": data["supplier"]}).json()
+    assert selected["dados"][0]["valor_homologado_item"] == "1.30000001"
+    assert len(selected["dados"][0]["resultados"]) == 4
+    assert selected["dados"][0]["ultima_data_resultado"] == "2026-09-15"
+
+
+@pytest.mark.integration
+def test_item_search_catalog_filters_and_amount_pagination(query_client):
+    client, data = query_client
+    for search in ["BORRACHA", "100%", "Alfa"]:
+        body = client.get("/api/v1/itens", params={"busca": search}).json()
+        assert [i["id"] for i in body["dados"]] == [data["item_first"]]
+    for search in ["100_", "' OR 1=1 --", "inexistente"]:
+        assert client.get("/api/v1/itens", params={"busca": search}).json()["dados"] == []
+    assert client.get("/api/v1/itens?busca=%20%20").json()["meta"]["total"] == 2
+    params = {"valor_minimo": "0.30000001", "valor_maximo": "0.30000001"}
+    assert client.get("/api/v1/itens", params=params).json()["dados"][0]["id"] == data["item_first"]
+    assert client.get("/api/v1/itens?valor_minimo=200").json()["dados"] == []
+    page1 = client.get("/api/v1/itens?ordenacao=valor_desc&tamanho_pagina=1").json()
+    page2 = client.get("/api/v1/itens?ordenacao=valor_desc&tamanho_pagina=1&pagina=2").json()
+    assert page1["dados"][0]["id"] == data["item_first"]
+    assert page2["dados"][0]["id"] == data["item_second"]
+    beyond = client.get("/api/v1/itens?pagina=99").json()
+    assert beyond["dados"] == [] and beyond["meta"]["total"] == 2
+    with data["engine"].begin() as cn:
+        catalog = add(cn, p.itens_catalogo, catalogo="CATMAT", codigo="000123", descricao="Teste")
+        cn.execute(
+            p.itens_versoes.update()
+            .where(p.itens_versoes.c.id == data["item_version_first"])
+            .values(catalogo_id=catalog)
+        )
+    catalog_params = {"catalogo": "CATMAT", "codigo_catalogo": "000123"}
+    match = client.get("/api/v1/itens", params=catalog_params).json()["dados"]
+    assert len(match) == 1 and match[0]["codigo_catalogo"] == "000123"
+    assert client.get("/api/v1/itens?codigo_catalogo=123").json()["dados"] == []
+    assert client.get("/api/v1/itens?catalogo=CATSER").json()["dados"] == []
+
+
+@pytest.mark.integration
+def test_item_unknown_amount_empty_results_and_known_zero_are_distinct(query_client):
+    client, data = query_client
+    with data["engine"].begin() as cn:
+        cn.execute(
+            p.resultados_itens.update()
+            .where(
+                p.resultados_itens.c.item_versao_id == data["item_version_first"],
+                p.resultados_itens.c.sequencial_resultado == 1,
+            )
+            .values(valor_total_homologado=None)
+        )
+        cn.execute(
+            p.resultados_itens.update()
+            .where(p.resultados_itens.c.item_versao_id == data["item_version_second"])
+            .values(valor_total_homologado=Decimal("0"), data_resultado=None)
+        )
+    item = client.get(f"/api/v1/itens/{data['item_first']}").json()["item"]
+    assert item["valor_homologado_item"] is None
+    assert item["resultados_sem_valor_total"] == 1
+    zero = client.get(f"/api/v1/itens/{data['item_second']}").json()["item"]
+    assert zero["valor_homologado_item"] == "0.00000000"
+    assert zero["ultima_data_resultado"] is None
+    assert [i["id"] for i in client.get("/api/v1/itens?ordenacao=valor_asc").json()["dados"]] == [
+        data["item_second"],
+        data["item_first"],
+    ]
+    assert [i["id"] for i in client.get("/api/v1/itens?valor_minimo=0").json()["dados"]] == [
+        data["item_second"]
+    ]
+    assert client.get("/api/v1/itens?homologacao_inicio=2026-09-13").json()["dados"] == []
+    with data["engine"].begin() as cn:
+        cn.execute(
+            p.resultados_itens.update()
+            .where(p.resultados_itens.c.item_versao_id == data["item_version_second"])
+            .values(cancelado=True)
+        )
+    empty = client.get(f"/api/v1/itens/{data['item_second']}").json()["item"]
+    assert empty["valor_homologado_item"] is None
+    assert empty["resultados_ativos"] == 0 and empty["resultados_sem_valor_total"] == 0
+    assert len(empty["resultados"]) == 1 and empty["resultados"][0]["cancelado"] is True
+    # Ambos os totais ficaram desconhecidos: desempatar por UUID, não por ordem de inserção.
+    assert [i["id"] for i in client.get("/api/v1/itens?ordenacao=valor_asc").json()["dados"]] == (
+        sorted([data["item_first"], data["item_second"]])
+    )
+
+
+@pytest.mark.integration
+def test_item_errors_and_validated_empty_base(query_client):
+    client, data = query_client
+    for params in [{"base_id": data["rejected"]}, {"base_id": str(uuid4())}]:
+        assert client.get("/api/v1/itens", params=params).status_code == 404
+    missing = client.get(f"/api/v1/itens/{uuid4()}")
+    assert missing.status_code == 404
+    assert missing.json()["erro"]["codigo"] == "item_nao_encontrado"
+    assert missing.json()["erro"]["request_id"] == missing.headers["X-Request-ID"]
+    with data["engine"].begin() as cn:
+        empty = add(
+            cn,
+            c.versoes_base,
+            versao="vazia",
+            versao_transformador="teste",
+            versao_codigo="teste",
+            chave_manifesto="vazia.json",
+            sha256_manifesto="a" * 64,
+            periodo_inicio=date(2026, 9, 1),
+            periodo_fim=date(2026, 9, 30),
+            status="validada",
+        )
+    page = client.get("/api/v1/itens", params={"base_id": str(empty)}).json()
+    assert page["dados"] == [] and page["meta"]["total"] == 0
+
+
+@pytest.mark.integration
+def test_item_without_any_results_remains_visible_and_order_is_stable(query_client):
+    client, data = query_client
+    with data["engine"].begin() as cn:
+        identity = add(
+            cn,
+            p.itens_processo,
+            processo_id=data["first"],
+            chave_oficial="00003",
+        )
+        parent = cn.scalar(
+            sa.select(p.processos_versoes.c.id).where(
+                p.processos_versoes.c.base_id == data["base"],
+                p.processos_versoes.c.processo_id == data["first"],
+            )
+        )
+        add(
+            cn,
+            p.itens_versoes,
+            base_id=data["base"],
+            item_id=identity,
+            processo_id=data["first"],
+            processo_versao_id=parent,
+            numero_item="00003",
+            descricao="Sem resultado",
+        )
+    item = client.get(f"/api/v1/itens/{identity}").json()["item"]
+    assert item["chave_oficial"] == "00003" and item["numero_item"] == "00003"
+    assert item["resultados"] == [] and item["valor_homologado_item"] is None
+    assert item["resultados_ativos"] == 0 and item["ultima_data_resultado"] is None
+    assert item["quantidade"] is None and item["unidade_medida"] is None
+    for ordering in ["publicacao_asc", "publicacao_desc"]:
+        pages = [
+            client.get(
+                "/api/v1/itens",
+                params={"ordenacao": ordering, "tamanho_pagina": 1, "pagina": n},
+            ).json()["dados"][0]["id"]
+            for n in [1, 2, 3]
+        ]
+        assert pages == sorted([data["item_first"], data["item_second"], str(identity)])
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"processo_id": "LC-2026-0142"},
+        {"escopo_valor": "processo"},
+        {"execucao_analise_id": str(uuid4())},
+        {"ordenacao": "score_desc"},
+        {"valor_minimo": "2", "valor_maximo": "1"},
+        {"valor_minimo": "Infinity"},
+        {"homologacao_inicio": "2026-09-30", "homologacao_fim": "2026-09-01"},
+        {"codigo_catalogo": ""},
+        {"pagina": 0},
+        {"tamanho_pagina": 101},
+    ],
+)
+def test_invalid_item_filters_are_rejected_before_database_access(settings, params):
+    with TestClient(create_app(settings)) as client:
+        response = client.get("/api/v1/itens", params=params)
+    assert response.status_code == 422
+    assert response.json()["erro"]["codigo"] == "parametros_invalidos"
+
+
+def test_item_openapi_identifies_granularity_and_rejects_fake_path_id(settings):
+    with TestClient(create_app(settings)) as client:
+        schema = client.get("/openapi.json").json()
+        assert client.get("/api/v1/itens/LC-2026-0142").status_code == 422
+    operation = schema["paths"]["/api/v1/itens"]["get"]
+    params = {p["name"] for p in operation["parameters"]}
+    assert {"base_id", "processo_id", "fornecedor_id", "codigo_catalogo"} <= params
+    assert "escopo_valor" not in params and "execucao_analise_id" not in params
+    model = schema["components"]["schemas"]["ItemSummary"]["properties"]
+    assert model["processo"] == {"$ref": "#/components/schemas/ItemProcessContext"}
+    assert {"type": "string"} in model["valor_homologado_item"]["anyOf"]
+    for code in ["404", "422", "500", "503"]:
+        assert operation["responses"][code]["content"]["application/json"]["schema"] == {
+            "$ref": "#/components/schemas/ErrorResponse"
+        }

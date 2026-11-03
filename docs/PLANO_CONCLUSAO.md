@@ -22,21 +22,21 @@ Este é o ponto de entrada para continuar o projeto. Ler este arquivo antes de i
 
 ## Estado confirmado em 03/11/2026
 
-- `main` foi atualizada por fast-forward para `e2a5a84`, igual à `origin/main` na consulta realizada; atualização do frontend integrada pelo PR #3 em 01/11/2026.
+- `main` local está em `1d847bd`, após merge autorizado da etapa 01. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O envio ao GitHub continua pendente por permissão de escrita; a última referência remota consultada estava em `e2a5a84`.
 - A organização local difere do GitHub: frontend em `Frontend-licita-clara/` e protótipos em `docs/prototipo/`.
-- No início da revisão, backend, coletor, ML, shared, infraestrutura, docs e CI estavam sem rastreamento no Git. A etapa 01 consolidou esses arquivos e a reorganização em branch própria; a integração na `main` ainda está pendente.
+- No início da revisão, backend, coletor, ML, shared, infraestrutura, docs e CI estavam sem rastreamento no Git. A etapa 01 consolidou esses arquivos e a reorganização em branch própria e já foi integrada à `main` local. As branches de entrega foram preservadas.
 - Backup anterior à atualização: `../abp-backup-antes-atualizacao-20261103-092407/`. Contém arquivos locais, diff e estado do Git; não é backup completo do banco/datasets ignorados.
 - PostgreSQL local saudável, com duas bases validadas de setembro/2026. Cada versão tem 7 processos, 10 itens e 130 referências; não somar versões como cobertura adicional.
 - Banco possui 34 tabelas de aplicação e quatro migrações documentadas. Ter tabela não significa ter serviço implementado.
 - Tabelas de modelos, execuções de análise, scores, avaliações, revisões e relatórios estavam vazias. Participações e contratos também sem registros no piloto.
-- API possui sete rotas de consulta, além de health/readiness. Análise permanece `nao_publicada`, score e prioridade nulos.
+- API possui nove rotas de consulta, além de health/readiness: a etapa 02 acrescenta lista e detalhe global de itens com contexto do processo. Análise permanece `nao_publicada`, score e prioridade nulos.
 - Frontend React/Vite atualizado compila, mas as telas usam `src/data.js`, valores fixos e dados simulados. Não há integração HTTP com o backend.
-- Lista visual trabalha com itens; API lista processos. Resolver essa diferença antes de conectar o ranking.
+- Lista visual trabalha com itens; as novas consultas `/itens` e `/itens/{item_id}` alinham esse contrato. A integração visual usará essas rotas na etapa 03, preservando processo e resultados de cada fornecedor.
 - Filtros de data, valor e modalidade e controles de paginação ainda possuem elementos apenas visuais. Revisão usa estado React e não persiste. Exportar PDF/CSV chama `window.print()`.
 - Isolation Forest tem ensaios separados do fluxo operacional, com artefatos reproduzíveis; não há inferência publicada no PostgreSQL. Autoencoder não implementado.
 - Ensaio corretivo: 140 referências de treino e 35 de avaliação; replicação histórica: 177/107. Estabilidade aprovada nesses ensaios não comprova utilidade de auditoria.
 - Há divergências documentais de especificação e limitações temporais registradas. O dossiê independente tem 18 casos, todos com parecer `pendente` na conferência atual.
-- Validação executada nesta sessão: **95 testes Python aprovados, sem skips**, lint aprovado e **94 arquivos** aprovados na checagem de formatação. Build Vite aprovado após atualizar o frontend. Isso não testa o fluxo completo ainda inexistente.
+- Validação mais recente (etapa 02): **113 testes Python aprovados, sem skips**, lint e formatação aprovados (94 arquivos). HTTP real conferiu dez itens do piloto; OpenAPI anterior preservado. Build Vite foi aprovado na etapa 01; não houve mudança frontend nesta etapa. Isso não testa o fluxo completo ainda inexistente.
 - Ainda não há implantação remota confirmada.
 
 ## Figma e referências
@@ -53,15 +53,16 @@ Documentos de apoio:
 - [Contexto técnico](CONTEXTO_BACKEND_E_DADOS.md).
 - [Checklist técnico anterior](TODO_IMPLEMENTACAO_BACKEND_E_DADOS.md): preserva histórico, mas tem instruções antigas; este plano organiza a conclusão atual.
 - [Contrato implementado da API](API_CONSULTAS.md): prevalece sobre exemplos antigos propostos no contexto.
+- [Contratos de itens/processos](CONTRATOS_ITENS_PROCESSOS.md): decisão da etapa 02, navegação, valores e testes manuais.
 - [Banco](BANCO_DE_DADOS.md) e [importação](PREPARACAO_E_IMPORTACAO.md).
 - [Revisão do núcleo](validacao_nucleo/REVISAO_E_CONFIRMACAO.md), [achados](validacao_nucleo/ACHADOS_DOCUMENTAIS.md) e [guia independente](validacao_nucleo/GUIA_REVISAO_INDEPENDENTE.md).
 - [Backend](../backend/README.md), [ML](../ml/README.md), [coletor](../collector/README.md) e [infraestrutura](../infra/README.md).
 
 ## Etapa atual e próximo passo
 
-**Etapa atual:** 01 — consolidação concluída e validada localmente, branch `chore/01-consolidar-repositorio`; pronta para revisão e integração.
+**Etapa atual:** 02 — contratos e consultas de itens concluídos e validados localmente, branch `feat/02-contratos-itens-processos`; pronta para revisão.
 
-**Próxima etapa:** integrar a base consolidada conforme autorização do usuário e iniciar 02 — contratos de itens/processos. Nenhum push ou merge na `main` foi realizado nesta entrega.
+**Próxima etapa:** 03 — integrar consultas reais ao frontend, após integração autorizada da etapa 02. Não houve merge desta etapa na `main` nem novo envio ao GitHub; a permissão remota não impede desenvolvimento local.
 
 **Pendências externas:** acesso ao Figma; pareceres humanos independentes; definição/provisionamento da hospedagem. Não impedem iniciar consolidação, contratos e consultas reais.
 
@@ -69,7 +70,7 @@ Documentos de apoio:
 
 - [x] 00 — Criar contexto, checklist, branches e critérios de teste.
 - [x] 01 — Consolidar código local, organização e documentação no Git.
-- [ ] 02 — Definir contratos de itens, processos, resultados e análises.
+- [x] 02 — Definir contratos de itens, processos, resultados e análises.
 - [ ] 03 — Integrar consultas reais ao frontend.
 - [ ] 04 — Preparar base analítica operacional e atributos reproduzíveis.
 - [ ] 05 — Concluir avaliação do Isolation Forest e revisão independente.
@@ -82,7 +83,7 @@ Documentos de apoio:
 - [ ] 12 — Hospedar e automatizar operação com recuperação.
 - [ ] 13 — Validar fluxo completo e preparar entrega acadêmica reproduzível.
 
-As branches 00 e 01 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
+As branches 00, 01 e 02 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
 
 ## Entregas, branches e aceitação
 
@@ -112,10 +113,10 @@ Branch: `chore/01-consolidar-repositorio`. Dependência: 00.
 
 Branch: `feat/02-contratos-itens-processos`. Dependência: 01.
 
-- [ ] Decidir e documentar listagem por item, processo ou resultado; recomendação inicial: análise por item com contexto do processo e resultados por fornecedor preservados.
-- [ ] Definir IDs estáveis, snapshots, múltiplos vencedores, seleção de base/execução e navegação.
-- [ ] Definir valores globais versus recorte, dinheiro decimal, nulos, estados de análise e erros.
-- [ ] Documentar endpoints e compatibilidade com a API existente, sem quebrar silenciosamente consumidores.
+- [x] Decidir e documentar listagem por item, processo ou resultado; fila por item com contexto do processo e resultados por fornecedor preservados.
+- [x] Definir IDs estáveis, snapshots, múltiplos vencedores, seleção de base/execução e navegação; seleção de execução continua explicitamente planejada para 07.
+- [x] Definir valores globais versus recorte, dinheiro decimal, nulos, estados de análise e erros.
+- [x] Documentar endpoints e compatibilidade com a API existente, sem quebrar silenciosamente consumidores.
 
 **Como testar:** exemplos com vários itens/fornecedores e bases; validar OpenAPI e contratos; conferir que totais não se multiplicam. **Conclusão:** a mesma entidade é identificada e interpretada corretamente na API, interface e modelo.
 
@@ -313,3 +314,14 @@ Checklist atualizado:
 - Não verificado: execução remota do CI, implantação e fluxos de negócio das etapas futuras. Testes de integração usaram schemas descartáveis do banco de testes existente; não foi necessário migrar ou importar na base da aplicação.
 - Resultado: **OK para a consolidação local**; integração na `main` e publicação remota ainda pendentes.
 - Próxima etapa: 02, após integração autorizada da base consolidada.
+
+### Entrega 02 — 03/11/2026
+
+- Branch: `feat/02-contratos-itens-processos`; título do commit: `feat: definir contratos e consultas de itens com contexto do processo`.
+- Mudança: contratos de granularidade, IDs, valores e navegação documentados; implementados `GET /api/v1/itens` e `GET /api/v1/itens/{item_id}`, preservando as consultas anteriores. Resultados múltiplos e cancelados permanecem explícitos; total incompleto fica nulo.
+- Pré-requisitos/passos: [contratos e teste manual no Swagger](CONTRATOS_ITENS_PROCESSOS.md). Suíte completa usa PostgreSQL `_test` conforme README do backend.
+- Verificações: 113 testes aprovados, zero skips, lint e formatação aprovados; OpenAPI comparado à `main` com nove rotas e 23 schemas anteriores idênticos. HTTP TCP local com a identidade restrita conferiu os dez itens reais, contexto do processo, compatibilidade, erros 404/422 e preservação dos dados/configuração.
+- Evidência: [resultado da etapa 02](diagnostico/conclusao_etapa02.json).
+- Não verificado/fora do escopo: integração de telas, browser, publicação de scores e CI remoto. Nenhuma migração ou importação executada, nenhum score fabricado. Servidor temporário de validação encerrado.
+- Resultado: **OK para contratos e consultas de itens**. As telas ainda consomem mocks até a etapa 03.
+- Próxima etapa: integrar esta entrega localmente mediante autorização e iniciar 03 em branch própria. O acesso de escrita remoto continua pendente.

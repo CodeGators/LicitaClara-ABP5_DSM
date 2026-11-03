@@ -319,7 +319,11 @@ class QueryRepository:
             .order_by(IV.c.numero_item, IV.c.item_id)
         )
         result = self.page(query, filters, base_id)
-        ids = [row["item_versao_id"] for row in result["dados"]]
+        self.item_results(result["dados"], base_id)
+        return result
+
+    def item_results(self, rows, base_id):
+        ids = [row["item_versao_id"] for row in rows]
         grouped = defaultdict(list)
         if ids:
             for row in self.session.execute(
@@ -328,9 +332,174 @@ class QueryRepository:
                 .order_by(RI.c.sequencial_resultado, RI.c.id)
             ).mappings():
                 grouped[row["item_versao_id"]].append(dict(row))
-        for row in result["dados"]:
+        for row in rows:
             row["resultados"] = grouped[row["item_versao_id"]]
+
+    def item_query(self, base_id):
+        # Agregar antes dos joins mantém uma linha por item, inclusive com vários vencedores.
+        totals = (
+            sa.select(
+                RI.c.item_versao_id,
+                sa.func.count().label("resultados_ativos"),
+                (sa.func.count() - sa.func.count(RI.c.valor_total_homologado)).label(
+                    "resultados_sem_valor_total"
+                ),
+                sa.case(
+                    (
+                        sa.func.count() == sa.func.count(RI.c.valor_total_homologado),
+                        sa.func.sum(RI.c.valor_total_homologado),
+                    ),
+                    else_=None,
+                ).label("valor_homologado_item"),
+                sa.func.max(RI.c.data_resultado).label("ultima_data_resultado"),
+            )
+            .where(RI.c.base_id == base_id, RI.c.cancelado.is_(False))
+            .group_by(RI.c.item_versao_id)
+            .subquery()
+        )
+        context = {
+            "id": PV.c.processo_id,
+            "processo_versao_id": PV.c.id,
+            "fonte": p.processos.c.fonte,
+            "chave_oficial": p.processos.c.chave_oficial,
+            "numero_compra": PV.c.numero_compra,
+            "numero_processo": PV.c.numero_processo,
+            "numero_controle_pncp": PV.c.numero_controle_pncp,
+            "objeto": PV.c.objeto,
+            "orgao_id": PV.c.orgao_id,
+            "orgao_nome": PV.c.orgao_nome,
+            "modalidade_id": PV.c.modalidade_id,
+            "modalidade_nome": p.modalidades.c.nome,
+            "data_publicacao": PV.c.data_publicacao,
+        }
+        return (
+            sa.select(
+                IV.c.item_id.label("id"),
+                IV.c.id.label("item_versao_id"),
+                p.itens_processo.c.chave_oficial,
+                IV.c.numero_item,
+                IV.c.descricao,
+                IV.c.unidade_medida,
+                IV.c.quantidade,
+                IV.c.valor_unitario_estimado,
+                IV.c.orcamento_sigiloso,
+                p.itens_catalogo.c.catalogo,
+                p.itens_catalogo.c.codigo.label("codigo_catalogo"),
+                totals.c.valor_homologado_item,
+                sa.func.coalesce(totals.c.resultados_ativos, 0).label("resultados_ativos"),
+                sa.func.coalesce(totals.c.resultados_sem_valor_total, 0).label(
+                    "resultados_sem_valor_total"
+                ),
+                totals.c.ultima_data_resultado,
+                *(column.label("processo_" + key) for key, column in context.items()),
+            )
+            .select_from(
+                IV.join(
+                    PV,
+                    (PV.c.id == IV.c.processo_versao_id) & (PV.c.base_id == IV.c.base_id),
+                )
+                .join(p.processos, p.processos.c.id == PV.c.processo_id)
+                .join(
+                    p.itens_processo,
+                    (p.itens_processo.c.id == IV.c.item_id)
+                    & (p.itens_processo.c.processo_id == PV.c.processo_id),
+                )
+                .outerjoin(p.modalidades, p.modalidades.c.id == PV.c.modalidade_id)
+                .outerjoin(p.itens_catalogo, p.itens_catalogo.c.id == IV.c.catalogo_id)
+                .outerjoin(totals, totals.c.item_versao_id == IV.c.id)
+            )
+            .where(IV.c.base_id == base_id, PV.c.base_id == base_id)
+        )
+
+    def finish_items(self, rows, base_id):
+        self.item_results(rows, base_id)
+        for row in rows:
+            keys = [key for key in row if key.startswith("processo_")]
+            row["processo"] = {key.removeprefix("processo_"): row.pop(key) for key in keys}
+
+    def catalog_items(self, base_id, filters):
+        query = self.item_query(base_id)
+        for field in ("orgao_id", "modalidade_id"):
+            if (value := getattr(filters, field)) is not None:
+                query = query.where(PV.c[field] == value)
+        if filters.processo_id is not None:
+            query = query.where(PV.c.processo_id == filters.processo_id)
+        for field, column in (
+            ("catalogo", p.itens_catalogo.c.catalogo),
+            ("codigo_catalogo", p.itens_catalogo.c.codigo),
+        ):
+            if (value := getattr(filters, field)) is not None:
+                query = query.where(column == value)
+
+        def result_match(*conditions):
+            return (
+                sa.select(1)
+                .where(
+                    RI.c.item_versao_id == IV.c.id,
+                    RI.c.base_id == base_id,
+                    RI.c.cancelado.is_(False),
+                    *conditions,
+                )
+                .correlate(IV)
+                .exists()
+            )
+
+        conditions = []
+        if filters.fornecedor_id is not None:
+            conditions.append(RI.c.fornecedor_id == filters.fornecedor_id)
+        if filters.homologacao_inicio is not None:
+            conditions.append(RI.c.data_resultado >= filters.homologacao_inicio)
+        if filters.homologacao_fim is not None:
+            conditions.append(RI.c.data_resultado <= filters.homologacao_fim)
+        if conditions:
+            query = query.where(result_match(*conditions))
+        amount = query.selected_columns["valor_homologado_item"]
+        if filters.valor_minimo is not None:
+            query = query.where(amount >= filters.valor_minimo)
+        if filters.valor_maximo is not None:
+            query = query.where(amount <= filters.valor_maximo)
+        if filters.busca and (search := filters.busca.strip()):
+            query = query.where(
+                sa.or_(
+                    *(
+                        column.icontains(search, autoescape=True)
+                        for column in (
+                            IV.c.descricao,
+                            IV.c.numero_item,
+                            p.itens_processo.c.chave_oficial,
+                            PV.c.objeto,
+                            PV.c.numero_compra,
+                            PV.c.numero_processo,
+                            p.processos.c.chave_oficial,
+                        )
+                    ),
+                    result_match(RI.c.fornecedor_nome.icontains(search, autoescape=True)),
+                )
+            )
+        orders = {
+            "publicacao_desc": PV.c.data_publicacao.desc().nulls_last(),
+            "publicacao_asc": PV.c.data_publicacao.asc().nulls_last(),
+            "valor_desc": amount.desc().nulls_last(),
+            "valor_asc": amount.asc().nulls_last(),
+            "descricao_asc": IV.c.descricao.asc(),
+        }
+        result = self.page(
+            query.order_by(orders[filters.ordenacao], IV.c.item_id), filters, base_id
+        )
+        self.finish_items(result["dados"], base_id)
         return result
+
+    def item(self, base_id, item_id):
+        row = (
+            self.session.execute(self.item_query(base_id).where(IV.c.item_id == item_id))
+            .mappings()
+            .one_or_none()
+        )
+        if row is None:
+            raise QueryError("item_nao_encontrado", "Item não encontrado nesta base.")
+        data = dict(row)
+        self.finish_items([data], base_id)
+        return data
 
     def documents(self, base_id, process_id, filters):
         snapshot = self.process(base_id, process_id)["processo_versao_id"]

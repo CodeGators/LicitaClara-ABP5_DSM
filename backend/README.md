@@ -2,6 +2,8 @@
 
 Ambiente local, endpoints operacionais, consultas versionadas de processos/itens/documentos e esquema PostgreSQL com quatro migrações implementados. O coletor e a preparação/importação estão operacionais. Os ensaios de ML permanecem sem publicação de scores. Veja os [contratos, filtros e comandos da etapa 06](../docs/API_CONSULTAS.md).
 
+A etapa 02 do plano de conclusão acrescenta `GET /api/v1/itens` e `GET /api/v1/itens/{item_id}`. Esses endpoints retornam uma linha por item, contexto do processo e resultados por fornecedor, sem modificar as sete rotas originais. Ver [contratos de itens/processos e testes manuais](../docs/CONTRATOS_ITENS_PROCESSOS.md).
+
 ## Instalar e executar
 
 Usar Python 3.12.x, Docker Compose e uv 0.13.2. Executar a partir da raiz do repositório:

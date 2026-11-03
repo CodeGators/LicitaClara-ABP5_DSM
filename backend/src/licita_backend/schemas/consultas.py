@@ -26,7 +26,7 @@ class LookupFilters(Pagination):
     busca: str | None = Field(default=None, max_length=200)
 
 
-class ProcessFilters(LookupFilters):
+class ProcurementFilters(LookupFilters):
     orgao_id: UUID | None = None
     fornecedor_id: UUID | None = None
     modalidade_id: UUID | None = None
@@ -34,10 +34,6 @@ class ProcessFilters(LookupFilters):
     homologacao_fim: date | None = None
     valor_minimo: AmountFilter | None = None
     valor_maximo: AmountFilter | None = None
-    escopo_valor: Literal["processo", "itens_recorte"] = "processo"
-    ordenacao: Literal[
-        "publicacao_desc", "publicacao_asc", "valor_desc", "valor_asc", "objeto_asc"
-    ] = "publicacao_desc"
 
     @model_validator(mode="after")
     def ordered_ranges(self):
@@ -54,6 +50,22 @@ class ProcessFilters(LookupFilters):
         ):
             raise ValueError("Valor mínimo deve ser menor ou igual ao máximo")
         return self
+
+
+class ProcessFilters(ProcurementFilters):
+    escopo_valor: Literal["processo", "itens_recorte"] = "processo"
+    ordenacao: Literal[
+        "publicacao_desc", "publicacao_asc", "valor_desc", "valor_asc", "objeto_asc"
+    ] = "publicacao_desc"
+
+
+class ItemFilters(ProcurementFilters):
+    processo_id: UUID | None = None
+    catalogo: str | None = Field(default=None, min_length=1, max_length=100)
+    codigo_catalogo: str | None = Field(default=None, min_length=1, max_length=100)
+    ordenacao: Literal[
+        "publicacao_desc", "publicacao_asc", "valor_desc", "valor_asc", "descricao_asc"
+    ] = "publicacao_desc"
 
 
 class PageMeta(BaseModel):
@@ -159,6 +171,36 @@ class Item(BaseModel):
     codigo_catalogo: str | None
     resultados: list[ItemResult]
     analise: AnalysisUnavailable = Field(default_factory=AnalysisUnavailable)
+
+
+class ItemProcessContext(BaseModel):
+    id: UUID
+    processo_versao_id: UUID
+    fonte: str
+    chave_oficial: str
+    numero_compra: str
+    numero_processo: str | None
+    numero_controle_pncp: str | None
+    objeto: str
+    orgao_id: UUID
+    orgao_nome: str
+    modalidade_id: UUID | None
+    modalidade_nome: str | None
+    data_publicacao: date | None
+
+
+class ItemSummary(Item):
+    chave_oficial: str
+    processo: ItemProcessContext
+    valor_homologado_item: Money | None
+    resultados_ativos: int
+    resultados_sem_valor_total: int
+    ultima_data_resultado: date | None
+
+
+class ItemResponse(BaseModel):
+    base_id: UUID
+    item: ItemSummary
 
 
 class Document(BaseModel):

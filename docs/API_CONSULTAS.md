@@ -2,6 +2,8 @@
 
 Implementado em 20/10/2026. API de leitura de dados importados no PostgreSQL, independente dos ensaios de ML. Não calcula ou publica scores. O frontend permanece com seus dados simulados até integração posterior.
 
+Atualização de 03/11/2026: a etapa 02 do plano de conclusão acrescentou `/itens` e `/itens/{item_id}`, com contexto do processo e total do próprio item. As sete rotas originais mantêm seus contratos. Ver [contratos de itens/processos](CONTRATOS_ITENS_PROCESSOS.md) para filtros, navegação e instruções de teste. As evidências da etapa 06 abaixo continuam sendo o registro histórico de 20/10/2026.
+
 ## Executar
 
 Na raiz do repositório, com `.env` configurado e PostgreSQL migrado em execução:
@@ -27,6 +29,8 @@ Todas usam prefixo `/api/v1`.
 | GET | `/processos/{processo_id}` | Detalhe do processo no snapshot selecionado |
 | GET | `/processos/{processo_id}/itens` | Itens do recorte com seus resultados, incluindo a indicação de cancelamento |
 | GET | `/processos/{processo_id}/documentos` | Metadados de anexos da compra e de contratos explicitamente vinculados |
+| GET | `/itens` | Itens paginados da base, cada um com contexto do processo, todos os resultados e total dos resultados não cancelados |
+| GET | `/itens/{item_id}` | Detalhe do item pelo UUID estável, limitado à base selecionada |
 
 `/health` e `/ready` continuam disponíveis. Não foram criadas rotas de escrita, coleta ou treinamento.
 

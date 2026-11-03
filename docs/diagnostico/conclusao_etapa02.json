@@ -1,0 +1,111 @@
+{
+  "etapa": "02 do PLANO_CONCLUSAO: contratos de itens e processos",
+  "data_local": "2026-11-03",
+  "timezone": "America/Sao_Paulo",
+  "branch": "feat/02-contratos-itens-processos",
+  "main_local_base": "1d847bd",
+  "testes": {
+    "tests": 113,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "comando_testes": "uv run --locked --all-packages --extra validation pytest -q",
+  "lint": "aprovado",
+  "formatacao": {
+    "resultado": "aprovado",
+    "arquivos": 94
+  },
+  "compatibilidade_openapi": {
+    "rotas_anteriores_preservadas": 9,
+    "schemas_anteriores_preservados": 23,
+    "novas_rotas": [
+      "/api/v1/itens",
+      "/api/v1/itens/{item_id}"
+    ]
+  },
+  "http": {
+    "tipo": "HTTP TCP local com login restrito da API",
+    "base_id": "a21534e3-e1a9-5d31-9a4e-c3beb608914f",
+    "total_itens": 10,
+    "contagens_aplicacao_preservadas": true,
+    "env_preservado": true,
+    "servidor_temporario_encerrado": true,
+    "verificacoes": [
+      {
+        "rota": "/api/v1/health",
+        "http": 200,
+        "request_id_presente": true
+      },
+      {
+        "rota": "/api/v1/ready",
+        "http": 200,
+        "request_id_presente": true
+      },
+      {
+        "rota": "/api/v1/base/status",
+        "http": 200,
+        "request_id_presente": true
+      },
+      {
+        "rota": "/api/v1/itens?base_id=a21534e3-e1a9-5d31-9a4e-c3beb608914f&tamanho_pagina=1&ordenacao=descricao_asc",
+        "http": 200,
+        "request_id_presente": true
+      },
+      {
+        "rota": "/api/v1/itens/48e44996-8615-575c-ace6-065cbef78ab2?base_id=a21534e3-e1a9-5d31-9a4e-c3beb608914f",
+        "http": 200,
+        "request_id_presente": true
+      },
+      {
+        "rota": "/api/v1/processos/87e660bd-af81-54c6-8828-1a6ccfc5d95f?base_id=a21534e3-e1a9-5d31-9a4e-c3beb608914f",
+        "http": 200,
+        "request_id_presente": true
+      },
+      {
+        "rota": "/api/v1/processos/87e660bd-af81-54c6-8828-1a6ccfc5d95f/itens?base_id=a21534e3-e1a9-5d31-9a4e-c3beb608914f",
+        "http": 200,
+        "request_id_presente": true
+      },
+      {
+        "rota": "/api/v1/processos/87e660bd-af81-54c6-8828-1a6ccfc5d95f/documentos?base_id=a21534e3-e1a9-5d31-9a4e-c3beb608914f",
+        "http": 200,
+        "request_id_presente": true
+      },
+      {
+        "rota": "/api/v1/itens?base_id=a21534e3-e1a9-5d31-9a4e-c3beb608914f&pagina=11&tamanho_pagina=1",
+        "http": 200,
+        "request_id_presente": true
+      },
+      {
+        "rota": "/api/v1/itens/00000000-0000-0000-0000-000000000000?base_id=a21534e3-e1a9-5d31-9a4e-c3beb608914f",
+        "http": 404,
+        "request_id_presente": true
+      },
+      {
+        "rota": "/api/v1/itens/LC-2026-0142",
+        "http": 422,
+        "request_id_presente": true
+      },
+      {
+        "rota": "/api/v1/itens?ordenacao=score_desc",
+        "http": 422,
+        "request_id_presente": true
+      }
+    ]
+  },
+  "sha256_arquivos_verificados": {
+    "backend/src/licita_backend/api/v1/consultas.py": "d4cd355dc977e7ecbb3ba80a53d7397cad14a9125e4e71ba2bae9ab924011a09",
+    "backend/src/licita_backend/repositories/consultas.py": "21201787c376202b597f02b26ce0dfeaa05e1b79e38c4c717f7b92f2aa20f9d8",
+    "backend/src/licita_backend/schemas/consultas.py": "048cab8e63520d0ba45c011fc05921d39058341ca9b18b96341c33ed168495ba",
+    "backend/tests/test_consultas.py": "1d39f0fb98ae3b9f8a4ad1bcd74577aa8a37eed11e3a799ebdaa7b33f00bcb7a"
+  },
+  "migracoes_executadas": false,
+  "importacoes_executadas": false,
+  "scores_publicados": false,
+  "frontend_alterado": false,
+  "merge_main_executado": false,
+  "push_executado": false,
+  "ci_remoto_executado": false,
+  "resultado": "OK_CONTRATOS_E_CONSULTAS_ITENS"
+}
