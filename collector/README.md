@@ -81,3 +81,5 @@ uv run --locked --package licita-collector licita-collector complementar --compe
 Substitua UUID_MATERIAL pelo identificador de um arquivo material real. Propostas usam inclusão do item segundo o LEIAME; consultas JSON usam a competência como janela de referência, sem reescrever as datas da origem. Envelopes JSON podem ser retomados/reprocessados pelos mesmos comandos; não requerem extração. Totais incompatíveis ou paginação ignorada/repetida provocam falha, sem confirmação do objeto.
 
 São adquiridos metadados de documentos e detalhe contratual; PDFs não são baixados. A importação desses arquivos cabe ao pacote ML. [Regras e evidências da etapa 05](../docs/PREPARACAO_E_IMPORTACAO.md). Scripts exploratórios permanecem separados da aquisição de produção.
+
+Consulte a [base e atributos analíticos](../docs/ATRIBUTOS_ANALITICOS.md) para aquisição histórica registrada, preparo versionado, critérios e testes da etapa 04.

@@ -22,7 +22,7 @@ Este é o ponto de entrada para continuar o projeto. Ler este arquivo antes de i
 
 ## Estado confirmado em 03/11/2026
 
-- `main` local está em `e1945f2`, após merges autorizados das etapas 01 e 02. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O envio ao GitHub continua pendente por permissão de escrita; a última referência remota consultada estava em `e2a5a84`.
+- `main` local está em `5f0003c`, após merges autorizados das etapas 01–03. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O envio ao GitHub continua pendente por permissão de escrita; a última referência remota consultada estava em `e2a5a84`.
 - A organização local difere do GitHub: frontend em `Frontend-licita-clara/` e protótipos em `docs/prototipo/`.
 - No início da revisão, backend, coletor, ML, shared, infraestrutura, docs e CI estavam sem rastreamento no Git. A etapa 01 consolidou esses arquivos e a reorganização em branch própria e já foi integrada à `main` local. As branches de entrega foram preservadas.
 - Backup anterior à atualização: `../abp-backup-antes-atualizacao-20261103-092407/`. Contém arquivos locais, diff e estado do Git; não é backup completo do banco/datasets ignorados.
@@ -36,7 +36,8 @@ Este é o ponto de entrada para continuar o projeto. Ler este arquivo antes de i
 - Isolation Forest tem ensaios separados do fluxo operacional, com artefatos reproduzíveis; não há inferência publicada no PostgreSQL. Autoencoder não implementado.
 - Ensaio corretivo: 140 referências de treino e 35 de avaliação; replicação histórica: 177/107. Estabilidade aprovada nesses ensaios não comprova utilidade de auditoria.
 - Há divergências documentais de especificação e limitações temporais registradas. O dossiê independente tem 18 casos, todos com parecer `pendente` na conferência atual.
-- Validação mais recente (etapa 03): **115 testes Python**, **6 testes de cliente**, **13 testes browser com fixtures** e **1 teste browser com API/PostgreSQL reais**, todos aprovados sem skips. Lint/formatação e instalação/build frontend aprovados. Capturas desktop/mobile inspecionadas; isso não comprova fidelidade ao Figma nem o fluxo completo das etapas futuras.
+- Etapa 04: 131 testes Python aprovados sem skips, lint/formatação aprovados; aquisição e preparo reais reexecutados com preservação das bases. [Política e comandos](ATRIBUTOS_ANALITICOS.md).
+- Validação frontend (etapa 03): **115 testes Python**, **6 testes de cliente**, **13 testes browser com fixtures** e **1 teste browser com API/PostgreSQL reais**, todos aprovados sem skips. Lint/formatação e instalação/build frontend aprovados. Capturas desktop/mobile inspecionadas; isso não comprova fidelidade ao Figma nem o fluxo completo das etapas futuras.
 - Ainda não há implantação remota confirmada.
 
 ## Figma e referências
@@ -61,9 +62,9 @@ Documentos de apoio:
 
 ## Etapa atual e próximo passo
 
-**Etapa atual:** 03 — consultas reais integradas e verificadas, branch `feat/03-frontend-consultas-reais`; pronta para revisão.
+**Etapa atual:** 04 — base e atributos analíticos preparados na branch `feat/04-base-atributos-analiticos`, pronta para teste do usuário.
 
-**Próxima etapa:** 04 — base operacional e atributos analíticos, após integração autorizada da etapa 03. Não houve merge desta etapa na `main` nem envio ao GitHub; a permissão remota não impede desenvolvimento local.
+**Próxima etapa:** 05 — avaliação do Isolation Forest e revisão independente, após integração autorizada da etapa 04. Esta entrega ainda não foi integrada à `main` nem enviada ao GitHub.
 
 **Pendências externas:** acesso ao Figma; pareceres humanos independentes; definição/provisionamento da hospedagem. Não impedem iniciar consolidação, contratos e consultas reais.
 
@@ -73,7 +74,7 @@ Documentos de apoio:
 - [x] 01 — Consolidar código local, organização e documentação no Git.
 - [x] 02 — Definir contratos de itens, processos, resultados e análises.
 - [x] 03 — Integrar consultas reais ao frontend.
-- [ ] 04 — Preparar base analítica operacional e atributos reproduzíveis.
+- [x] 04 — Preparar base analítica operacional e atributos reproduzíveis.
 - [ ] 05 — Concluir avaliação do Isolation Forest e revisão independente.
 - [ ] 06 — Implementar e comparar Autoencoder.
 - [ ] 07 — Implementar inferência, explicações e publicação versionada.
@@ -84,7 +85,7 @@ Documentos de apoio:
 - [ ] 12 — Hospedar e automatizar operação com recuperação.
 - [ ] 13 — Validar fluxo completo e preparar entrega acadêmica reproduzível.
 
-As branches 00–03 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
+As branches 00–04 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
 
 ## Entregas, branches e aceitação
 
@@ -136,12 +137,12 @@ Branch: `feat/03-frontend-consultas-reais`. Dependência: 02.
 
 Branch: `feat/04-base-atributos-analiticos`. Dependência: 02.
 
-- [ ] Incorporar histórico dos ensaios à aquisição/preparação operacional, com manifesto e proveniência.
-- [ ] Versionar comparabilidade por especificação, unidade/embalagem e condições disponíveis; tratar divergências documentadas sem alterar ensaios antigos.
-- [ ] Incorporar data do resultado aos cortes e registrar limites de revisões posteriores dos snapshots.
-- [ ] Definir fórmulas, janelas, mínimos e indisponibilidade para preço/mediana, estimado/homologado, participantes, frequência, HHI e publicação/assinatura.
-- [ ] Obter cobertura necessária ou registrar por que um atributo não pode ser calculado; não inventar valores para preencher telas.
-- [ ] Medir recursos e suficiência/diversidade antes de ampliar histórico ou limites.
+- [x] Incorporar histórico dos ensaios à aquisição/preparação operacional, com manifesto e proveniência.
+- [x] Versionar comparabilidade por especificação, unidade/embalagem e condições disponíveis; tratar divergências documentadas sem alterar ensaios antigos.
+- [x] Incorporar data do resultado aos cortes e registrar limites de revisões posteriores dos snapshots.
+- [x] Definir fórmulas, janelas, mínimos e indisponibilidade para preço/mediana, estimado/homologado, participantes, frequência, HHI e publicação/assinatura.
+- [x] Obter cobertura necessária ou registrar por que um atributo não pode ser calculado; não inventar valores para preencher telas.
+- [x] Medir recursos e suficiência/diversidade antes de ampliar histórico ou limites.
 
 **Como testar:** exemplos de preço, unidade, HHI e datas com resultados conhecidos; impedir dados futuros nas referências; reexecutar sem duplicação; conferir manifesto e rejeições. **Conclusão:** cada atributo disponível é reproduzível e cada ausência é explicada.
 
@@ -149,7 +150,7 @@ Branch: `feat/04-base-atributos-analiticos`. Dependência: 02.
 
 Branch: `feat/05-validacao-isolation-forest`. Dependência: 04.
 
-- [ ] Treinar pelo fluxo versionado, preservar artefato e reproduzir inferência após recarga.
+- [ ] Treinar pelo fluxo versionado, preservar artefato e reproduzir inferência após recarga. Consumir somente grupos/linhas elegíveis e registrar a base de treino correta, distinta do piloto operacional.
 - [ ] Revisar documentalmente amostra do treino e concluir pareceres independentes dos casos, com participação humana.
 - [ ] Comparar IF com regras unilateral/bilateral sem ajustar repetidamente sobre a mesma avaliação.
 - [ ] Registrar estabilidade, utilidade, inconclusivos e confirmação temporal conforme protocolo; insuficiência não vira aprovação.
@@ -338,3 +339,15 @@ Checklist atualizado:
 - Não verificado/fora do escopo: CI remoto, produção, fidelidade ao Figma, demais navegadores, revisão completa de acessibilidade e funcionalidades analíticas/de escrita futuras. Não houve migração/importação ou publicação de score. Dados/configuração preservados; servidores temporários de validação encerrados.
 - Resultado: **OK para consultas reais no frontend**. A validação acadêmica do modelo e os indicadores finais ainda dependem das etapas 04–08.
 - Próxima etapa: 04, após integração local autorizada desta entrega.
+
+### Entrega 04 — 03/11/2026
+
+- Branch: `feat/04-base-atributos-analiticos`; título do commit: `feat: preparar base e atributos analiticos versionados`.
+- Mudança: aquisição histórica registrada online/offline; preparação imutável com fontes explícitas, Parquet decimal, cortes por resultado, grupos estritos, exclusões documentais, fórmulas e motivos de indisponibilidade.
+- Como testar: seguir [base e atributos analíticos](ATRIBUTOS_ANALITICOS.md). Repetir `atributos` deve retornar `reutilizada: true` e o mesmo fingerprint.
+- Verificação: **131 testes Python aprovados, zero falhas/skips**, lint e formatação aprovados (101 arquivos); resultados em [evidência agregada](diagnostico/conclusao_etapa04.json). Testes cobrem corrupção, precisão, datas, unidades, mínimos, reexecução e cobertura desconhecida.
+- Resultado real: 658 entradas, 641 normalizadas e 17 rejeitadas; um grupo tecnicamente elegível com 140 registros de treino e 35 de avaliação; 10 alvos operacionais com ausências explicadas.
+- Preservação: 233 arquivos dos ensaios e `.env` inalterados; tabelas de domínio e duas bases de consulta preservadas. Apenas aquisição recebeu registros. Nenhuma migração, treinamento ou publicação de score.
+- Limites: snapshots revisados após corte; comparabilidade documental e utilidade ainda não aprovadas. Pareceres humanos pendentes. Frontend inalterado; browser/build e CI remoto não reexecutados.
+- Resultado: **OK para preparar e rastrear atributos**. Aprovação do modelo depende da etapa 05.
+- Próximo passo: teste do usuário, integração local autorizada e etapa 05 em branch própria.

@@ -2,6 +2,7 @@
 
 import argparse
 import json
+from datetime import date
 from importlib.metadata import version
 from uuid import UUID
 
@@ -30,6 +31,13 @@ def main():
     complement.add_argument("--competencia", required=True, type=month)
     complement.add_argument("--material-arquivo", required=True, type=UUID)
     complement.add_argument("--catalogo", required=True)
+    history = commands.add_parser("historico-material")
+    history.add_argument("--inicio", required=True, type=date.fromisoformat)
+    history.add_argument("--fim", required=True, type=date.fromisoformat)
+    history.add_argument("--catalogo", required=True)
+    history.add_argument(
+        "--cache", help="Diretório de snapshots/metadados; sem rede quando informado"
+    )
     resume = commands.add_parser("retomar")
     resume.add_argument("--execucao-id", required=True, type=UUID)
     process = commands.add_parser("reprocessar")
@@ -48,6 +56,19 @@ def main():
         )
         repository = Repository(engine)
         service = Collector(settings, repository, storage(settings))
+        if args.command == "historico-material":
+            from licita_collector.api import JsonScope
+            from licita_collector.history import CachedHistory
+
+            scope = JsonScope(
+                "material_historico_api",
+                args.fim.replace(day=1),
+                {"inicio": str(args.inicio), "fim": str(args.fim), "catalogo": args.catalogo},
+            )
+            if args.cache:
+                service.http = CachedHistory(settings, scope, args.cache)
+            print(json.dumps(service.collect(scope), ensure_ascii=False), flush=True)
+            return 0
         if args.command == "complementar":
             from licita_collector.complement import complement, selected_purchases
 

@@ -93,3 +93,5 @@ A ferramenta pode ser útil para **cidadãos**, **empresas que vendem para o gov
 ## 👥 Equipe CodeGators
 
 Projeto desenvolvido por estudantes como parte da disciplina de Aprendizagem Baseada em Projetos (ABP) do curso de Desenvolvimento de Software Multiplataforma (DSM).
+
+Consulte a [base e atributos analíticos](docs/ATRIBUTOS_ANALITICOS.md) para aquisição histórica registrada, preparo versionado, critérios e testes da etapa 04.

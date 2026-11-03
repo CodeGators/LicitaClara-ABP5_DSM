@@ -1,5 +1,7 @@
 """Ciclo de coleta usando permissões reais e schema descartável em banco *_test."""
 
+import hashlib
+import json
 import os
 from datetime import date
 from pathlib import Path
@@ -19,6 +21,47 @@ from licita_collector.source import Scope
 from licita_shared.storage.local import LocalObjectStorage
 
 pytestmark = pytest.mark.integration
+
+
+def test_operational_offline_history_repeat_and_resume(database, settings, tmp_path):
+    from licita_collector.api import JsonScope
+    from licita_collector.history import CachedHistory
+
+    repository, admin = database
+    scope = JsonScope(
+        "material_historico_api",
+        date(2026, 9, 1),
+        {"catalogo": "486374", "inicio": "2025-10-01", "fim": "2026-09-30"},
+    )
+    raw = json.dumps(
+        {"resultado": [{"codigoItemCatalogo": 486374}], "totalRegistros": 1, "totalPaginas": 1}
+    ).encode()
+    path = tmp_path / "historico_486374_pagina_1.json"
+    path.write_bytes(raw)
+    path.with_suffix(".meta.json").write_text(
+        json.dumps(
+            {
+                "url": scope.url(),
+                "sha256": hashlib.sha256(raw).hexdigest(),
+                "bytes": len(raw),
+                "status": 200,
+            }
+        )
+    )
+    service = Collector(
+        settings,
+        repository,
+        LocalObjectStorage(settings.storage_root),
+        CachedHistory(settings, scope, tmp_path),
+    )
+    first = service.collect(scope)
+    second = service.collect(scope)
+    assert second["arquivo_id"] == first["arquivo_id"] and second["reutilizado"]
+    assert repository.execution(first["execucao_id"]) == scope
+    assert service.collect(scope, first["execucao_id"])["reutilizado"]
+    with admin.connect() as cn:
+        assert cn.scalar(sa.text("SELECT count(*) FROM arquivos_coletados")) == 1
+        assert cn.scalar(sa.text("SELECT count(*) FROM processos_versoes")) == 0
 
 
 @pytest.fixture

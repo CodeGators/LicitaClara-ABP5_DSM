@@ -82,6 +82,8 @@ class Repository:
             .where(
                 files.c.competencia >= start.replace(day=1),
                 files.c.competencia <= end.replace(day=1),
+                # Histórico de pesquisa é insumo analítico independente, não publicação da API.
+                ~files.c.modulo.startswith("historico/"),
             )
             .order_by(files.c.fonte, files.c.modulo, files.c.competencia, observed.c.last.desc())
         ).mappings()

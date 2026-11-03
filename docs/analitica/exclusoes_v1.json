@@ -1,0 +1,20 @@
+{
+  "versao": "exclusoes-documentais-v1",
+  "escopo": "Suspensao das comparacoes de especificacao ate esclarecimento; nao e parecer humano ou prova de fraude.",
+  "exclusoes": [
+    {
+      "id_referencia": "d9fb091e10cd7de5a83d",
+      "motivo": "Termo descreve detector de falsidade em papel-moeda, nao marca-texto comum.",
+      "evidencia_url": "https://pncp.gov.br/api/pncp/v1/orgaos/96291141000180/compras/2026/6394/arquivos/6",
+      "pagina": 4,
+      "pdf_sha256": "13f96b6240c8ca3dddd04d9e5edab054a675e4ade1e6e4d240a1bab5ba646f26"
+    },
+    {
+      "id_referencia": "e173028921b187804539",
+      "motivo": "Termo descreve destaca-texto verde em grupo de marca-texto amarelo.",
+      "evidencia_url": "https://pncp.gov.br/api/pncp/v1/orgaos/10764033000161/compras/2026/30/arquivos/3",
+      "pagina": 2,
+      "pdf_sha256": "2aaeab3529c5f941787315c9e6aac0d9b35c48a55880a6e5ba2ab7135b7b6456"
+    }
+  ]
+}

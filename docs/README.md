@@ -20,3 +20,5 @@ Começar pelo [plano de conclusão](PLANO_CONCLUSAO.md): estado, checklist, bran
 - [Contexto técnico](CONTEXTO_BACKEND_E_DADOS.md) e [checklist técnico histórico](TODO_IMPLEMENTACAO_BACKEND_E_DADOS.md): contêm propostas e notas datadas; sua numeração difere do plano de conclusão.
 
 O PDF da proposta acadêmica é preservado como documento original; fonte efetiva e evolução do projeto estão nos documentos atuais. O arquivo `UML` da raiz é uma proposta conceitual histórica; o esquema efetivamente implementado está em `diagramas/`. Imagens em `prototipo/` e o HTML AuditaGov são referências demonstrativas, sem comprovar integração ou modelo publicado.
+
+Consulte a [base e atributos analíticos](ATRIBUTOS_ANALITICOS.md) para aquisição histórica registrada, preparo versionado, critérios e testes da etapa 04.

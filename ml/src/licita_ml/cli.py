@@ -23,6 +23,13 @@ def main():
     prepare.add_argument("--fim", required=True, type=date.fromisoformat)
     prepare.add_argument("--catalogo", required=True)
     prepare.add_argument("--arquivos", nargs="+", type=UUID)
+    attributes = commands.add_parser("atributos")
+    attributes.add_argument("--base-id", required=True, type=UUID)
+    attributes.add_argument("--historicos", required=True, nargs="+", type=UUID)
+    attributes.add_argument("--inicio", required=True, type=date.fromisoformat)
+    attributes.add_argument("--treino-fim", required=True, type=date.fromisoformat)
+    attributes.add_argument("--fim", required=True, type=date.fromisoformat)
+    attributes.add_argument("--exclusoes", required=True)
     args = parser.parse_args()
     engine = None
     try:
@@ -35,9 +42,20 @@ def main():
             pool_pre_ping=True,
             connect_args={"connect_timeout": 10},
         )
-        result = Pipeline(settings, Repository(engine), storage(settings)).run(
-            args.inicio, args.fim, args.catalogo, args.arquivos
-        )
+        if args.command == "atributos":
+            from licita_ml.analytical.pipeline import AnalyticalPipeline
+            from licita_ml.analytical.rules import Policy
+
+            result = AnalyticalPipeline(settings, Repository(engine), storage(settings)).run(
+                args.base_id,
+                args.historicos,
+                Policy(args.inicio, args.treino_fim, args.fim),
+                args.exclusoes,
+            )
+        else:
+            result = Pipeline(settings, Repository(engine), storage(settings)).run(
+                args.inicio, args.fim, args.catalogo, args.arquivos
+            )
         print(json.dumps(result, ensure_ascii=False), flush=True)
         return 0
     except Exception as error:

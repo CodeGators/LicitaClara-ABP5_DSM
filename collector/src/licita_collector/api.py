@@ -13,6 +13,7 @@ from licita_collector.http import Download
 API = "https://dadosabertos.compras.gov.br"
 PNCP = "https://pncp.gov.br/api/pncp/v1"
 ENDPOINTS = {
+    "material_historico_api": "/modulo-pesquisa-preco/1_consultarMaterial",
     "compra_api": "/modulo-contratacoes/1.1_consultarContratacoes_PNCP_14133_Id",
     "itens_api": "/modulo-contratacoes/2.1_consultarItensContratacoes_PNCP_14133_Id",
     "resultados_api": "/modulo-contratacoes/3.1_consultarResultadoItensContratacoes_PNCP_14133_Id",
@@ -37,7 +38,14 @@ class JsonScope:
     def __post_init__(self):
         if self.kind not in ENDPOINTS or self.competence.day != 1:
             raise ValueError("Escopo JSON inválido")
-        if self.kind.endswith("_api"):
+        if self.kind == "material_historico_api":
+            start = date.fromisoformat(self.query["inicio"])
+            end = date.fromisoformat(self.query["fim"])
+            if not str(self.query.get("catalogo", "")).isdigit() or start > end:
+                raise ValueError("Catálogo ou período histórico inválido")
+            if self.competence != end.replace(day=1):
+                raise ValueError("Competência deve identificar o mês final da consulta histórica")
+        elif self.kind.endswith("_api"):
             value = self.query.get("idCompra", "")
             if not value.isdigit():
                 raise ValueError("idCompra deve conter somente dígitos")
@@ -57,6 +65,8 @@ class JsonScope:
     @property
     def module(self):
         digest = hashlib.sha256(canonical(self.query).encode()).hexdigest()[:20]
+        if self.kind == "material_historico_api":
+            return f"historico/material/{digest}"
         return f"api/{self.kind}/{digest}"
 
     @property
@@ -73,6 +83,22 @@ class JsonScope:
         }
 
     def url(self, page=1):
+        if self.kind == "material_historico_api":
+            return (
+                API
+                + ENDPOINTS[self.kind]
+                + "?"
+                + urlencode(
+                    {
+                        "tipo": "codigoItemCatalogo",
+                        "codigo": self.query["catalogo"],
+                        "dataCompraInicio": self.query["inicio"],
+                        "dataCompraFim": self.query["fim"],
+                        "pagina": page,
+                        "tamanhoPagina": 500,
+                    }
+                )
+            )
         if self.source == "comprasgov":
             return (
                 API
@@ -135,6 +161,8 @@ def acquire(scope, folder, http):
                 "resposta_original": raw.decode("utf-8"),
             }
         )
+        if hasattr(http, "provenance"):
+            pages[-1]["origem_cache"] = http.provenance(url)
         if number >= count:
             break
     else:
