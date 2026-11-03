@@ -110,3 +110,7 @@ npm run build --prefix Frontend-licita-clara
 ```
 
 As evidências finais da execução estão em [conclusao_etapa03.json](diagnostico/conclusao_etapa03.json). Fidelidade ao Figma, revisão completa de acessibilidade, autenticação e publicação de análise não são demonstradas por estes testes; seguem nas etapas correspondentes.
+
+## Atualização na etapa 08
+
+`/painel`, `/ranking`, `/fornecedores` e `/fornecedores/{id}` agora consultam dados reais e seleção experimental explícita. A antiga tela fictícia de fornecedores foi preservada em `/demonstracao/fornecedores`. Consulte o [guia atual das telas analíticas](PAINEL_RANKING_FORNECEDORES.md); as instruções e resultados acima registram a entrega histórica 03.

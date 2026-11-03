@@ -193,3 +193,13 @@ h1{font-size:30px;font-weight:500;letter-spacing:-.01em}
 .pagination{margin-top:20px;gap:12px;flex-wrap:wrap}
 .stats strong{overflow-wrap:anywhere}
 @media(max-width:560px){.real-filters{grid-template-columns:1fr}.stats{grid-template-columns:1fr}}
+
+/* Análise experimental: uma cor neutra, sem faixas de risco inventadas. */
+.distribution { display: flex; align-items: end; gap: 10px; min-height: 180px; margin: 24px 0; overflow-x: auto; padding: 8px 0; }
+.distribution > div { flex: 1; min-width: 32px; display: flex; align-items: center; flex-direction: column; gap: 6px; }
+.distribution > div > div { width: 100%; background: var(--petroleo); border-radius: 3px 3px 0 0; min-height: 0; }
+.distribution small { white-space: nowrap; font-size: 10px; color: var(--secundario); }
+.empty-chart { padding: 36px 12px; text-align: center; color: var(--secundario); }
+.analysis-selection .pager { margin-top: 12px; }
+.compact-table .tbl td, .compact-table .tbl td:first-child { min-width: 0; max-width: none; white-space: nowrap; }
+.compact-table:focus-visible { outline: 2px solid var(--petroleo); outline-offset: 3px; }

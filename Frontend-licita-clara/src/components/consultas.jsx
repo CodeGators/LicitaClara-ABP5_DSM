@@ -1,6 +1,6 @@
 import { cloneElement, useId, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { baseLink, date, decimal, money, safeOfficialUrl } from '../api.mjs'
+import { Link, useLocation } from 'react-router-dom'
+import { baseLink, date, decimal, money, safeOfficialUrl, selectionLink } from '../api.mjs'
 import useApi from '../useApi.js'
 
 export function QueryState({ query, loading = 'Carregando…' }) {
@@ -15,7 +15,7 @@ export function Field({ label, children }) {
   return <div className="field"><label htmlFor={id}>{label}</label>{cloneElement(children, { id })}</div>
 }
 export const Info = ({ label, children }) => <div><small>{label}</small><strong>{children}</strong></div>
-export const NoAnalysis = () => <div className="note"><b>Análise não publicada</b>Score, prioridade e comparação com similares ainda não estão disponíveis. Isso não representa conclusão sobre a regularidade da compra.</div>
+export const NoAnalysis = () => <div className="note"><b>Análise não publicada</b>Não há prioridade de auditoria validada. O canal experimental, quando selecionado, pode ser consultado no detalhe e no ranking. Ausência de score não representa conclusão sobre regularidade.</div>
 
 export function LookupFilter({ kind, title, value, onChange, baseId }) {
   const [search, setSearch] = useState('')
@@ -63,8 +63,10 @@ export function Pager({ meta, onChange }) {
 }
 
 export function ItemTable({ items, baseId, from }) {
+  const location = useLocation()
+  const selected = new URLSearchParams(location.search).get('execucao_id')
   return <div className="table-scroll"><table className="tbl"><thead><tr><th>Item</th><th>Órgão / compra</th><th>Fornecedores com resultados não cancelados</th><th>Total homologado do item</th><th>Análise</th></tr></thead><tbody>{items.map(item => {
     const suppliers = [...new Set(item.resultados.filter(r => !r.cancelado).map(r => r.fornecedor_nome))]
-    return <tr key={item.id}><td><Link className="link-a" to={baseLink(`/itens/${item.id}`, baseId)} state={{ from }}>{item.descricao}</Link><small>Item {item.numero_item} · {item.catalogo ? `${item.catalogo} ${item.codigo_catalogo}` : 'Catálogo não informado'}</small></td><td>{item.processo.orgao_nome}<small>Compra {item.processo.numero_compra}</small></td><td>{suppliers.length ? suppliers.join('; ') : 'Não informado'}</td><td>{money(item.valor_homologado_item)}{item.resultados_sem_valor_total > 0 && <small>Total incompleto na fonte</small>}</td><td><span className="pill rev">Não publicada</span></td></tr>
+    return <tr key={item.id}><td><Link className="link-a" to={selected ? selectionLink(`/itens/${item.id}`, location.search) : baseLink(`/itens/${item.id}`, baseId)} state={{ from }}>{item.descricao}</Link><small>Item {item.numero_item} · {item.catalogo ? `${item.catalogo} ${item.codigo_catalogo}` : 'Catálogo não informado'}</small></td><td>{item.processo.orgao_nome}<small>Compra {item.processo.numero_compra}</small></td><td>{suppliers.length ? suppliers.join('; ') : 'Não informado'}</td><td>{money(item.valor_homologado_item)}{item.resultados_sem_valor_total > 0 && <small>Total incompleto na fonte</small>}</td><td><span className="pill rev">{selected && selected !== 'nenhuma' ? 'Consultar análise no detalhe' : 'Não publicada'}</span></td></tr>
   })}</tbody></table></div>
 }

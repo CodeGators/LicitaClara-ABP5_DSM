@@ -1,0 +1,127 @@
+import { test, expect } from '@playwright/test'
+import { BASE, ITEM, SUPPLIER, item, otherItem, mockApi } from './fixtures.js'
+
+const EXEC = '77777777-7777-4777-8777-777777777777'
+const NEW_EXEC = '77777777-7777-4777-8777-888888888888'
+const MODEL = '88888888-8888-4888-8888-888888888888'
+const AE = '88888888-8888-4888-8888-999999999999'
+
+async function mockView(page, overrides = {}) {
+  const state = await mockApi(page, { active: EXEC, scored: true, ...overrides, handler: async ({ url, path, send, error }) => {
+    const done = async body => { await send(body); return true }
+    const bad = async (message, status) => { await error(message, status); return true }
+    if (path === '/analises/publicacao') return done({ base_id: BASE, execucao_id: state.active, status: state.active ? 'publicada_experimental' : 'nao_publicada', experimental: true })
+    const run = id => ({ id, base_id: BASE, concluido_em: '2026-11-03T15:00:00Z', modelos: [{ id: MODEL, algoritmo: 'isolation_forest' }, { id: AE, algoritmo: 'autoencoder' }] })
+    if (path === '/analises/execucoes') return done({ dados: [run(EXEC), run(NEW_EXEC)], total: 2, total_paginas: 1 })
+    if (path === `/analises/execucoes/${EXEC}` || path === `/analises/execucoes/${NEW_EXEC}`) return done(run(path.split('/').at(-1)))
+    if (path.startsWith('/analises/execucoes/') && !path.includes('/itens/')) return bad('Execução não publicada nesta base.', 404)
+    if (path.includes(`/itens/${ITEM}`) && path.startsWith('/analises/')) return done({ dados: [{ cobertura: [{ modelo_id: MODEL, motivo: state.scored ? null : 'SEM_REFERENCIA_EXATA' }], resultados: state.scored ? [{ id: 'score-1', modelo_id: MODEL, resultado_item_id: item.resultados[0].id, algoritmo: 'isolation_forest', score_bruto: '0.514', indice_experimental: '88.125', explicacao: { status: 'indisponivel', parcelas: [] } }] : [] }] })
+    if (!path.startsWith('/visao/')) return false
+    if (state.viewOffline) return bad('Consulta do recorte indisponível.', 503)
+    if (url.searchParams.get('modelo_id') === 'invalido') return bad('Modelo não pertence à execução selecionada.', 422)
+    const hasScore = state.scored && url.searchParams.get('execucao_id') && url.searchParams.get('modelo_id')
+    let rows = [item, otherItem].map((r, i) => ({ ...r, resultados: r.resultados.filter(e => !e.cancelado), valor_homologado: r.valor_homologado_item, soma_valores_conhecidos: r.valor_homologado_item, resultados_sem_total: 0, resultados_analisados: i === 0 && hasScore ? 1 : 0, status_analise: i === 0 && hasScore ? 'analisados' : 'nao_analisados', indice_experimental: i === 0 && hasScore ? '88.125' : null, motivos: i === 0 && hasScore ? {} : { SEM_REFERENCIA_EXATA: 1 } }))
+    rows = rows.filter(r => r.descricao.toLowerCase().includes((url.searchParams.get('busca') || '').toLowerCase()))
+    const filter = url.searchParams.get('analise') || 'todos'
+    if (filter !== 'todos') rows = rows.filter(r => r.status_analise === filter)
+    const context = { base_id: BASE, execucao_id: url.searchParams.get('execucao_id'), modelo_id: url.searchParams.get('modelo_id'), experimental: true, universo: {}, resumo: { itens: rows.length, processos: rows.length ? 1 : 0, orgaos: 1, fornecedores: 1, fornecedores_no_denominador: 1, contratos_vinculados: 0, resultados: 1, analisados: rows.filter(r => r.status_analise === 'analisados').length, parcial: 0, nao_analisados: rows.filter(r => r.status_analise === 'nao_analisados').length, valor_homologado: '0.10000001', soma_valores_conhecidos: '0.10000001', resultados_sem_total: 0 } }
+    const pageOf = entries => {
+      const size = Number(url.searchParams.get('tamanho_pagina') || 20), n = Number(url.searchParams.get('pagina') || 1)
+      return { dados: entries.slice((n-1)*size,n*size), total: entries.length, pagina: n, tamanho_pagina: size, total_paginas: Math.ceil(entries.length/size) }
+    }
+    if (path === '/visao/painel') return done({ ...context, distribuicao: Array.from({ length: 10 }, (_,i) => ({ inicio: i*10, fim: (i+1)*10, itens: i === 8 ? context.resumo.analisados : 0 })), evolucao: rows.length ? [{ mes: '2026-09', itens: rows.length, analisados: context.resumo.analisados, parcial: 0, nao_analisados: context.resumo.nao_analisados }] : [], motivos_indisponibilidade: context.resumo.nao_analisados ? { SEM_REFERENCIA_EXATA: context.resumo.nao_analisados } : {} })
+    if (path === '/visao/ranking') return done({ ...context, ...pageOf(rows) })
+    const supplier = { id: SUPPLIER, nome: 'Fornecedor do recorte', compras_com_resultado: 1, contratos_vinculados: 0, itens: 1, orgaos: 1, valor_homologado: '0.10000001', resultados_sem_total: 0, indice_experimental: hasScore ? '88.125' : null }
+    if (path === '/visao/fornecedores') return done({ ...context, ...pageOf(rows.length ? [supplier] : []) })
+    if (path === `/visao/fornecedores/${SUPPLIER}`) return done({ ...context, fornecedor: supplier, relacoes: [{ orgao_id: 'org', orgao_nome: 'Órgão do recorte', compras_com_resultado: 1, valor_fornecedor: null, valor_homologado: null, participacao: null, hhi: null, motivo: 'TOTAIS_INCOMPLETOS' }], itens: pageOf(rows.slice(0,1)) })
+    return bad('Fornecedor não encontrado neste recorte.', 404)
+  } })
+  return state
+}
+
+test('painel fixa versão/modelo, conserva filtros entre telas e distingue índices de risco', async ({ page }) => {
+  const state = await mockView(page)
+  const errors = []; page.on('pageerror', e => errors.push(e.message))
+  await page.goto('/painel')
+  await expect(page.getByRole('heading', { name: 'Painel do recorte' })).toBeVisible()
+  await expect(page).toHaveURL(new RegExp(`execucao_id=${EXEC}`))
+  await expect(page).toHaveURL(new RegExp(`modelo_id=${MODEL}`))
+  await expect(page.getByText('Análise experimental · utilidade não validada')).toBeVisible()
+  await expect(page.getByText('R$ 0,10000001', { exact: true })).toBeVisible()
+  await page.getByLabel('Buscar item, compra ou fornecedor').fill('Borracha')
+  await page.getByRole('button', { name: 'Aplicar filtros' }).click()
+  await page.getByRole('link', { name: 'Ranking experimental', exact: true }).click()
+  await expect(page.getByRole('heading', { name: '1 item(ns) no ranking' })).toBeVisible()
+  expect(new URL(page.url()).searchParams.get('busca')).toBe('Borracha')
+  state.active = NEW_EXEC
+  await page.getByRole('link', { name: 'Borracha do recorte', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Análise experimental selecionada' })).toBeVisible()
+  await expect(page.getByRole('cell', { name: '88,125', exact: true })).toBeVisible()
+  expect(new URL(page.url()).searchParams.get('execucao_id')).toBe(EXEC)
+  await page.getByRole('link', { name: 'Voltar à consulta' }).click()
+  await expect(page.getByRole('heading', { name: '1 item(ns) no ranking' })).toBeVisible()
+  expect(errors).toEqual([])
+})
+
+test('ausência de scores e publicação não vira zero nem bloqueia consultas reais', async ({ page }) => {
+  await mockView(page, { active: null, scored: false })
+  await page.goto('/painel')
+  await expect(page.getByText('Nenhum índice disponível neste recorte.')).toBeVisible()
+  await expect(page).toHaveURL(/execucao_id=nenhuma/)
+  await page.getByRole('link', { name: 'Ranking experimental', exact: true }).click()
+  await expect(page.getByRole('heading', { name: '2 item(ns) no ranking' })).toBeVisible()
+  await expect(page.getByRole('cell', { name: 'Indisponível', exact: true })).toHaveCount(2)
+  await page.getByLabel('Estado da análise').selectOption('analisados')
+  await page.getByRole('button', { name: 'Aplicar filtros' }).click()
+  await expect(page.getByText('Nenhum item encontrado nesta página.')).toBeVisible()
+})
+
+test('fornecedor mostra compras e contratos separados e concentração desconhecida', async ({ page }) => {
+  await mockView(page)
+  await page.goto('/fornecedores')
+  await page.getByRole('link', { name: 'Fornecedor do recorte', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Fornecedor do recorte', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Participação e concentração por órgão' })).toBeVisible()
+  await expect(page.getByRole('cell', { name: 'Indisponível', exact: false })).toHaveCount(2)
+  await expect(page.getByText('1 compras com resultado · 0 contratos vinculados conhecidos · 1 órgãos')).toBeVisible()
+})
+
+test('troca de modelo, paginação, erro e retentativa mantêm seleção explícita', async ({ page }) => {
+  const state = await mockView(page)
+  await page.goto(`/ranking?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=${MODEL}&tamanho_pagina=1`)
+  await expect(page.getByRole('link', { name: 'Borracha do recorte', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Próxima', exact: true }).click()
+  await expect(page.getByRole('link', { name: 'Caneta do recorte', exact: true })).toBeVisible()
+  await page.getByLabel('Modelo experimental').selectOption(AE)
+  await expect(page).not.toHaveURL(/pagina=2/)
+  state.viewOffline = true
+  await page.getByLabel('Ordenação', { exact: true }).selectOption('descricao_asc')
+  await page.getByRole('button', { name: 'Aplicar filtros' }).click()
+  await expect(page.getByRole('heading', { name: 'Consulta indisponível' })).toBeVisible()
+  state.viewOffline = false
+  await page.getByRole('button', { name: 'Tentar novamente' }).click()
+  await expect(page.getByRole('heading', { name: '2 item(ns) no ranking' })).toBeVisible()
+  expect(new URL(page.url()).searchParams.get('modelo_id')).toBe(AE)
+})
+
+test('execução inexistente não troca silenciosamente para a ativa e permite escolher outra', async ({ page }) => {
+  await mockView(page)
+  await page.goto(`/ranking?base_id=${BASE}&execucao_id=00000000-0000-4000-8000-000000000000`)
+  await expect(page.getByRole('heading', { name: 'Registro não encontrado' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Borracha do recorte', exact: true })).toHaveCount(0)
+  await page.getByLabel('Execução publicada').selectOption(EXEC)
+  await expect(page.getByRole('heading', { name: '2 item(ns) no ranking' })).toBeVisible()
+  await page.goto(`/itens/${ITEM}?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=00000000-0000-4000-8000-000000000000`)
+  await expect(page.getByRole('heading', { name: 'Modelo fora da execução selecionada' })).toBeVisible()
+  await expect(page.getByRole('cell', { name: '88,125', exact: true })).toHaveCount(0)
+})
+
+test('painel real é utilizável em tela pequena e tema escuro', async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.addInitScript(() => localStorage.setItem('lc_tema', 'dark'))
+  await mockView(page, { scored: false })
+  await page.goto('/painel')
+  await expect(page.getByText('Nenhum índice disponível neste recorte.')).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.screenshot({ path: testInfo.outputPath('painel-mobile.png'), fullPage: true })
+})

@@ -1,0 +1,141 @@
+{
+  "etapa": 8,
+  "branch": "feat/08-painel-ranking-fornecedores",
+  "data": "2026-11-03",
+  "main_local_remota_antes": "de16cf2",
+  "testes": {
+    "python_aprovados": 153,
+    "falhas": 0,
+    "skips": 0,
+    "visao_focados": 7,
+    "cliente_node_aprovados": 7,
+    "browser_controlados_aprovados": 19,
+    "browser_live_aprovados": 2,
+    "navegador": "Google Chrome headless",
+    "lint_python": "aprovado",
+    "formatacao_python": "121 arquivos formatados",
+    "build_vite": "aprovado"
+  },
+  "selecao_real": {
+    "base_id": "a21534e3-e1a9-5d31-9a4e-c3beb608914f",
+    "execucao_id": "c680b7ea-196d-59db-93c7-03f6c7aaebb4",
+    "modelo_id": "18fb70f8-2fa7-5e2e-95ed-6d890f4e7943"
+  },
+  "resumo_real": {
+    "itens": 10,
+    "processos": 7,
+    "orgaos": 7,
+    "fornecedores": 6,
+    "fornecedores_no_denominador": 6,
+    "contratos_vinculados": 0,
+    "resultados": 8,
+    "analisados": 0,
+    "parcial": 0,
+    "nao_analisados": 10,
+    "valor_homologado": "26579.80000000",
+    "soma_valores_conhecidos": "26579.80000000",
+    "resultados_sem_total": 0
+  },
+  "evolucao_real": [
+    {
+      "mes": "2025-04",
+      "itens": 4,
+      "analisados": 0,
+      "parcial": 0,
+      "nao_analisados": 4
+    },
+    {
+      "mes": "2026-02",
+      "itens": 1,
+      "analisados": 0,
+      "parcial": 0,
+      "nao_analisados": 1
+    },
+    {
+      "mes": "2026-09",
+      "itens": 3,
+      "analisados": 0,
+      "parcial": 0,
+      "nao_analisados": 3
+    },
+    {
+      "mes": "sem_data",
+      "itens": 2,
+      "analisados": 0,
+      "parcial": 0,
+      "nao_analisados": 2
+    }
+  ],
+  "motivos_reais": {
+    "RESULTADO_ANTERIOR_AO_PERIODO": 4,
+    "SEM_REFERENCIA_COM_VINCULO_E_ESPECIFICACAO_EXATOS": 4,
+    "SEM_RESULTADO_CONHECIDO": 2
+  },
+  "reconciliacao_painel_ranking_fornecedores": true,
+  "filtro_analisados_total_real": 0,
+  "preservacao": {
+    "tabelas_verificadas": 34,
+    "contagens_iguais_entrega07": true,
+    "linhas_anteriores_preservadas": true,
+    "arquivos_anteriores_preservados": 237,
+    "env_preservado": true,
+    "migrações_importacoes_treinamentos_publicacoes_executados": false,
+    "selecao_publicada_preservada": {
+      "base_id": "a21534e3-e1a9-5d31-9a4e-c3beb608914f",
+      "execucao_id": "c680b7ea-196d-59db-93c7-03f6c7aaebb4",
+      "modelo_id": "18fb70f8-2fa7-5e2e-95ed-6d890f4e7943"
+    }
+  },
+  "rotas_frontend_reais": [
+    "/painel",
+    "/ranking",
+    "/fornecedores",
+    "/fornecedores/:id",
+    "/itens/:id com análise selecionada"
+  ],
+  "api_nova": [
+    "/api/v1/visao/painel",
+    "/api/v1/visao/ranking",
+    "/api/v1/visao/fornecedores",
+    "/api/v1/visao/fornecedores/{supplier_id}"
+  ],
+  "screenshots": [
+    {
+      "arquivo_local": "/tmp/licita-etapa08-live-final/live-painel-ranking-e-forn-8c0e0--conservam-a-análise-na-URL-live/painel-real-mobile.png",
+      "sha256": "f4d71c1ff664632d82d3617ad5c2e271f6ff4a4e6801805da26feca4d5327900"
+    },
+    {
+      "arquivo_local": "/tmp/licita-etapa08-live-final/live-painel-ranking-e-forn-8c0e0--conservam-a-análise-na-URL-live/painel-real.png",
+      "sha256": "4f36e79062267fff723a1b8dcb2e60bd923e4bbf09b6ba27e540f620ecbd6218"
+    },
+    {
+      "arquivo_local": "/tmp/licita-etapa08-live-final/live-painel-ranking-e-forn-8c0e0--conservam-a-análise-na-URL-live/fornecedor-real.png",
+      "sha256": "35d83d177464cc25d3d46ef2f3c62123e2fe61897122e65930afa5feb809c283"
+    },
+    {
+      "arquivo_local": "/tmp/licita-etapa08-live-final/live-consulta-real-pelo-pr-8f57f--item-processo-e-documentos-live/item-real.png",
+      "sha256": "eaf82dccea055e0b546dff19cc68a8ef74cc95144cad8a7553e4fb6fc9167341"
+    }
+  ],
+  "inspecao_visual": "Capturas desktop/mobile e tema escuro; não é conferência Figma nem auditoria completa de acessibilidade.",
+  "servidor_temporario": "encerrado",
+  "decisao": "OK para consultas integradas e ranking experimental com ausências explícitas",
+  "utilidade_modelos_validada": false,
+  "prioridade_auditoria": null,
+  "limites": [
+    "piloto sem índices elegíveis",
+    "revisão humana e confirmação temporal pendentes",
+    "20 mil registros por tabela; exceder gera 503 sem truncamento",
+    "HHI do recorte de itens/resultados, não universo completo do órgão"
+  ],
+  "nao_executado": [
+    "migrações",
+    "coleta/importação",
+    "treinamento/inferência/publicação",
+    "autenticação/revisão persistente",
+    "relatórios reais",
+    "CI remoto",
+    "deploy",
+    "merge/push desta etapa"
+  ]
+}

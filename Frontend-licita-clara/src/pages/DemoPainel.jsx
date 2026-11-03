@@ -43,7 +43,7 @@ export default function Painel() {
         action={<button className="btn ghost"><Calendar size={16} /> Jan–Jun 2026</button>} />
       <div className="grid g4">
         <Kpi label="Itens no recorte" value="1.248" sub="8 órgãos fictícios · 146 fornecedores" icon={Files} to="/demonstracao/itens?aba=todos" />
-        <Kpi label="Valor homologado" value="R$ 86,4 mi" sub="Compras e contratos do semestre" icon={Wallet} to="/fornecedores" />
+        <Kpi label="Valor homologado" value="R$ 86,4 mi" sub="Compras e contratos do semestre" icon={Wallet} to="/demonstracao/fornecedores" />
         <Kpi label="Alta prioridade" value="96" cls="t-alta" sub="7,7% dos itens · score de 80 a 100" icon={TriangleAlert} to="/demonstracao/itens?aba=alta" tip="Processos com score de 80 a 100, que merecem revisão primeiro." />
         <Kpi label="Em revisão humana" value="24" sub="Dos 96 itens de alta prioridade" icon={ScanSearch} to="/demonstracao/itens?aba=sinalizados" />
       </div>

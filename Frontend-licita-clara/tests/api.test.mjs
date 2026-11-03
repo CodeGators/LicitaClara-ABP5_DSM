@@ -58,3 +58,13 @@ test('cancelamento e timeout interrompem a consulta com estados distintos', asyn
   await assert.rejects(request, error => error.name === 'AbortError')
   await assert.rejects(get('/itens'), error => error.code === 'tempo_esgotado')
 })
+
+test('links analíticos preservam seleção e filtros sem carregar página ou parâmetros estranhos', async () => {
+  const { selectionLink } = await import('../src/api.mjs')
+  const url = new URL(selectionLink('/ranking', '?base_id=base&execucao_id=exec&modelo_id=model&busca=A%26B&pagina=9&estranho=valor'), 'https://example.test')
+  assert.equal(url.searchParams.get('modelo_id'), 'model')
+  assert.equal(url.searchParams.get('execucao_id'), 'exec')
+  assert.equal(url.searchParams.get('busca'), 'A&B')
+  assert.equal(url.searchParams.has('pagina'), false)
+  assert.equal(url.searchParams.has('estranho'), false)
+})

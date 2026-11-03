@@ -5,19 +5,22 @@ import Logo from './Logo.jsx'
 import AjudaModal from './AjudaModal.jsx'
 import useTheme from '../useTheme.js'
 import { useBase } from '../BaseContext.jsx'
-import { baseLink, date } from '../api.mjs'
+import { date } from '../api.mjs'
+import { selectionLink } from '../AnalysisContext.jsx'
 
 const nav = [
   { to: '/itens', label: 'Consultar itens', icon: ListFilter },
+  { to: '/painel', label: 'Painel', icon: LayoutGrid },
+  { to: '/ranking', label: 'Ranking experimental', icon: ListFilter },
   { to: '/demonstracao/painel', label: 'Painel · demonstração', icon: LayoutGrid },
-  { to: '/fornecedores', label: 'Fornecedores · demonstração', icon: Building2 },
+  { to: '/fornecedores', label: 'Fornecedores', icon: Building2 },
   { to: '/relatorios', label: 'Relatórios · demonstração', icon: FileText },
 ]
-const names = { itens: 'Consultar itens', processos: 'Processo da compra', demonstracao: 'Demonstração', fornecedores: 'Fornecedores · demonstração', relatorios: 'Relatórios · demonstração' }
+const names = { itens: 'Consultar itens', processos: 'Processo da compra', demonstracao: 'Demonstração', painel: 'Painel', ranking: 'Ranking experimental', fornecedores: 'Fornecedores', relatorios: 'Relatórios · demonstração' }
 const readSeen = () => { try { return localStorage.getItem('lc_ajuda_vista') } catch { return null } }
 
 export default function Layout() {
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
   const parts = pathname.split('/').filter(Boolean)
   const base = useBase()
   const real = base.enabled
@@ -26,7 +29,7 @@ export default function Layout() {
   const [ajuda, setAjuda] = useState(() => !readSeen())
   const fechar = () => { try { localStorage.setItem('lc_ajuda_vista', '1') } catch {} setAjuda(false) }
 
-  useEffect(() => setMenu(false), [pathname])
+  useEffect(() => { setMenu(false); window.scrollTo(0, 0) }, [pathname])
   useEffect(() => {
     const esc = e => e.key === 'Escape' && setMenu(false)
     window.addEventListener('keydown', esc)
@@ -43,7 +46,7 @@ export default function Layout() {
           <div className="eyebrow">Espaço de análise</div>
           <nav className="nav">
             {nav.map(({ to, label, icon: I, end }) => (
-              <NavLink key={to} to={to === '/itens' && base.baseId && real ? baseLink(to, base.baseId) : to} end={end} className={({ isActive }) => (isActive || (to === '/itens' && real) ? 'active' : '')}>
+              <NavLink key={to} to={real && base.baseId && !to.startsWith('/demonstracao') && to !== '/relatorios' ? selectionLink(to, search) : to} end={end} className={({ isActive }) => (isActive || (to === '/itens' && /^\/(itens|processos)(\/|$)/.test(pathname)) ? 'active' : '')}>
                 <I size={18} /> {label}
               </NavLink>
             ))}
@@ -69,7 +72,7 @@ export default function Layout() {
             <span><span className="hide-sm">Auditoria cidadã / </span>{names[parts[0] || '']}</span>
           </div>
           <div className="chips">
-            <span className="demo">{real ? 'Dados oficiais · análise não publicada' : 'Demonstração · dados simulados'}</span>
+            <span className="demo">{real ? (/^\/(painel|ranking|fornecedores)(\/|$)/.test(pathname) || (new URLSearchParams(search).get('execucao_id') && new URLSearchParams(search).get('execucao_id') !== 'nenhuma')) ? 'Dados oficiais · análise experimental' : 'Dados oficiais · análise não publicada' : 'Demonstração · dados simulados'}</span>
             <button className="help-btn" onClick={() => setAjuda(true)} aria-label="Como funciona"><CircleHelp size={16} /><span className="hide-sm">Como funciona</span></button>
             <button className="help-btn" onClick={alternar} aria-label={tema === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'} title={tema === 'dark' ? 'Modo claro' : 'Modo escuro'}>
               {tema === 'dark' ? <Sun size={16} /> : <Moon size={16} />}<span className="hide-sm">{tema === 'dark' ? 'Claro' : 'Escuro'}</span>

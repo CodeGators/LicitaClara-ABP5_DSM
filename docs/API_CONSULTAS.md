@@ -143,3 +143,7 @@ A verificação HTTP local com o login restrito da aplicação consultou a base 
 ## Análises experimentais (etapa 07)
 
 Cinco rotas adicionais de leitura em `/api/v1/analises` exigem base/execução explícitas e preservam estados sem score. Consulte [inferência e publicação](INFERENCIA_PUBLICACAO.md). O campo legado `analise.nao_publicada` continua relativo à ausência de publicação de auditoria validada; ele não seleciona automaticamente o canal experimental. Bases de treino (`recorte.tipo=treino_modelo`) são excluídas das consultas operacionais.
+
+## Visão agregada (etapa 08)
+
+Quatro GET em `/api/v1/visao` oferecem painel, ranking, fornecedores e detalhe de fornecedor com o mesmo universo/seleção e paginação. O filtro de análise é de cobertura, sem faixas de risco validadas. Veja [contrato e definições](PAINEL_RANKING_FORNECEDORES.md).

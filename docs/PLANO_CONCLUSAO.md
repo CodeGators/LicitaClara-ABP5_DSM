@@ -22,20 +22,21 @@ Este é o ponto de entrada para continuar o projeto. Ler este arquivo antes de i
 
 ## Estado confirmado em 03/11/2026
 
-- `main` local está em `e9223b0`, após merges autorizados das entregas técnicas 01–06. A revisão humana de 05 permanece pendente. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O envio ao GitHub continua pendente por permissão de escrita; a última referência remota consultada estava em `e2a5a84`.
+- `main` local e remota estão sincronizadas em `de16cf2`, após integração e push autorizados das entregas técnicas 00–07. A revisão humana de 05 permanece pendente. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O acesso SSH da conta `rodrigoaslima` está funcionando e a permissão de escrita foi confirmada no envio de `de16cf2`; não alterar credenciais.
 - A organização local difere do GitHub: frontend em `Frontend-licita-clara/` e protótipos em `docs/prototipo/`.
 - No início da revisão, backend, coletor, ML, shared, infraestrutura, docs e CI estavam sem rastreamento no Git. A etapa 01 consolidou esses arquivos e a reorganização em branch própria e já foi integrada à `main` local. As branches de entrega foram preservadas.
 - Backup anterior à atualização: `../abp-backup-antes-atualizacao-20261103-092407/`. Contém arquivos locais, diff e estado do Git; não é backup completo do banco/datasets ignorados.
 - PostgreSQL local saudável, com duas bases validadas de setembro/2026. Cada versão tem 7 processos, 10 itens e 130 referências; não somar versões como cobertura adicional.
 - Banco possui 34 tabelas de aplicação e cinco migrações documentadas. Ter tabela não significa ter serviço implementado.
 - Antes de 07, tabelas de modelos, execuções de análise, scores, avaliações, revisões e relatórios estavam vazias. A etapa 07 registrou duas versões do mesmo treino separado de 140 referências, quatro versões de modelos (dois algoritmos), duas execuções/publicações experimentais e catorze avaliações de processo sem score; scores, revisões e relatórios continuam vazios. Participações e contratos também sem registros no piloto.
-- API possui quinze rotas de leitura, além de health/readiness (cinco experimentais de análise): inclui lista/detalhe global de itens e `/fornecedores/opcoes` para o seletor. Nas consultas antigas, análise de auditoria permanece `nao_publicada`, score e prioridade nulos; o canal experimental exige consulta explícita.
-- Frontend real integrado: entrada `/itens`, detalhe de item/processo, documentos, filtros e paginação HTTP. A base é fixada na URL. Essas telas não consomem os registros de `src/data.js`.
-- Demonstrações preservadas em `/demonstracao/painel`, `/demonstracao/itens`, `/fornecedores` e `/relatorios`, com aviso explícito de dados fictícios. IDs reais não são substituídos por exemplos.
+- API possui dezenove rotas de leitura, além de health/readiness (cinco de análise experimental e quatro de visão agregada): inclui lista/detalhe global de itens e `/fornecedores/opcoes` para o seletor. Nas consultas antigas, análise de auditoria permanece `nao_publicada`, score e prioridade nulos; o canal experimental exige consulta explícita.
+- Frontend real integrado: entrada `/itens`, detalhe de item/processo, documentos, `/painel`, `/ranking`, `/fornecedores` e detalhe de fornecedor, com filtros/paginação e seleção de execução/modelo na URL. A base é fixada na URL. Essas telas não consomem os registros de `src/data.js`.
+- Demonstrações preservadas em `/demonstracao/painel`, `/demonstracao/itens`, `/demonstracao/fornecedores` e `/relatorios`, com aviso explícito de dados fictícios. IDs reais não são substituídos por exemplos.
 - Revisão persistente e exportações reais seguem pendentes; controles antigos continuam somente nas demonstrações. A consulta real mostra indisponibilidade dessas funções e análise não publicada.
 - Isolation Forest e Autoencoder têm avaliação técnica versionada sobre o dataset analítico, com artefatos reproduzíveis e ensaios antigos preservados. Há inferência e publicação experimental de cobertura no PostgreSQL, com zero scores elegíveis no piloto; utilidade e prioridade de auditoria não foram aprovadas e revisão humana permanece pendente.
 - Ensaio corretivo: 140 referências de treino e 35 de avaliação; replicação histórica: 177/107. Estabilidade aprovada nesses ensaios não comprova utilidade de auditoria.
 - Há divergências documentais de especificação e limitações temporais registradas. O dossiê independente tem 18 casos, todos com parecer `pendente` na conferência atual.
+- Etapa 08: 153 testes Python, 7 testes do cliente, 19 cenários browser controlados e 2 fluxos browser reais aprovados, sem skips; lint/formatação e build aprovados. Painel/ranking/fornecedores usam API, com universo explícito e índices ausentes no piloto.
 - Etapa 07: 146 testes Python aprovados sem falhas/skips, lint/formatação aprovados (117 arquivos), migração 0005 e Alembic check aprovados; API real restrita e versão anterior consultável verificadas.
 - Etapa 06: 143 testes Python aprovados sem skips, lint/formatação aprovados (109 arquivos), cinco treinos AE com recarga exata e comparação real/reutilização verificadas. Utilidade inconclusiva; nenhum vencedor validado.
 - Etapa 05: 135 testes Python aprovados sem skips, lint/formatação aprovados (105 arquivos), grade real de 40 ajustes e recarga exata. Revisão humana pendente; utilidade inconclusiva.
@@ -61,6 +62,7 @@ Documentos de apoio:
 - [Frontend integrado](FRONTEND_CONSULTAS_REAIS.md): execução com proxy Vite, caminhos reais/demonstrativos e testes no navegador.
 - [Banco](BANCO_DE_DADOS.md) e [importação](PREPARACAO_E_IMPORTACAO.md).
 - [Revisão do núcleo](validacao_nucleo/REVISAO_E_CONFIRMACAO.md), [achados](validacao_nucleo/ACHADOS_DOCUMENTAIS.md) e [guia independente](validacao_nucleo/GUIA_REVISAO_INDEPENDENTE.md).
+- [Painel, ranking e fornecedores](PAINEL_RANKING_FORNECEDORES.md): rotas reais, filtros compartilhados, HHI, valores e testes de 08.
 - [Inferência e publicação](INFERENCIA_PUBLICACAO.md): registro do treino/modelos, política experimental, API e testes da etapa 07.
 - [Comparação com Autoencoder](COMPARACAO_AUTOENCODER.md): arquitetura, resultados, sensibilidade e decisão da etapa 06.
 - [Avaliação versionada do IF](AVALIACAO_ISOLATION_FOREST.md): comandos, revisão e alternativa sem revisor independente.
@@ -68,9 +70,9 @@ Documentos de apoio:
 
 ## Etapa atual e próximo passo
 
-**Etapa atual:** 07 — inferência e publicação experimental implementadas e verificadas na branch `feat/07-inferencia-publicacao`, pronta para teste do usuário. O piloto tem cobertura zero de scores, explicitamente registrada; cenários com scores usam dados controlados em testes.
+**Etapa atual:** 08 — painel, ranking experimental e fornecedores integrados e verificados na branch `feat/08-painel-ranking-fornecedores`, pronta para teste do usuário. As telas mostram dados oficiais e ausência de índices no piloto, sem fallback fictício.
 
-**Próxima etapa:** após teste e integração autorizada de 07, completar painel/ranking/fornecedores reais (08), consumindo execução explícita e exibindo ausências e natureza experimental. Ainda não existe ranking validado de auditoria. A etapa 07 não foi integrada à `main` nem enviada ao GitHub.
+**Próxima etapa:** após teste e integração autorizada de 08, implementar identidade/autorização e revisão persistente (09). Ainda não existe ranking validado de auditoria nem revisão humana independente concluída. A etapa 08 não foi integrada à `main` nem enviada ao GitHub.
 
 **Pendências externas:** acesso ao Figma; pareceres humanos independentes (usuário não tem revisor confirmado; alternativa técnica documentada sem aprovar utilidade); definição/provisionamento da hospedagem. Não impedem iniciar consolidação, contratos e consultas reais.
 
@@ -84,14 +86,14 @@ Documentos de apoio:
 - [ ] 05 — Concluir avaliação do Isolation Forest e revisão independente.
 - [x] 06 — Implementar e comparar Autoencoder (comparação técnica; utilidade inconclusiva).
 - [x] 07 — Implementar inferência, explicações e publicação versionada (experimental; piloto sem scores elegíveis).
-- [ ] 08 — Completar painel, ranking e fornecedores integrados.
+- [x] 08 — Completar painel, ranking e fornecedores integrados (canal experimental e ausências explícitas).
 - [ ] 09 — Implementar autenticação, autorização e revisão persistente.
 - [ ] 10 — Implementar relatórios PDF/CSV reais.
 - [ ] 11 — Concluir conferência visual, responsividade e acessibilidade.
 - [ ] 12 — Hospedar e automatizar operação com recuperação.
 - [ ] 13 — Validar fluxo completo e preparar entrega acadêmica reproduzível.
 
-As branches 00–07 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
+As branches 00–08 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
 
 ## Entregas, branches e aceitação
 
@@ -190,10 +192,10 @@ Branch: `feat/07-inferencia-publicacao`. Dependências: 04, 05; decisão final d
 
 Branch: `feat/08-painel-ranking-fornecedores`. Dependências: 03 e 07.
 
-- [ ] Implementar resumos, distribuição, evolução e contadores reais, incluindo não analisados.
-- [ ] Implementar fornecedores, relações e concentração com universo e período explícitos.
-- [ ] Integrar filtros por análise/prioridade e manter consistência entre telas.
-- [ ] Exibir corretamente itens, processos, contratos e valores conhecidos, sem usar rótulos intercambiáveis.
+- [x] Implementar resumos, distribuição, evolução e contadores reais, incluindo não analisados.
+- [x] Implementar fornecedores, relações e concentração com universo e período explícitos.
+- [x] Integrar seleção de execução/modelo e filtros de cobertura da análise, mantendo consistência entre telas; prioridade de auditoria permanece indisponível porque não há faixas validadas.
+- [x] Exibir corretamente itens, processos, contratos e valores conhecidos, sem usar rótulos intercambiáveis.
 
 **Como testar:** reconciliar gráficos/cards/listas sob os mesmos filtros e base; conferir denominadores do HHI; testar ausência de análise e múltiplos fornecedores. **Conclusão:** nenhum indicador funcional depende de constantes simuladas.
 
@@ -392,3 +394,16 @@ Checklist atualizado:
 - Verificações: **146 testes Python aprovados sem falhas/skips**, incluindo três cenários focados em inferência/publicação, lint/formatação aprovados (117 arquivos), Alembic check sem divergências. Evidência: [agregado da etapa 07](diagnostico/conclusao_etapa07.json). Testes com scores controlados cobrem múltiplos vencedores, parcelas AE, recarga, FK, falha/retomada e troca ativa atômica. Não houve mudança visual ou teste browser nesta etapa; CI remoto/deploy não executados.
 - **Resultado: OK para inferência/publicação experimental; cobertura insuficiente para ranking com scores no piloto.** Não converter ausências em zero, índice em probabilidade ou estabilidade em utilidade. Revisão humana e confirmação temporal continuam pendentes; a etapa 08 deve mostrar esses limites.
 - Próximo passo: teste do usuário, integração autorizada e 08 em branch própria.
+
+### Entrega 08 — 03/11/2026
+
+- Branch: `feat/08-painel-ranking-fornecedores`; título do commit: `feat: integrar painel ranking e fornecedores aos dados reais`.
+- Estado anterior confirmado: `main` local/remota em `de16cf2`, após push autorizado por SSH. Nenhum merge/push desta etapa foi realizado.
+- Mudança: quatro endpoints GET de visão agregada com universo comum; painel, ranking, fornecedores e relações reais; filtros, paginação e seleção de base/execução/modelo fixados na URL; análise selecionada no detalhe do item. Demonstrações anteriores preservadas em rotas explícitas.
+- Semântica: totais decimais por resultado, múltiplos vencedores e cancelados, soma conhecida separada do total incompleto, HHI com todos os fornecedores do recorte e frequência por compra distinta. Não há prioridade de auditoria inferida; índices são experimentais e ausências não viram zero.
+- Teste manual: [guia da etapa 08](PAINEL_RANKING_FORNECEDORES.md). Iniciar API/Vite e abrir `/painel`, `/ranking`, `/fornecedores`; trocar filtros/modelo/execução, abrir item/fornecedor e conferir contexto preservado.
+- Verificações: **153 testes Python**, **7 testes do cliente**, **19 cenários browser controlados** e **2 fluxos browser reais** aprovados, sem skips. Lint/formatação Python (121 arquivos) e build Vite aprovados; screenshots desktop/mobile/tema escuro inspecionadas, sem alegar fidelidade ao Figma ou auditoria integral de acessibilidade.
+- Resultado real: dez itens, sete compras, seis fornecedores, oito resultados não cancelados, R$ 26.579,80 homologados e zero contratos vinculados conhecidos. Dez itens não analisados no modelo escolhido; gráfico de índices indisponível. Painel/ranking/fornecedores reconciliados sob os mesmos filtros.
+- Evidência: [agregado da etapa 08](diagnostico/conclusao_etapa08.json). Contagens das 34 tabelas iguais às de 07; linhas anteriores, 237 arquivos verificados e `.env` preservados. Não houve migração, coleta/importação, treinamento, inferência ou publicação. Servidor temporário de validação encerrado.
+- **Resultado: OK para consultas integradas e ranking experimental com cobertura explícita.** Scores elegíveis, revisão independente/utilidade e confirmação temporal continuam pendentes; nenhuma prioridade validada foi publicada.
+- Próximo passo: teste do usuário, integração autorizada e 09 em branch própria. Relatórios reais e conferência final da interface continuam em 10/11.

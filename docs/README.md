@@ -28,3 +28,5 @@ A [avaliação versionada do Isolation Forest](AVALIACAO_ISOLATION_FOREST.md) co
 A [comparação Autoencoder/Isolation Forest](COMPARACAO_AUTOENCODER.md) usa a mesma coorte e regras de referência, sem vencedor validado ou publicação de scores.
 
 A [inferência/publicação versionada](INFERENCIA_PUBLICACAO.md) registra treino/modelos, cobertura por resultado e canal experimental explícito; o piloto atual tem zero scores elegíveis.
+
+O [painel, ranking e fornecedores reais](PAINEL_RANKING_FORNECEDORES.md) compartilha base/execução/modelo e filtros; leia as definições de universo, valores, HHI e indisponibilidade antes de interpretar os indicadores.

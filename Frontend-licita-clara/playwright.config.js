@@ -14,7 +14,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
-    { name: 'mock', testMatch: 'consultas.spec.js' },
+    { name: 'mock', testMatch: ['consultas.spec.js', 'visao.spec.js'] },
     { name: 'live', testMatch: 'live.spec.js' },
   ],
   webServer: {
