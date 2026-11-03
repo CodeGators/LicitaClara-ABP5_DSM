@@ -17,7 +17,10 @@ class QueryRepository:
         self.session = session
 
     def base(self, base_id=None, optional=False):
-        query = sa.select(c.versoes_base).where(c.versoes_base.c.status == "validada")
+        query = sa.select(c.versoes_base).where(
+            c.versoes_base.c.status == "validada",
+            c.versoes_base.c.recorte["tipo"].astext.is_distinct_from("treino_modelo"),
+        )
         if base_id is not None:
             query = query.where(c.versoes_base.c.id == base_id)
         row = (

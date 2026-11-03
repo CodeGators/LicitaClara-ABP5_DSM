@@ -139,3 +139,7 @@ Foram aprovados 95 testes locais, sem skips, além de lint e formatação. Os no
 A verificação HTTP local com o login restrito da aplicação consultou a base real `a21534e3-e1a9-5d31-9a4e-c3beb608914f`: sete processos, dez itens, oito resultados ativos, seis fornecedores nesses resultados, sete órgãos, duas modalidades, 130 referências de preço e dez metadados de documentos. Os sete processos estão sem data de resultado global e dois sem valor homologado global; esses campos não foram fabricados. Cinco processos têm soma de resultados ativos no recorte. Três possuem resultado ativo entre 01/09 e 20/10/2026.
 
 [Evidência da etapa 06](diagnostico/validacao_etapa06.json). As contagens persistidas foram preservadas, sem migrações ou novas importações. O servidor usado na verificação foi temporário e encerrado; iniciar a API pelo comando acima para navegar. Nenhum serviço preexistente foi encerrado. O CI segue preparado; não houve execução remota nesta entrega.
+
+## Análises experimentais (etapa 07)
+
+Cinco rotas adicionais de leitura em `/api/v1/analises` exigem base/execução explícitas e preservam estados sem score. Consulte [inferência e publicação](INFERENCIA_PUBLICACAO.md). O campo legado `analise.nao_publicada` continua relativo à ausência de publicação de auditoria validada; ele não seleciona automaticamente o canal experimental. Bases de treino (`recorte.tipo=treino_modelo`) são excluídas das consultas operacionais.

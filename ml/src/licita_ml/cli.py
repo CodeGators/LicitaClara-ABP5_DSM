@@ -48,6 +48,13 @@ def main():
     comparison_review.add_argument("--grupo", required=True)
     comparison_review.add_argument("--treino", required=True)
     comparison_review.add_argument("--avaliacao", required=True)
+    inference = commands.add_parser("inferir")
+    inference.add_argument("--comparacao", required=True)
+    inference.add_argument("--sha256-comparacao", required=True)
+    inference.add_argument("--atributos", required=True)
+    inference.add_argument("--sha256-atributos", required=True)
+    publish = commands.add_parser("publicar-experimental")
+    publish.add_argument("--execucao", required=True, type=UUID)
     args = parser.parse_args()
     engine = None
     try:
@@ -60,7 +67,17 @@ def main():
             pool_pre_ping=True,
             connect_args={"connect_timeout": 10},
         )
-        if args.command in {"comparar-modelos", "revisao-comparacao"}:
+        if args.command in {"inferir", "publicar-experimental"}:
+            from licita_ml.inference.pipeline import InferencePipeline
+
+            inference_pipeline = InferencePipeline(settings, Repository(engine), storage(settings))
+            if args.command == "inferir":
+                result = inference_pipeline.run(
+                    args.comparacao, args.sha256_comparacao, args.atributos, args.sha256_atributos
+                )
+            else:
+                result = inference_pipeline.publish(args.execucao)
+        elif args.command in {"comparar-modelos", "revisao-comparacao"}:
             from licita_ml.comparison.pipeline import ComparisonPipeline
 
             comparison_pipeline = ComparisonPipeline(storage(settings))

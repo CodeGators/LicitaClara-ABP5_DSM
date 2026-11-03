@@ -86,7 +86,7 @@ O contrato implementado é exatamente:
 {"analise": {"status": "nao_publicada", "score": null, "prioridade": null}}
 ```
 
-Isso significa que nenhuma análise foi publicada nesta API, não que o item seja regular, de baixa prioridade ou que nunca houve experimento. Estados operacionais do treinamento não devem aparecer como aprovação pública.
+Esse campo continua significando ausência de publicação de auditoria validada, sem afirmar regularidade ou baixa prioridade. Desde a etapa 07 há um canal experimental separado, consultado explicitamente pelas [rotas de análise](INFERENCIA_PUBLICACAO.md). Estados operacionais do treinamento não devem aparecer como aprovação pública.
 
 Na etapa 07, definir seleção por execução/base, motivos de indisponibilidade e a distinção entre análise não publicada, alvo não analisado em execução publicada e alvo analisado. Score/política/modelo devem ser rastreáveis; faixas 0–100 do protótipo não são limites já validados. A ampliação dos estados deve atualizar schemas, OpenAPI, testes e consumidores juntos, sem alterar retroativamente a interpretação dos dados atuais.
 

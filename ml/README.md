@@ -1,6 +1,6 @@
 # Preparação e modelagem
 
-O pacote `licita-ml` implementa preparação/importação de dados, avaliação versionada do Isolation Forest e comparação com Autoencoder sobre os atributos analíticos. Os ensaios históricos separados permanecem preservados. A inferência de produção ainda não está implementada e a utilidade do ranking continua inconclusiva por ausência de revisão independente. Veja a [avaliação versionada](../docs/AVALIACAO_ISOLATION_FOREST.md) e o [histórico dos ensaios](../docs/validacao_nucleo/RESULTADO.md).
+O pacote `licita-ml` implementa preparação/importação de dados, avaliação versionada do Isolation Forest e comparação com Autoencoder sobre os atributos analíticos. Os ensaios históricos separados permanecem preservados. A inferência experimental em lote está implementada com registro de treino e publicação versionada; a utilidade do ranking continua inconclusiva por ausência de revisão independente. Veja a [avaliação versionada](../docs/AVALIACAO_ISOLATION_FOREST.md) e o [histórico dos ensaios](../docs/validacao_nucleo/RESULTADO.md).
 
 Na raiz do repositório, com PostgreSQL migrado e `PROCESSING_DATABASE_URL` restrita já configurada:
 
@@ -67,3 +67,5 @@ Consulte a [base e atributos analíticos](../docs/ATRIBUTOS_ANALITICOS.md) para 
 A [avaliação versionada do Isolation Forest](../docs/AVALIACAO_ISOLATION_FOREST.md) consome o dataset analítico, compara regras e prepara revisão documental; utilidade ainda inconclusiva.
 
 A [comparação Autoencoder/Isolation Forest](../docs/COMPARACAO_AUTOENCODER.md) usa a mesma coorte e regras de referência, sem vencedor validado ou publicação de scores.
+
+A [inferência/publicação versionada](../docs/INFERENCIA_PUBLICACAO.md) registra treino/modelos, cobertura por resultado e canal experimental explícito; o piloto atual tem zero scores elegíveis.

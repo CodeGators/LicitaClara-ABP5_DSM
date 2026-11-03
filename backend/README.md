@@ -84,3 +84,5 @@ uv run --locked --all-packages --extra validation uvicorn licita_backend.main:cr
 ```
 
 Os scores continuam nulos com análise `nao_publicada`. Valores globais do processo e dos itens do recorte são campos distintos; consultar a documentação antes de usá-los em totais ou filtros.
+
+A [inferência/publicação versionada](../docs/INFERENCIA_PUBLICACAO.md) registra treino/modelos, cobertura por resultado e canal experimental explícito; o piloto atual tem zero scores elegíveis.

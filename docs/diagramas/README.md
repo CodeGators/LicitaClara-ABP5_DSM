@@ -1,12 +1,12 @@
 # UML do PostgreSQL — Licita Clara
 
-Gerado a partir da metadata SQLAlchemy correspondente à revisão `0004_complementos`.
+Gerado a partir da metadata SQLAlchemy correspondente à revisão `0005_resultados`.
 
 - [Abrir diagrama interativo](UML_BANCO.html): funciona localmente, sem internet. Use zoom, rolagem e busca; selecione uma tabela para destacar os vínculos e consultar todos os campos.
 - [Imagem vetorial SVG](UML_BANCO.svg): visão geral que permite ampliar sem perder definição.
 - [PlantUML completo](UML_BANCO.puml): diagrama de classes UML com estereótipo `table`, todos os campos, tipos e relacionamentos, editável em ferramentas compatíveis.
 
-São **34 tabelas de aplicação e 64 FKs**, agrupadas em seis áreas para facilitar a leitura. A tabela interna `alembic_version` não faz parte do domínio e foi omitida. As visões HTML/SVG apresentam campos principais nos cartões; o painel HTML e o PlantUML contêm todos os campos.
+São **34 tabelas de aplicação e 65 FKs**, agrupadas em seis áreas para facilitar a leitura. A tabela interna `alembic_version` não faz parte do domínio e foi omitida. As visões HTML/SVG apresentam campos principais nos cartões; o painel HTML e o PlantUML contêm todos os campos.
 
 `PK` indica chave primária, `FK` indica chave estrangeira e `?` indica campo que aceita NULL. No SVG/HTML, a seta aponta da tabela filha para o pai referenciado. No PlantUML, os vínculos indicam um pai obrigatório (`1`) ou opcional (`0..1`) por registro filho, com multiplicidade inversa permissiva (`0..*`). FKs compostas são desenhadas como um vínculo, não como relações independentes para cada coluna. Restrições de unicidade e CHECK refinam essas associações; consulte o [dicionário do banco](../BANCO_DE_DADOS.md).
 

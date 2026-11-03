@@ -22,20 +22,21 @@ Este é o ponto de entrada para continuar o projeto. Ler este arquivo antes de i
 
 ## Estado confirmado em 03/11/2026
 
-- `main` local está em `0fafea5`, após merges autorizados das entregas técnicas 01–05. A revisão humana de 05 permanece pendente. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O envio ao GitHub continua pendente por permissão de escrita; a última referência remota consultada estava em `e2a5a84`.
+- `main` local está em `e9223b0`, após merges autorizados das entregas técnicas 01–06. A revisão humana de 05 permanece pendente. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O envio ao GitHub continua pendente por permissão de escrita; a última referência remota consultada estava em `e2a5a84`.
 - A organização local difere do GitHub: frontend em `Frontend-licita-clara/` e protótipos em `docs/prototipo/`.
 - No início da revisão, backend, coletor, ML, shared, infraestrutura, docs e CI estavam sem rastreamento no Git. A etapa 01 consolidou esses arquivos e a reorganização em branch própria e já foi integrada à `main` local. As branches de entrega foram preservadas.
 - Backup anterior à atualização: `../abp-backup-antes-atualizacao-20261103-092407/`. Contém arquivos locais, diff e estado do Git; não é backup completo do banco/datasets ignorados.
 - PostgreSQL local saudável, com duas bases validadas de setembro/2026. Cada versão tem 7 processos, 10 itens e 130 referências; não somar versões como cobertura adicional.
-- Banco possui 34 tabelas de aplicação e quatro migrações documentadas. Ter tabela não significa ter serviço implementado.
-- Tabelas de modelos, execuções de análise, scores, avaliações, revisões e relatórios estavam vazias. Participações e contratos também sem registros no piloto.
-- API possui dez rotas de consulta, além de health/readiness: inclui lista/detalhe global de itens e `/fornecedores/opcoes` para o seletor. Análise permanece `nao_publicada`, score e prioridade nulos.
+- Banco possui 34 tabelas de aplicação e cinco migrações documentadas. Ter tabela não significa ter serviço implementado.
+- Antes de 07, tabelas de modelos, execuções de análise, scores, avaliações, revisões e relatórios estavam vazias. A etapa 07 registrou duas versões do mesmo treino separado de 140 referências, quatro versões de modelos (dois algoritmos), duas execuções/publicações experimentais e catorze avaliações de processo sem score; scores, revisões e relatórios continuam vazios. Participações e contratos também sem registros no piloto.
+- API possui quinze rotas de leitura, além de health/readiness (cinco experimentais de análise): inclui lista/detalhe global de itens e `/fornecedores/opcoes` para o seletor. Nas consultas antigas, análise de auditoria permanece `nao_publicada`, score e prioridade nulos; o canal experimental exige consulta explícita.
 - Frontend real integrado: entrada `/itens`, detalhe de item/processo, documentos, filtros e paginação HTTP. A base é fixada na URL. Essas telas não consomem os registros de `src/data.js`.
 - Demonstrações preservadas em `/demonstracao/painel`, `/demonstracao/itens`, `/fornecedores` e `/relatorios`, com aviso explícito de dados fictícios. IDs reais não são substituídos por exemplos.
 - Revisão persistente e exportações reais seguem pendentes; controles antigos continuam somente nas demonstrações. A consulta real mostra indisponibilidade dessas funções e análise não publicada.
-- Isolation Forest e Autoencoder têm avaliação técnica versionada sobre o dataset analítico, com artefatos reproduzíveis e ensaios antigos preservados. Não há inferência/modelo/score publicados no PostgreSQL nem utilidade aprovada; revisão humana permanece pendente.
+- Isolation Forest e Autoencoder têm avaliação técnica versionada sobre o dataset analítico, com artefatos reproduzíveis e ensaios antigos preservados. Há inferência e publicação experimental de cobertura no PostgreSQL, com zero scores elegíveis no piloto; utilidade e prioridade de auditoria não foram aprovadas e revisão humana permanece pendente.
 - Ensaio corretivo: 140 referências de treino e 35 de avaliação; replicação histórica: 177/107. Estabilidade aprovada nesses ensaios não comprova utilidade de auditoria.
 - Há divergências documentais de especificação e limitações temporais registradas. O dossiê independente tem 18 casos, todos com parecer `pendente` na conferência atual.
+- Etapa 07: 146 testes Python aprovados sem falhas/skips, lint/formatação aprovados (117 arquivos), migração 0005 e Alembic check aprovados; API real restrita e versão anterior consultável verificadas.
 - Etapa 06: 143 testes Python aprovados sem skips, lint/formatação aprovados (109 arquivos), cinco treinos AE com recarga exata e comparação real/reutilização verificadas. Utilidade inconclusiva; nenhum vencedor validado.
 - Etapa 05: 135 testes Python aprovados sem skips, lint/formatação aprovados (105 arquivos), grade real de 40 ajustes e recarga exata. Revisão humana pendente; utilidade inconclusiva.
 - Etapa 04: 131 testes Python aprovados sem skips, lint/formatação aprovados; aquisição e preparo reais reexecutados com preservação das bases. [Política e comandos](ATRIBUTOS_ANALITICOS.md).
@@ -60,15 +61,16 @@ Documentos de apoio:
 - [Frontend integrado](FRONTEND_CONSULTAS_REAIS.md): execução com proxy Vite, caminhos reais/demonstrativos e testes no navegador.
 - [Banco](BANCO_DE_DADOS.md) e [importação](PREPARACAO_E_IMPORTACAO.md).
 - [Revisão do núcleo](validacao_nucleo/REVISAO_E_CONFIRMACAO.md), [achados](validacao_nucleo/ACHADOS_DOCUMENTAIS.md) e [guia independente](validacao_nucleo/GUIA_REVISAO_INDEPENDENTE.md).
+- [Inferência e publicação](INFERENCIA_PUBLICACAO.md): registro do treino/modelos, política experimental, API e testes da etapa 07.
 - [Comparação com Autoencoder](COMPARACAO_AUTOENCODER.md): arquitetura, resultados, sensibilidade e decisão da etapa 06.
 - [Avaliação versionada do IF](AVALIACAO_ISOLATION_FOREST.md): comandos, revisão e alternativa sem revisor independente.
 - [Backend](../backend/README.md), [ML](../ml/README.md), [coletor](../collector/README.md) e [infraestrutura](../infra/README.md).
 
 ## Etapa atual e próximo passo
 
-**Etapa atual:** 06 — Autoencoder e comparação técnica concluídos na branch `feat/06-autoencoder-comparacao`, pronta para teste do usuário. Utilidade continua inconclusiva por ausência de revisão humana independente.
+**Etapa atual:** 07 — inferência e publicação experimental implementadas e verificadas na branch `feat/07-inferencia-publicacao`, pronta para teste do usuário. O piloto tem cobertura zero de scores, explicitamente registrada; cenários com scores usam dados controlados em testes.
 
-**Próxima etapa:** após testar e integrar 06 mediante autorização, implementar inferência/publicação (07), incluindo registro correto da base de treino e decisão explícita de eventual demonstração experimental. Nenhum algoritmo foi aprovado como prioridade validada de auditoria. A etapa 06 não foi integrada à `main` nem enviada ao GitHub.
+**Próxima etapa:** após teste e integração autorizada de 07, completar painel/ranking/fornecedores reais (08), consumindo execução explícita e exibindo ausências e natureza experimental. Ainda não existe ranking validado de auditoria. A etapa 07 não foi integrada à `main` nem enviada ao GitHub.
 
 **Pendências externas:** acesso ao Figma; pareceres humanos independentes (usuário não tem revisor confirmado; alternativa técnica documentada sem aprovar utilidade); definição/provisionamento da hospedagem. Não impedem iniciar consolidação, contratos e consultas reais.
 
@@ -81,7 +83,7 @@ Documentos de apoio:
 - [x] 04 — Preparar base analítica operacional e atributos reproduzíveis.
 - [ ] 05 — Concluir avaliação do Isolation Forest e revisão independente.
 - [x] 06 — Implementar e comparar Autoencoder (comparação técnica; utilidade inconclusiva).
-- [ ] 07 — Implementar inferência, explicações e publicação versionada.
+- [x] 07 — Implementar inferência, explicações e publicação versionada (experimental; piloto sem scores elegíveis).
 - [ ] 08 — Completar painel, ranking e fornecedores integrados.
 - [ ] 09 — Implementar autenticação, autorização e revisão persistente.
 - [ ] 10 — Implementar relatórios PDF/CSV reais.
@@ -89,7 +91,7 @@ Documentos de apoio:
 - [ ] 12 — Hospedar e automatizar operação com recuperação.
 - [ ] 13 — Validar fluxo completo e preparar entrega acadêmica reproduzível.
 
-As branches 00–06 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
+As branches 00–07 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
 
 ## Entregas, branches e aceitação
 
@@ -176,11 +178,11 @@ Branch: `feat/06-autoencoder-comparacao`. Dependências: 04 e protocolo de 05.
 
 Branch: `feat/07-inferencia-publicacao`. Dependências: 04, 05; decisão final de comparação em 06.
 
-- [ ] Criar comandos de inferência em lote e registrar base, modelo, código, parâmetros e cobertura; registrar a base real de treino antes de associar modelos em SQL.
-- [ ] Persistir scores brutos, política de normalização/prioridade e comparações rastreáveis.
-- [ ] Calcular explicações adequadas ou retornar indisponibilidade; retirar pesos fictícios.
-- [ ] Publicar lote completo atomicamente, preservando execuções anteriores e impedindo mistura de bases. A comparação 06 não aprovou utilidade; distinguir demonstração experimental de prioridade validada, sem publicar automaticamente pela estabilidade.
-- [ ] Expor análises/execuções e definir eventual agregação item → processo.
+- [x] Criar comandos de inferência em lote e registrar base, modelo, código, parâmetros e cobertura; registrar a base real de treino antes de associar modelos em SQL.
+- [x] Persistir scores brutos, política de normalização/prioridade e comparações rastreáveis.
+- [x] Calcular explicações adequadas ou retornar indisponibilidade; retirar pesos fictícios.
+- [x] Publicar lote completo atomicamente, preservando execuções anteriores e impedindo mistura de bases. A comparação 06 não aprovou utilidade; distinguir demonstração experimental de prioridade validada, sem publicar automaticamente pela estabilidade.
+- [x] Expor análises/execuções e definir eventual agregação item → processo.
 
 **Como testar:** recarga, repetição, falha no meio do lote e troca de versão ativa; reconciliar score exibido com artefato e origem. **Conclusão:** análise consultável e rastreável; publicação respeita a decisão de validação.
 
@@ -378,3 +380,15 @@ Checklist atualizado:
 - Verificações: **143 testes Python aprovados sem falhas/skips**, incluindo 8 focados no AE/comparação; lint/formatação aprovados (109 arquivos). Evidência: [resultado agregado da etapa 06](diagnostico/conclusao_etapa06.json). Preservados bases de consulta, modelos/ensaios anteriores, planilhas e configuração. Não houve migração, registro SQL de modelo, inferência operacional ou publicação de score. Frontend inalterado; browser/build e CI remoto não repetidos.
 - **Resultado: OK para comparação técnica/experimental.** Sem vencedor validado, sem combinação arbitrária de scores e utilidade inconclusiva. Revisão humana de 05 e confirmação temporal continuam pendentes; esta conclusão não aprova ranking como prioridade de auditoria.
 - Próximo passo: teste do usuário, integração autorizada e 07 em branch própria, mantendo as limitações e o vínculo correto de treino/modelo.
+
+### Entrega 07 — 03/11/2026
+
+- Branch: `feat/07-inferencia-publicacao`; título do commit: `feat: registrar inferencia e publicacao experimental por resultado`.
+- Integração anterior: 06 em `e9223b0` na `main` local por autorização, branch preservada, sem push.
+- Mudança: registro correto do dataset de treino/modelos, inferência por resultado de fornecedor, CDF do treino descritiva, parcelas AE e explicação IF indisponível, cobertura completa, falha/retomada e ativação experimental atômica. Cinco endpoints novos com base/execução explícitas.
+- Banco: aplicada `0005_resultados`, mantendo 34 tabelas; FK composta resultado/item/base, unicidade por resultado e bloqueio de downgrade com análises desse tipo. Diagramas/dicionário atualizados. Base de treino é excluída das consultas operacionais.
+- Como testar: [guia completo](INFERENCIA_PUBLICACAO.md). Repetir inferência/publicação deve reutilizar a execução `c680b7ea-196d-59db-93c7-03f6c7aaebb4`. Reiniciar API antiga para carregar as novas rotas e seleção de base.
+- Resultado real: dez itens, vinte pares alvo/modelo, **zero scores elegíveis**, por data, comparação exata ausente ou resultado desconhecido. A execução final liga duas âncoras a um registro real de treino de 140 referências; sete processos ficam explicitamente sem agregação/score. A versão anterior de execução/modelos/treino permanece no histórico, sem contar os mesmos exemplos duas vezes. Publicação experimental consultável e duas bases operacionais preservadas.
+- Verificações: **146 testes Python aprovados sem falhas/skips**, incluindo três cenários focados em inferência/publicação, lint/formatação aprovados (117 arquivos), Alembic check sem divergências. Evidência: [agregado da etapa 07](diagnostico/conclusao_etapa07.json). Testes com scores controlados cobrem múltiplos vencedores, parcelas AE, recarga, FK, falha/retomada e troca ativa atômica. Não houve mudança visual ou teste browser nesta etapa; CI remoto/deploy não executados.
+- **Resultado: OK para inferência/publicação experimental; cobertura insuficiente para ranking com scores no piloto.** Não converter ausências em zero, índice em probabilidade ou estabilidade em utilidade. Revisão humana e confirmação temporal continuam pendentes; a etapa 08 deve mostrar esses limites.
+- Próximo passo: teste do usuário, integração autorizada e 08 em branch própria.

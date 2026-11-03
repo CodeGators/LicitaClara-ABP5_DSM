@@ -62,6 +62,7 @@ resultados_modelo = table(
     uid("modelo_id"),
     uid("processo_versao_id"),
     uid("item_versao_id", nullable=True),
+    uid("resultado_item_id", nullable=True),
     text("tipo_alvo"),
     sa.Column("score_bruto", sa.Numeric(30, 12), nullable=False),
     sa.Column("score_normalizado", SCORE, nullable=False),
@@ -78,10 +79,16 @@ resultados_modelo = table(
         ["item_versao_id", "processo_versao_id", "base_id"],
         ["itens_versoes.id", "itens_versoes.processo_versao_id", "itens_versoes.base_id"],
     ),
-    choices("tipo_alvo", ["processo", "item"]),
+    sa.ForeignKeyConstraint(
+        ["resultado_item_id", "item_versao_id", "base_id"],
+        ["resultados_itens.id", "resultados_itens.item_versao_id", "resultados_itens.base_id"],
+    ),
+    choices("tipo_alvo", ["processo", "item", "resultado"]),
     check(
-        "(tipo_alvo = 'processo' AND item_versao_id IS NULL) OR (tipo_alvo = 'item' "
-        "AND item_versao_id IS NOT NULL)",
+        "(tipo_alvo = 'processo' AND item_versao_id IS NULL AND resultado_item_id IS NULL) OR "
+        "(tipo_alvo = 'item' AND item_versao_id IS NOT NULL AND resultado_item_id IS NULL) OR "
+        "(tipo_alvo = 'resultado' AND item_versao_id IS NOT NULL "
+        "AND resultado_item_id IS NOT NULL)",
         "alvo_coerente",
     ),
     check("score_normalizado BETWEEN 0 AND 100", "score_intervalo"),
@@ -90,6 +97,7 @@ resultados_modelo = table(
         "modelo_id",
         "processo_versao_id",
         "item_versao_id",
+        "resultado_item_id",
         postgresql_nulls_not_distinct=True,
     ),
 )

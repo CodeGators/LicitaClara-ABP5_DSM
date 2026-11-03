@@ -172,6 +172,7 @@ resultados_itens = table(
     base_fk("itens_versoes", "item_versao_id"),
     unique("base_id", "item_versao_id", "fornecedor_id", "sequencial_resultado"),
     unique("id", "base_id"),
+    unique("id", "item_versao_id", "base_id"),
     check("quantidade_homologada IS NULL OR quantidade_homologada >= 0", "quantidade_nao_negativa"),
     check(
         "valor_unitario_homologado IS NULL OR valor_unitario_homologado >= 0",

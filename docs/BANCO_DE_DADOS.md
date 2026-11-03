@@ -1,9 +1,9 @@
-# Banco de dados — etapa 03
+# Banco de dados — esquema atual
 
 Modelo implementado em SQLAlchemy Core, com metadata compartilhada com Alembic.
 
 [Diagrama UML interativo](diagramas/UML_BANCO.html) · [SVG](diagramas/UML_BANCO.svg) · [PlantUML completo](diagramas/UML_BANCO.puml).
-Verificado em 20/10/2026. Fonte principal: Compras.gov.br; complemento PNCP para anexos e assinatura contratual.
+Atualizado em 03/11/2026 (migração 0005); estrutura anterior verificada em 20/10/2026. Fonte principal: Compras.gov.br; complemento PNCP para anexos e assinatura contratual.
 
 ## Migrações e escopo
 
@@ -11,6 +11,7 @@ Verificado em 20/10/2026. Fonte principal: Compras.gov.br; complemento PNCP para
 - `0002_dominio`: identidades, snapshots, resultados, preços de referência, análises e auditoria; inclui atualização dos nomes de constraints compostas da revisão anterior.
 - `0003_proveniencia`: unicidade de linha/importação/alvo, inclusive quando alvos opcionais são NULL, para evitar proveniência duplicada em retomadas.
 - `0004_complementos`: propostas, identidades/snapshots de contratos, vínculos, documentos e novos alvos de proveniência.
+- `0005_resultados`: score por resultado/fornecedor, FK composta resultado/item/base e unicidade preservando múltiplos vencedores.
 - Há 34 tabelas da aplicação, além de `alembic_version`.
 - Participações representam propostas de itens homologados, conforme cobertura diagnosticada; não garantem todos os participantes de qualquer processo. Ver [diagnóstico complementar e mapeamento](DIAGNOSTICO_PARTICIPACOES_CONTRATOS_DOCUMENTOS.md).
 - Há metadados de coleta e snapshots de negócio reais do piloto da etapa 05. Os originais e Parquets permanecem fora do Git. Ver [preparação/importação](PREPARACAO_E_IMPORTACAO.md).
@@ -543,13 +544,13 @@ Resultado por snapshot de item, fornecedor e sequencial; aceita múltiplos vence
 
 Relações: (base_id) → versoes_base.id; (item_versao_id, base_id) → itens_versoes.id, itens_versoes.base_id; (fornecedor_id) → fornecedores.id.
 
-Unicidade: (id, base_id); (base_id, item_versao_id, fornecedor_id, sequencial_resultado).
+Unicidade: (id, base_id); (id, item_versao_id, base_id); (base_id, item_versao_id, fornecedor_id, sequencial_resultado).
 
 Validações: `quantidade_homologada IS NULL OR quantidade_homologada >= 0`; `valor_total_homologado IS NULL OR valor_total_homologado >= 0`; `valor_unitario_homologado IS NULL OR valor_unitario_homologado >= 0`.
 
 ### `resultados_modelo`
 
-Score por modelo/execução/alvo; snapshot de processo obrigatório e item opcional.
+Score por modelo/execução/alvo; snapshot de processo obrigatório e item e resultado opcionais conforme tipo de alvo; a inferência experimental usa resultado por fornecedor.
 
 | Coluna | Tipo PostgreSQL | NULL | Default |
 | --- | --- | --- | --- |
@@ -559,6 +560,7 @@ Score por modelo/execução/alvo; snapshot de processo obrigatório e item opcio
 | `modelo_id` | `UUID` | não | `—` |
 | `processo_versao_id` | `UUID` | não | `—` |
 | `item_versao_id` | `UUID` | sim | `—` |
+| `resultado_item_id` | `UUID` | sim | `—` |
 | `tipo_alvo` | `TEXT` | não | `—` |
 | `score_bruto` | `NUMERIC(30, 12)` | não | `—` |
 | `score_normalizado` | `NUMERIC(6, 3)` | não | `—` |
@@ -566,11 +568,11 @@ Score por modelo/execução/alvo; snapshot de processo obrigatório e item opcio
 | `atributos` | `JSONB` | não | `'{}'::jsonb` |
 | `criado_em` | `TIMESTAMP WITH TIME ZONE` | não | `now()` |
 
-Relações: (item_versao_id, processo_versao_id, base_id) → itens_versoes.id, itens_versoes.processo_versao_id, itens_versoes.base_id; (execucao_id, base_id) → execucoes_analise.id, execucoes_analise.base_id; (processo_versao_id, base_id) → processos_versoes.id, processos_versoes.base_id; (execucao_id, modelo_id) → execucoes_modelos.execucao_id, execucoes_modelos.modelo_id.
+Relações: (resultado_item_id, item_versao_id, base_id) → resultados_itens.id, resultados_itens.item_versao_id, resultados_itens.base_id; (item_versao_id, processo_versao_id, base_id) → itens_versoes.id, itens_versoes.processo_versao_id, itens_versoes.base_id; (execucao_id, base_id) → execucoes_analise.id, execucoes_analise.base_id; (processo_versao_id, base_id) → processos_versoes.id, processos_versoes.base_id; (execucao_id, modelo_id) → execucoes_modelos.execucao_id, execucoes_modelos.modelo_id.
 
-Unicidade: (execucao_id, modelo_id, processo_versao_id, item_versao_id).
+Unicidade: (execucao_id, modelo_id, processo_versao_id, item_versao_id, resultado_item_id), com NULLs não distintos.
 
-Validações: `(tipo_alvo = 'processo' AND item_versao_id IS NULL) OR (tipo_alvo = 'item' AND item_versao_id IS NOT NULL)`; `score_normalizado BETWEEN 0 AND 100`; `tipo_alvo IN ('processo', 'item')`.
+Validações: `tipo_alvo` em `processo`, `item`, `resultado`; processo não tem item/resultado, item exige item e resultado nulo, resultado exige ambos. `score_normalizado BETWEEN 0 AND 100`. O índice experimental é CDF do treino, não risco validado; ver [política e execução](INFERENCIA_PUBLICACAO.md).
 
 ### `revisoes`
 
@@ -778,3 +780,5 @@ Relações: (base_id) → versoes_base.id; (contrato_versao_id, base_id) → con
 Unicidade: (base_id, fonte, chave_origem); (id, base_id).
 
 Validações: `num_nonnulls(chave_objeto, sha256, tamanho_bytes) IN (0, 3)`; `num_nonnulls(processo_versao_id, contrato_versao_id) = 1`; `sequencial_documento >= 1`; `sha256 IS NULL OR sha256 ~ '^[0-9a-f]{64}$'`; `tamanho_bytes IS NULL OR tamanho_bytes >= 0`.
+
+Na etapa 07, `versoes_base` também registra datasets de modelagem em objetos (`recorte.tipo=treino_modelo`), excluídos das consultas operacionais. Essa linha é a base real referenciada por `versoes_modelo.base_treino_id`; não representa processos/itens importados nem cobertura adicional de consultas.

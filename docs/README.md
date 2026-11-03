@@ -7,7 +7,7 @@ Começar pelo [plano de conclusão](PLANO_CONCLUSAO.md): estado, checklist, bran
 - [API de consultas](API_CONSULTAS.md): rotas implementadas, parâmetros e semântica dos valores.
 - [Contratos de itens/processos](CONTRATOS_ITENS_PROCESSOS.md): granularidade, IDs, resultados múltiplos e navegação da integração.
 - [Frontend integrado](FRONTEND_CONSULTAS_REAIS.md): configuração, rotas reais/demonstrativas e testes no navegador.
-- [Banco de dados](BANCO_DE_DADOS.md) e [diagramas](diagramas/README.md): 34 tabelas e quatro migrações.
+- [Banco de dados](BANCO_DE_DADOS.md) e [diagramas](diagramas/README.md): 34 tabelas e cinco migrações.
 - [Preparação e importação](PREPARACAO_E_IMPORTACAO.md) e [contratos entre componentes](CONTRATOS_BACKEND_E_DADOS.md).
 - [Backend](../backend/README.md), [coletor](../collector/README.md), [ML](../ml/README.md) e [infraestrutura](../infra/README.md): instalação e comandos.
 
@@ -26,3 +26,5 @@ Consulte a [base e atributos analíticos](ATRIBUTOS_ANALITICOS.md) para aquisiç
 A [avaliação versionada do Isolation Forest](AVALIACAO_ISOLATION_FOREST.md) consome o dataset analítico, compara regras e prepara revisão documental; utilidade ainda inconclusiva.
 
 A [comparação Autoencoder/Isolation Forest](COMPARACAO_AUTOENCODER.md) usa a mesma coorte e regras de referência, sem vencedor validado ou publicação de scores.
+
+A [inferência/publicação versionada](INFERENCIA_PUBLICACAO.md) registra treino/modelos, cobertura por resultado e canal experimental explícito; o piloto atual tem zero scores elegíveis.

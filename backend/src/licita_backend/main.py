@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from licita_backend.api.errors import register_errors
+from licita_backend.api.v1.analises import router as analises_router
 from licita_backend.api.v1.consultas import router as consultas_router
 from licita_backend.api.v1.health import router
 from licita_backend.core.config import Settings
@@ -67,4 +68,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     register_errors(app)
     app.include_router(router, prefix="/api/v1")
     app.include_router(consultas_router, prefix="/api/v1")
+    app.include_router(analises_router, prefix="/api/v1")
     return app
