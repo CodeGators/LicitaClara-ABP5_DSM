@@ -22,7 +22,7 @@ Este é o ponto de entrada para continuar o projeto. Ler este arquivo antes de i
 
 ## Estado confirmado em 03/11/2026
 
-- `main` local está em `5f0003c`, após merges autorizados das etapas 01–03. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O envio ao GitHub continua pendente por permissão de escrita; a última referência remota consultada estava em `e2a5a84`.
+- `main` local está em `3d7923c`, após merges autorizados das etapas 01–04. A atualização original do frontend foi integrada pelo PR #3 em 01/11/2026. O envio ao GitHub continua pendente por permissão de escrita; a última referência remota consultada estava em `e2a5a84`.
 - A organização local difere do GitHub: frontend em `Frontend-licita-clara/` e protótipos em `docs/prototipo/`.
 - No início da revisão, backend, coletor, ML, shared, infraestrutura, docs e CI estavam sem rastreamento no Git. A etapa 01 consolidou esses arquivos e a reorganização em branch própria e já foi integrada à `main` local. As branches de entrega foram preservadas.
 - Backup anterior à atualização: `../abp-backup-antes-atualizacao-20261103-092407/`. Contém arquivos locais, diff e estado do Git; não é backup completo do banco/datasets ignorados.
@@ -36,6 +36,7 @@ Este é o ponto de entrada para continuar o projeto. Ler este arquivo antes de i
 - Isolation Forest tem ensaios separados do fluxo operacional, com artefatos reproduzíveis; não há inferência publicada no PostgreSQL. Autoencoder não implementado.
 - Ensaio corretivo: 140 referências de treino e 35 de avaliação; replicação histórica: 177/107. Estabilidade aprovada nesses ensaios não comprova utilidade de auditoria.
 - Há divergências documentais de especificação e limitações temporais registradas. O dossiê independente tem 18 casos, todos com parecer `pendente` na conferência atual.
+- Etapa 05: 135 testes Python aprovados sem skips, lint/formatação aprovados (105 arquivos), grade real de 40 ajustes e recarga exata. Revisão humana pendente; utilidade inconclusiva.
 - Etapa 04: 131 testes Python aprovados sem skips, lint/formatação aprovados; aquisição e preparo reais reexecutados com preservação das bases. [Política e comandos](ATRIBUTOS_ANALITICOS.md).
 - Validação frontend (etapa 03): **115 testes Python**, **6 testes de cliente**, **13 testes browser com fixtures** e **1 teste browser com API/PostgreSQL reais**, todos aprovados sem skips. Lint/formatação e instalação/build frontend aprovados. Capturas desktop/mobile inspecionadas; isso não comprova fidelidade ao Figma nem o fluxo completo das etapas futuras.
 - Ainda não há implantação remota confirmada.
@@ -58,15 +59,16 @@ Documentos de apoio:
 - [Frontend integrado](FRONTEND_CONSULTAS_REAIS.md): execução com proxy Vite, caminhos reais/demonstrativos e testes no navegador.
 - [Banco](BANCO_DE_DADOS.md) e [importação](PREPARACAO_E_IMPORTACAO.md).
 - [Revisão do núcleo](validacao_nucleo/REVISAO_E_CONFIRMACAO.md), [achados](validacao_nucleo/ACHADOS_DOCUMENTAIS.md) e [guia independente](validacao_nucleo/GUIA_REVISAO_INDEPENDENTE.md).
+- [Avaliação versionada do IF](AVALIACAO_ISOLATION_FOREST.md): comandos, revisão e alternativa sem revisor independente.
 - [Backend](../backend/README.md), [ML](../ml/README.md), [coletor](../collector/README.md) e [infraestrutura](../infra/README.md).
 
 ## Etapa atual e próximo passo
 
-**Etapa atual:** 04 — base e atributos analíticos preparados na branch `feat/04-base-atributos-analiticos`, pronta para teste do usuário.
+**Etapa atual:** 05 — avaliação técnica versionada do Isolation Forest, branch `feat/05-validacao-isolation-forest`. Revisão documental humana permanece pendente; utilidade inconclusiva.
 
-**Próxima etapa:** 05 — avaliação do Isolation Forest e revisão independente, após integração autorizada da etapa 04. Esta entrega ainda não foi integrada à `main` nem enviada ao GitHub.
+**Próxima etapa:** após testar e integrar a entrega técnica de 05, comparar Autoencoder (06), mantendo explícita a ausência de validação independente. A entrega 05 não foi integrada à `main` nem enviada ao GitHub.
 
-**Pendências externas:** acesso ao Figma; pareceres humanos independentes; definição/provisionamento da hospedagem. Não impedem iniciar consolidação, contratos e consultas reais.
+**Pendências externas:** acesso ao Figma; pareceres humanos independentes (usuário não tem revisor confirmado; alternativa técnica documentada sem aprovar utilidade); definição/provisionamento da hospedagem. Não impedem iniciar consolidação, contratos e consultas reais.
 
 ## Checklist geral
 
@@ -85,7 +87,7 @@ Documentos de apoio:
 - [ ] 12 — Hospedar e automatizar operação com recuperação.
 - [ ] 13 — Validar fluxo completo e preparar entrega acadêmica reproduzível.
 
-As branches 00–04 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
+As branches 00–05 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
 
 ## Entregas, branches e aceitação
 
@@ -150,10 +152,10 @@ Branch: `feat/04-base-atributos-analiticos`. Dependência: 02.
 
 Branch: `feat/05-validacao-isolation-forest`. Dependência: 04.
 
-- [ ] Treinar pelo fluxo versionado, preservar artefato e reproduzir inferência após recarga. Consumir somente grupos/linhas elegíveis e registrar a base de treino correta, distinta do piloto operacional.
+- [x] Treinar pelo fluxo versionado, preservar artefato e reproduzir inferência após recarga. Consome somente grupos/linhas elegíveis; manifesto identifica dataset e IDs reais do treino, distinto do piloto operacional. Registro SQL com FK correta permanece obrigatório antes de 07.
 - [ ] Revisar documentalmente amostra do treino e concluir pareceres independentes dos casos, com participação humana.
-- [ ] Comparar IF com regras unilateral/bilateral sem ajustar repetidamente sobre a mesma avaliação.
-- [ ] Registrar estabilidade, utilidade, inconclusivos e confirmação temporal conforme protocolo; insuficiência não vira aprovação.
+- [x] Comparar IF com regras unilateral/bilateral sem ajustar repetidamente sobre a mesma avaliação.
+- [x] Registrar estabilidade, utilidade, inconclusivos e confirmação temporal conforme protocolo; insuficiência não vira aprovação.
 
 **Como testar:** executar ensaio sobre snapshots explícitos; conferir hashes, cortes, recarga e métricas; verificar pareceres/evidências. **Conclusão:** avaliação concluída com decisão fundamentada, inclusive se negativa/inconclusiva. Publicar ranking como validado exige evidência de utilidade; demonstração experimental deve preservar seus limites.
 
@@ -351,3 +353,15 @@ Checklist atualizado:
 - Limites: snapshots revisados após corte; comparabilidade documental e utilidade ainda não aprovadas. Pareceres humanos pendentes. Frontend inalterado; browser/build e CI remoto não reexecutados.
 - Resultado: **OK para preparar e rastrear atributos**. Aprovação do modelo depende da etapa 05.
 - Próximo passo: teste do usuário, integração local autorizada e etapa 05 em branch própria.
+
+### Entrega técnica 05 — 03/11/2026
+
+- Branch: `feat/05-validacao-isolation-forest`; título do commit: `feat: versionar avaliacao do isolation forest e revisao documental`.
+- A etapa 04 foi integrada à `main` local em `3d7923c`, por autorização do usuário, preservando sua branch; não houve push.
+- Mudança: `validar-if` verifica dataset/hash e política, treina duas variantes sob grade/âncora fixas, compara regras unilateral/bilateral e preserva modelos e relatório. `revisao-if` valida planilhas copiadas, preserva denominadores e não aprova utilidade automaticamente.
+- Como testar: [guia da avaliação](AVALIACAO_ISOLATION_FOREST.md). Repetição deve reutilizar o fingerprint. Amostras têm 20 casos de treino e 13 de avaliação, sem scores ou procedência do método.
+- Verificações: **135 testes Python aprovados sem falhas/skips**, lint e formatação aprovados (105 arquivos). Métricas reais: [evidência da etapa 05](diagnostico/conclusao_etapa05.json). Recarga reproduziu scores; testes cobrem integridade, insuficiência, política e revisão; tabela de consultas, ensaios e credenciais preservados.
+- **Resultado: OK técnico / PARCIAL na revisão humana.** Nenhum parecer independente foi preenchido. Utilidade e confirmação temporal continuam inconclusivas; não há prioridade de auditoria validada nem score publicado. O checklist geral de 05 continua aberto até cumprir a revisão ou formalizar com a equipe/professor uma conclusão acadêmica limitada.
+- O usuário informou não ter revisor confirmado. Alternativa: concluir comparação técnica com utilidade inconclusiva e identificar qualquer conferência própria como interna. O assistente não substitui pareceres humanos.
+- Registro SQL do modelo/base de treino fica para integração da inferência: o manifesto identifica o histórico real; não foi usado o UUID do piloto como base de treino. Não houve migração ou publicação.
+- Próximo passo: teste do usuário, integração autorizada da entrega técnica e etapa 06 em branch própria, com limitações preservadas.

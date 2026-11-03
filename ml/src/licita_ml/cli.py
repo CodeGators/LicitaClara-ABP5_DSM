@@ -1,4 +1,4 @@
-"""Preparação reproduzível; não executa treinamento nem migrações."""
+"""Preparação e avaliação reproduzíveis; não executa migrações ou publica scores."""
 
 import argparse
 import json
@@ -30,6 +30,15 @@ def main():
     attributes.add_argument("--treino-fim", required=True, type=date.fromisoformat)
     attributes.add_argument("--fim", required=True, type=date.fromisoformat)
     attributes.add_argument("--exclusoes", required=True)
+    validation = commands.add_parser("validar-if")
+    validation.add_argument("--manifesto", required=True)
+    validation.add_argument("--sha256", required=True)
+    review = commands.add_parser("revisao-if")
+    review.add_argument("--manifesto", required=True)
+    review.add_argument("--sha256", required=True)
+    review.add_argument("--grupo", required=True)
+    review.add_argument("--treino", required=True)
+    review.add_argument("--avaliacao", required=True)
     args = parser.parse_args()
     engine = None
     try:
@@ -42,7 +51,18 @@ def main():
             pool_pre_ping=True,
             connect_args={"connect_timeout": 10},
         )
-        if args.command == "atributos":
+        if args.command in {"validar-if", "revisao-if"}:
+            from licita_ml.validation.pipeline import ValidationPipeline
+
+            validation_pipeline = ValidationPipeline(storage(settings))
+            if args.command == "validar-if":
+                with Repository(engine).locked():
+                    result = validation_pipeline.run(args.manifesto, args.sha256)
+            else:
+                result = validation_pipeline.review(
+                    args.manifesto, args.sha256, args.grupo, args.treino, args.avaliacao
+                )
+        elif args.command == "atributos":
             from licita_ml.analytical.pipeline import AnalyticalPipeline
             from licita_ml.analytical.rules import Policy
 

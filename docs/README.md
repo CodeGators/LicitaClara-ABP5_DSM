@@ -22,3 +22,5 @@ Começar pelo [plano de conclusão](PLANO_CONCLUSAO.md): estado, checklist, bran
 O PDF da proposta acadêmica é preservado como documento original; fonte efetiva e evolução do projeto estão nos documentos atuais. O arquivo `UML` da raiz é uma proposta conceitual histórica; o esquema efetivamente implementado está em `diagramas/`. Imagens em `prototipo/` e o HTML AuditaGov são referências demonstrativas, sem comprovar integração ou modelo publicado.
 
 Consulte a [base e atributos analíticos](ATRIBUTOS_ANALITICOS.md) para aquisição histórica registrada, preparo versionado, critérios e testes da etapa 04.
+
+A [avaliação versionada do Isolation Forest](AVALIACAO_ISOLATION_FOREST.md) consome o dataset analítico, compara regras e prepara revisão documental; utilidade ainda inconclusiva.

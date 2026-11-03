@@ -1,6 +1,6 @@
 # Preparação e modelagem
 
-O pacote `licita-ml` implementa a etapa 05: leitura, resolução de registros, exportação Parquet e importação PostgreSQL de um recorte CATMAT. Há também um ensaio independente de treinamento e avaliação de Isolation Forest com dados reais. A inferência de produção ainda não está implementada; a utilidade do ranking aguarda revisão documental. Veja o [resultado e reprodução do ensaio](../docs/validacao_nucleo/RESULTADO.md).
+O pacote `licita-ml` implementa preparação/importação de dados e avaliação versionada do Isolation Forest sobre os atributos analíticos. Os ensaios históricos separados permanecem preservados. A inferência de produção ainda não está implementada e a utilidade do ranking continua inconclusiva por ausência de revisão independente. Veja a [avaliação versionada](../docs/AVALIACAO_ISOLATION_FOREST.md) e o [histórico dos ensaios](../docs/validacao_nucleo/RESULTADO.md).
 
 Na raiz do repositório, com PostgreSQL migrado e `PROCESSING_DATABASE_URL` restrita já configurada:
 
@@ -63,3 +63,5 @@ Esses comandos usam snapshots existentes conferidos por hash; consultas ausentes
 Os quatro modelos originais não são alterados pelos novos ensaios; os novos artefatos têm diretórios próprios. O dossiê independente não contém flags de algoritmo nem achados do assistente e se recusa a sobrescrever pareceres preenchidos. Nenhum desses comandos publica resultados no PostgreSQL.
 
 Consulte a [base e atributos analíticos](../docs/ATRIBUTOS_ANALITICOS.md) para aquisição histórica registrada, preparo versionado, critérios e testes da etapa 04.
+
+A [avaliação versionada do Isolation Forest](../docs/AVALIACAO_ISOLATION_FOREST.md) consome o dataset analítico, compara regras e prepara revisão documental; utilidade ainda inconclusiva.
