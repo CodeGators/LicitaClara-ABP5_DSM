@@ -1,0 +1,123 @@
+{
+  "executado_em_utc": "2026-10-21T00:20:46.657064+00:00",
+  "tipo": "HTTP TCP local com login restrito da API",
+  "rotas": [
+    {
+      "rota": "/api/v1/health",
+      "status": 200,
+      "request_id_presente": true,
+      "total": null
+    },
+    {
+      "rota": "/api/v1/ready",
+      "status": 200,
+      "request_id_presente": true,
+      "total": null
+    },
+    {
+      "rota": "/api/v1/base/status",
+      "status": 200,
+      "request_id_presente": true,
+      "total": null
+    },
+    {
+      "rota": "/api/v1/orgaos",
+      "status": 200,
+      "request_id_presente": true,
+      "total": 7
+    },
+    {
+      "rota": "/api/v1/modalidades",
+      "status": 200,
+      "request_id_presente": true,
+      "total": 2
+    },
+    {
+      "rota": "/api/v1/processos",
+      "status": 200,
+      "request_id_presente": true,
+      "total": 7
+    },
+    {
+      "rota": "/api/v1/processos/87e660bd-af81-54c6-8828-1a6ccfc5d95f",
+      "status": 200,
+      "request_id_presente": true,
+      "total": null
+    },
+    {
+      "rota": "/api/v1/processos/87e660bd-af81-54c6-8828-1a6ccfc5d95f/itens",
+      "status": 200,
+      "request_id_presente": true,
+      "total": 4
+    },
+    {
+      "rota": "/api/v1/processos/87e660bd-af81-54c6-8828-1a6ccfc5d95f/documentos",
+      "status": 200,
+      "request_id_presente": true,
+      "total": 1
+    },
+    {
+      "rota": "/api/v1/processos?tamanho_pagina=101",
+      "status": 422,
+      "erro_uniforme": true
+    },
+    {
+      "rota": "/api/v1/processos/00000000-0000-0000-0000-000000000000",
+      "status": 404,
+      "erro_uniforme": true
+    }
+  ],
+  "base_id": "a21534e3-e1a9-5d31-9a4e-c3beb608914f",
+  "cobertura": {
+    "processos": 7,
+    "itens": 10,
+    "resultados_ativos": 8,
+    "resultados_cancelados": 0,
+    "fornecedores_resultados_ativos": 6,
+    "orgaos": 7,
+    "referencias_precos": 130,
+    "documentos": 10,
+    "itens_sem_unidade": 0,
+    "processos_sem_data_resultado": 7,
+    "processos_sem_valor_homologado": 2
+  },
+  "analise": {
+    "status": "nao_publicada",
+    "score": null,
+    "prioridade": null
+  },
+  "ultima_importacao_concluida_em": "2026-10-20T22:47:35.765310Z",
+  "processo_exemplo_id": "87e660bd-af81-54c6-8828-1a6ccfc5d95f",
+  "processos_no_intervalo_resultados": 3,
+  "processos_com_valor_no_recorte": 5,
+  "sha256_openapi": "1c8e8d34b3b28d9085cd12add2265d1935f0ad0af400e02d35d20cabd8791a4b",
+  "rotas_negocio_documentadas": [
+    "/api/v1/base/status",
+    "/api/v1/modalidades",
+    "/api/v1/orgaos",
+    "/api/v1/processos",
+    "/api/v1/processos/{processo_id}",
+    "/api/v1/processos/{processo_id}/documentos",
+    "/api/v1/processos/{processo_id}/itens"
+  ],
+  "contagens_antes": {
+    "versoes_base": 2,
+    "processos_versoes": 14,
+    "itens_versoes": 20,
+    "resultados_itens": 16
+  },
+  "contagens_depois": {
+    "versoes_base": 2,
+    "processos_versoes": 14,
+    "itens_versoes": 20,
+    "resultados_itens": 16
+  },
+  "servidor_temporario_encerrado": true,
+  "tabelas_aplicacao": 34,
+  "testes_locais": {
+    "aprovados": 95,
+    "skips": 0,
+    "lint": "aprovado",
+    "formatacao": "aprovada"
+  }
+}

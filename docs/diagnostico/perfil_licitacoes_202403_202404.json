@@ -1,0 +1,494 @@
+{
+  "downloads": [
+    {
+      "competencia": "202404",
+      "url": "https://portaldatransparencia.gov.br/download-de-dados/licitacoes/202404",
+      "url_final": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/licitacoes/202404_Licitacoes.zip",
+      "bytes": 832362,
+      "sha256": "5090396018e2ab3a26bd8779373aab893f684a61b8c0f2df0e0a906f8383fcd7",
+      "coletado_em": "2026-10-19T23:22:52.898169+00:00"
+    },
+    {
+      "competencia": "202403",
+      "url": "https://portaldatransparencia.gov.br/download-de-dados/licitacoes/202403",
+      "url_final": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/licitacoes/202403_Licitacoes.zip",
+      "bytes": 2803662,
+      "sha256": "543f7df89d8c3489cfe0c321a9d046f9dbc5d8af4a2fb1d44b09b26734b35627",
+      "coletado_em": "2026-10-19T23:23:03.026331+00:00"
+    }
+  ],
+  "perfis": [
+    {
+      "arquivo": "202403_Licitacoes.zip",
+      "bytes_zip": 2803662,
+      "sha256": "543f7df89d8c3489cfe0c321a9d046f9dbc5d8af4a2fb1d44b09b26734b35627",
+      "tabelas": {
+        "EmpenhosRelacionados": {
+          "linhas": 0,
+          "bytes_csv": 189,
+          "encoding_leitura": "cp1252",
+          "delimitador": ";",
+          "colunas": [
+            "Número Licitação",
+            "Código UG",
+            "Nome UG",
+            "Código Modalidade Compra",
+            "Modalidade Compra",
+            "Número Processo",
+            "Código Empenho",
+            "Data Emissão Empenho",
+            "Observação Empenho",
+            "Valor Empenho (R$)"
+          ],
+          "duplicatas_linha": 0,
+          "vazios_por_coluna": {
+            "Número Licitação": 0,
+            "Código UG": 0,
+            "Nome UG": 0,
+            "Código Modalidade Compra": 0,
+            "Modalidade Compra": 0,
+            "Número Processo": 0,
+            "Código Empenho": 0,
+            "Data Emissão Empenho": 0,
+            "Observação Empenho": 0,
+            "Valor Empenho (R$)": 0
+          },
+          "Data Emissão Empenho": {
+            "min": null,
+            "max": null,
+            "invalidos": 0
+          },
+          "Valor Empenho (R$)": {
+            "invalidos": 0,
+            "zeros": 0,
+            "negativos": 0,
+            "min": null,
+            "max": null
+          },
+          "bytes_parquet_strings": 2030
+        },
+        "ItemLicitação": {
+          "linhas": 57381,
+          "bytes_csv": 15706142,
+          "encoding_leitura": "cp1252",
+          "delimitador": ";",
+          "colunas": [
+            "Número Licitação",
+            "Código UG",
+            "Nome UG",
+            "Código Modalidade Compra",
+            "Modalidade Compra",
+            "Número Processo",
+            "Código Órgão",
+            "Nome Órgão",
+            "Código Item Compra",
+            "Descrição",
+            "Quantidade Item",
+            "Valor Item",
+            "Código Vencedor",
+            "Nome Vencedor"
+          ],
+          "duplicatas_linha": 3,
+          "vazios_por_coluna": {
+            "Número Licitação": 0,
+            "Código UG": 0,
+            "Nome UG": 0,
+            "Código Modalidade Compra": 0,
+            "Modalidade Compra": 0,
+            "Número Processo": 0,
+            "Código Órgão": 0,
+            "Nome Órgão": 0,
+            "Código Item Compra": 141,
+            "Descrição": 0,
+            "Quantidade Item": 0,
+            "Valor Item": 0,
+            "Código Vencedor": 0,
+            "Nome Vencedor": 0
+          },
+          "Quantidade Item": {
+            "invalidos": 0,
+            "zeros": 0,
+            "negativos": 0,
+            "min": "1",
+            "max": "25855200"
+          },
+          "Valor Item": {
+            "invalidos": 0,
+            "zeros": 0,
+            "negativos": 0,
+            "min": "0.0100",
+            "max": "389475750.0000"
+          },
+          "bytes_parquet_strings": 899324
+        },
+        "Licitação": {
+          "linhas": 2653,
+          "bytes_csv": 1239490,
+          "encoding_leitura": "cp1252",
+          "delimitador": ";",
+          "colunas": [
+            "Número Licitação",
+            "Código UG",
+            "Nome UG",
+            "Código Modalidade Compra",
+            "Modalidade Compra",
+            "Número Processo",
+            "Objeto",
+            "Situação Licitação",
+            "Código Órgão Superior",
+            "Nome Órgão Superior",
+            "Código Órgão",
+            "Nome Órgão",
+            "UF",
+            "Município",
+            "Data Resultado Compra",
+            "Data Abertura",
+            "Valor Licitação"
+          ],
+          "duplicatas_linha": 0,
+          "vazios_por_coluna": {
+            "Número Licitação": 0,
+            "Código UG": 0,
+            "Nome UG": 0,
+            "Código Modalidade Compra": 0,
+            "Modalidade Compra": 0,
+            "Número Processo": 0,
+            "Objeto": 0,
+            "Situação Licitação": 0,
+            "Código Órgão Superior": 0,
+            "Nome Órgão Superior": 0,
+            "Código Órgão": 0,
+            "Nome Órgão": 0,
+            "UF": 0,
+            "Município": 0,
+            "Data Resultado Compra": 0,
+            "Data Abertura": 769,
+            "Valor Licitação": 0
+          },
+          "Data Resultado Compra": {
+            "min": "2024-03-01",
+            "max": "2024-03-31",
+            "invalidos": 0
+          },
+          "Data Abertura": {
+            "min": "2021-06-02",
+            "max": "2024-03-28",
+            "invalidos": 0
+          },
+          "Valor Licitação": {
+            "invalidos": 0,
+            "zeros": 1214,
+            "negativos": 0,
+            "min": "0.00",
+            "max": "389475750.0000"
+          },
+          "bytes_parquet_strings": 238254
+        },
+        "ParticipantesLicitação": {
+          "linhas": 144711,
+          "bytes_csv": 37668302,
+          "encoding_leitura": "cp1252",
+          "delimitador": ";",
+          "colunas": [
+            "Número Licitação",
+            "Código UG",
+            "Nome UG",
+            "Código Modalidade Compra",
+            "Modalidade Compra",
+            "Número Processo",
+            "Código Órgão",
+            "Nome Órgão",
+            "Código Item Compra",
+            "Descrição Item Compra",
+            "Código Participante",
+            "Nome Participante",
+            "Flag Vencedor"
+          ],
+          "duplicatas_linha": 118,
+          "vazios_por_coluna": {
+            "Número Licitação": 0,
+            "Código UG": 0,
+            "Nome UG": 0,
+            "Código Modalidade Compra": 0,
+            "Modalidade Compra": 0,
+            "Número Processo": 0,
+            "Código Órgão": 0,
+            "Nome Órgão": 0,
+            "Código Item Compra": 0,
+            "Descrição Item Compra": 0,
+            "Código Participante": 0,
+            "Nome Participante": 0,
+            "Flag Vencedor": 0
+          },
+          "bytes_parquet_strings": 935060
+        }
+      },
+      "relacoes": {
+        "chave_processo_candidata": [
+          "Código UG",
+          "Código Modalidade Compra",
+          "Número Licitação"
+        ],
+        "duplicatas_chave_processo": 0,
+        "itens_sem_processo_na_competencia": 0,
+        "participacoes_sem_processo_na_competencia": 0,
+        "participacoes_sem_item_na_competencia": 1052,
+        "itens_distintos": 57233,
+        "linhas_item_com_codigo_repetido": 148,
+        "duplicatas_item_vencedor": 92,
+        "duplicatas_item_participante": 144,
+        "orgaos_distintos_processos": 182,
+        "vencedores_distintos_itens": 5418,
+        "itens_codigo_diferente_22_digitos": 223,
+        "flag_vencedor": {
+          "SIM": 57381,
+          "NÃO": 87330
+        },
+        "modalidades_processos": {
+          "Pregão - Registro de Preço": 1315,
+          "Pregão": 562,
+          "Concorrência": 19,
+          "Dispensa de Licitação": 522,
+          "Inexigibilidade de Licitação": 228,
+          "Tomada de Preços": 7
+        }
+      }
+    },
+    {
+      "arquivo": "202404_Licitacoes.zip",
+      "bytes_zip": 832362,
+      "sha256": "5090396018e2ab3a26bd8779373aab893f684a61b8c0f2df0e0a906f8383fcd7",
+      "tabelas": {
+        "EmpenhosRelacionados": {
+          "linhas": 0,
+          "bytes_csv": 189,
+          "encoding_leitura": "cp1252",
+          "delimitador": ";",
+          "colunas": [
+            "Número Licitação",
+            "Código UG",
+            "Nome UG",
+            "Código Modalidade Compra",
+            "Modalidade Compra",
+            "Número Processo",
+            "Código Empenho",
+            "Data Emissão Empenho",
+            "Observação Empenho",
+            "Valor Empenho (R$)"
+          ],
+          "duplicatas_linha": 0,
+          "vazios_por_coluna": {
+            "Número Licitação": 0,
+            "Código UG": 0,
+            "Nome UG": 0,
+            "Código Modalidade Compra": 0,
+            "Modalidade Compra": 0,
+            "Número Processo": 0,
+            "Código Empenho": 0,
+            "Data Emissão Empenho": 0,
+            "Observação Empenho": 0,
+            "Valor Empenho (R$)": 0
+          },
+          "Data Emissão Empenho": {
+            "min": null,
+            "max": null,
+            "invalidos": 0
+          },
+          "Valor Empenho (R$)": {
+            "invalidos": 0,
+            "zeros": 0,
+            "negativos": 0,
+            "min": null,
+            "max": null
+          },
+          "bytes_parquet_strings": 2030
+        },
+        "ItemLicitação": {
+          "linhas": 17729,
+          "bytes_csv": 4864531,
+          "encoding_leitura": "cp1252",
+          "delimitador": ";",
+          "colunas": [
+            "Número Licitação",
+            "Código UG",
+            "Nome UG",
+            "Código Modalidade Compra",
+            "Modalidade Compra",
+            "Número Processo",
+            "Código Órgão",
+            "Nome Órgão",
+            "Código Item Compra",
+            "Descrição",
+            "Quantidade Item",
+            "Valor Item",
+            "Código Vencedor",
+            "Nome Vencedor"
+          ],
+          "duplicatas_linha": 7,
+          "vazios_por_coluna": {
+            "Número Licitação": 0,
+            "Código UG": 0,
+            "Nome UG": 0,
+            "Código Modalidade Compra": 0,
+            "Modalidade Compra": 0,
+            "Número Processo": 0,
+            "Código Órgão": 0,
+            "Nome Órgão": 0,
+            "Código Item Compra": 51,
+            "Descrição": 0,
+            "Quantidade Item": 0,
+            "Valor Item": 0,
+            "Código Vencedor": 0,
+            "Nome Vencedor": 0
+          },
+          "Quantidade Item": {
+            "invalidos": 0,
+            "zeros": 0,
+            "negativos": 0,
+            "min": "1",
+            "max": "60000000"
+          },
+          "Valor Item": {
+            "invalidos": 0,
+            "zeros": 0,
+            "negativos": 0,
+            "min": "0.0002",
+            "max": "73782299.5200"
+          },
+          "bytes_parquet_strings": 323177
+        },
+        "Licitação": {
+          "linhas": 721,
+          "bytes_csv": 335898,
+          "encoding_leitura": "cp1252",
+          "delimitador": ";",
+          "colunas": [
+            "Número Licitação",
+            "Código UG",
+            "Nome UG",
+            "Código Modalidade Compra",
+            "Modalidade Compra",
+            "Número Processo",
+            "Objeto",
+            "Situação Licitação",
+            "Código Órgão Superior",
+            "Nome Órgão Superior",
+            "Código Órgão",
+            "Nome Órgão",
+            "UF",
+            "Município",
+            "Data Resultado Compra",
+            "Data Abertura",
+            "Valor Licitação"
+          ],
+          "duplicatas_linha": 0,
+          "vazios_por_coluna": {
+            "Número Licitação": 0,
+            "Código UG": 0,
+            "Nome UG": 0,
+            "Código Modalidade Compra": 0,
+            "Modalidade Compra": 0,
+            "Número Processo": 0,
+            "Objeto": 0,
+            "Situação Licitação": 0,
+            "Código Órgão Superior": 0,
+            "Nome Órgão Superior": 0,
+            "Código Órgão": 0,
+            "Nome Órgão": 0,
+            "UF": 0,
+            "Município": 0,
+            "Data Resultado Compra": 0,
+            "Data Abertura": 144,
+            "Valor Licitação": 0
+          },
+          "Data Resultado Compra": {
+            "min": "2024-04-01",
+            "max": "2024-04-05",
+            "invalidos": 0
+          },
+          "Data Abertura": {
+            "min": "2023-06-23",
+            "max": "2024-04-05",
+            "invalidos": 0
+          },
+          "Valor Licitação": {
+            "invalidos": 0,
+            "zeros": 398,
+            "negativos": 0,
+            "min": "0.00",
+            "max": "55784210.1600"
+          },
+          "bytes_parquet_strings": 79664
+        },
+        "ParticipantesLicitação": {
+          "linhas": 38737,
+          "bytes_csv": 10178554,
+          "encoding_leitura": "cp1252",
+          "delimitador": ";",
+          "colunas": [
+            "Número Licitação",
+            "Código UG",
+            "Nome UG",
+            "Código Modalidade Compra",
+            "Modalidade Compra",
+            "Número Processo",
+            "Código Órgão",
+            "Nome Órgão",
+            "Código Item Compra",
+            "Descrição Item Compra",
+            "Código Participante",
+            "Nome Participante",
+            "Flag Vencedor"
+          ],
+          "duplicatas_linha": 41,
+          "vazios_por_coluna": {
+            "Número Licitação": 0,
+            "Código UG": 0,
+            "Nome UG": 0,
+            "Código Modalidade Compra": 0,
+            "Modalidade Compra": 0,
+            "Número Processo": 0,
+            "Código Órgão": 0,
+            "Nome Órgão": 0,
+            "Código Item Compra": 0,
+            "Descrição Item Compra": 0,
+            "Código Participante": 0,
+            "Nome Participante": 0,
+            "Flag Vencedor": 0
+          },
+          "bytes_parquet_strings": 311022
+        }
+      },
+      "relacoes": {
+        "chave_processo_candidata": [
+          "Código UG",
+          "Código Modalidade Compra",
+          "Número Licitação"
+        ],
+        "duplicatas_chave_processo": 0,
+        "itens_sem_processo_na_competencia": 0,
+        "participacoes_sem_processo_na_competencia": 0,
+        "participacoes_sem_item_na_competencia": 169,
+        "itens_distintos": 17675,
+        "linhas_item_com_codigo_repetido": 54,
+        "duplicatas_item_vencedor": 26,
+        "duplicatas_item_participante": 50,
+        "orgaos_distintos_processos": 127,
+        "vencedores_distintos_itens": 2392,
+        "itens_codigo_diferente_22_digitos": 64,
+        "flag_vencedor": {
+          "SIM": 17729,
+          "NÃO": 21008
+        },
+        "modalidades_processos": {
+          "Tomada de Preços": 4,
+          "Dispensa de Licitação": 105,
+          "Pregão - Registro de Preço": 405,
+          "Pregão": 172,
+          "Concorrência": 4,
+          "Inexigibilidade de Licitação": 31
+        }
+      }
+    }
+  ]
+}

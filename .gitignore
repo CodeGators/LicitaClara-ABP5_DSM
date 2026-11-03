@@ -147,3 +147,23 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Local datasets and generated model artifacts
+/data/
+/models/
+/collector/data/
+/ml/data/
+/ml/models/
+/ml/artifacts/
+.ipynb_checkpoints/

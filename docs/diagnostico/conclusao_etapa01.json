@@ -1,0 +1,164 @@
+{
+  "etapa": "01 do PLANO_CONCLUSAO: consolidacao do repositorio",
+  "data_local": "2026-11-03",
+  "timezone": "America/Sao_Paulo",
+  "branch": "chore/01-consolidar-repositorio",
+  "base_main": "e2a5a84",
+  "arvore_testada": "cedb69aa0b32bbde9227f9ea8cce81e15fee64d1",
+  "escopo_arvore": "Codigo, lockfiles e workflows testados; atualizacoes documentais de evidencias realizadas depois.",
+  "copia_limpa": {
+    "origem": "git archive de git write-tree",
+    "ambiente_virtual_novo": true,
+    "env_pessoal_copiado": false,
+    "datasets_copiados": false,
+    "modelos_copiados": false,
+    "integracao": "TEST_DATABASE_URL fornecida ao processo, com schemas descartaveis no banco _test existente"
+  },
+  "ambiente": {
+    "python": "3.12.3",
+    "uv": "0.13.2",
+    "node": "20.19.0",
+    "npm": "10.8.2"
+  },
+  "python": {
+    "testes": {
+      "tests": 95,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "formatacao_arquivos": 94,
+    "comandos": [
+      {
+        "command": [
+          "uv",
+          "sync",
+          "--locked",
+          "--all-packages",
+          "--extra",
+          "validation"
+        ],
+        "exit_code": 0,
+        "seconds": 4.42
+      },
+      {
+        "command": [
+          "uv",
+          "run",
+          "--locked",
+          "--all-packages",
+          "--extra",
+          "validation",
+          "ruff",
+          "check",
+          "."
+        ],
+        "exit_code": 0,
+        "seconds": 0.06
+      },
+      {
+        "command": [
+          "uv",
+          "run",
+          "--locked",
+          "--all-packages",
+          "--extra",
+          "validation",
+          "ruff",
+          "format",
+          "--check",
+          "."
+        ],
+        "exit_code": 0,
+        "seconds": 0.02
+      },
+      {
+        "command": [
+          "uv",
+          "run",
+          "--locked",
+          "--all-packages",
+          "--extra",
+          "validation",
+          "pytest",
+          "-q",
+          "--junitxml=../pytest.xml"
+        ],
+        "exit_code": 0,
+        "seconds": 30.01
+      },
+      {
+        "command": [
+          "uv",
+          "run",
+          "--locked",
+          "--package",
+          "licita-collector",
+          "licita-collector",
+          "--version"
+        ],
+        "exit_code": 0,
+        "seconds": 0.84
+      },
+      {
+        "command": [
+          "uv",
+          "run",
+          "--locked",
+          "--package",
+          "licita-ml",
+          "licita-ml",
+          "--version"
+        ],
+        "exit_code": 0,
+        "seconds": 0.95
+      }
+    ]
+  },
+  "frontend": {
+    "comandos": [
+      {
+        "command": [
+          "npm",
+          "ci",
+          "--prefix",
+          "Frontend-licita-clara",
+          "--no-audit",
+          "--no-fund"
+        ],
+        "exit_code": 0,
+        "seconds": 1.0
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "build",
+          "--prefix",
+          "Frontend-licita-clara"
+        ],
+        "exit_code": 0,
+        "seconds": 2.08
+      }
+    ],
+    "modulos_transformados": 1585,
+    "codigo_e_ativos_preservados": true
+  },
+  "git": {
+    "movimentacoes_verificadas": true,
+    "credenciais_locais_na_selecao": false,
+    "assinaturas_comuns_de_segredos_encontradas": false,
+    "dados_modelos_ambientes_ignorados": true,
+    "push_executado": false,
+    "merge_main_executado": false
+  },
+  "ci_remoto_executado": false,
+  "deploy_executado": false,
+  "resultado": "OK_CONSOLIDACAO_LOCAL",
+  "limitacoes": [
+    "Checagem de segredos limitada a valores locais e assinaturas comuns; nao e auditoria completa.",
+    "Nao valida navegacao no browser nem funcionalidades futuras.",
+    "Nao valida execucao remota dos workflows.",
+    "Instalacao e testes reutilizam ferramentas do sistema e o servidor PostgreSQL de testes existente."
+  ]
+}

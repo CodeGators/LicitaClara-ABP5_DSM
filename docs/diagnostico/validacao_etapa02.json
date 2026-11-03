@@ -1,0 +1,58 @@
+{
+  "verificado_em": "2026-10-19T21:09:20.839814-03:00",
+  "testes": {
+    "passaram": 19,
+    "pulados": 0
+  },
+  "lint": "passou",
+  "formatacao": "passou",
+  "antes": {
+    "/api/v1/health": {
+      "status": 200,
+      "body": {
+        "status": "ok",
+        "service": "licita-backend",
+        "database": null
+      },
+      "request_id": "4c41a3e0-f221-498f-aea2-79155059f502"
+    },
+    "/api/v1/ready": {
+      "status": 200,
+      "body": {
+        "status": "ok",
+        "service": "licita-backend",
+        "database": "ok"
+      },
+      "request_id": "130901bd-cd5d-4321-a8ab-b6c828a8b011"
+    }
+  },
+  "banco_parado": {
+    "/api/v1/health": {
+      "status": 200,
+      "body": {
+        "status": "ok",
+        "service": "licita-backend",
+        "database": null
+      },
+      "request_id": "07489557-cc07-48b0-b868-3ef8df6567f9"
+    },
+    "/api/v1/ready": {
+      "status": 503,
+      "body": {
+        "status": "unavailable",
+        "service": "licita-backend",
+        "database": "unavailable"
+      },
+      "request_id": "91e152fa-f0a6-4f75-9ae5-87317b3603dc"
+    }
+  },
+  "banco_restaurado": {
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "service": "licita-backend",
+      "database": "ok"
+    },
+    "request_id": "b48f63a4-1c42-449a-b1c0-9f523c253b5d"
+  }
+}

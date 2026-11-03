@@ -1,0 +1,56 @@
+{
+  "verificado_em": "2026-10-19T21:32:01.140955-03:00",
+  "testes": {
+    "passaram": 27,
+    "pulados": 0
+  },
+  "lint": "passou",
+  "formatacao": "passou",
+  "tabelas_aplicacao": 29,
+  "cenarios": [
+    "upgrade vazio",
+    "upgrade 0001 para head preserva registros",
+    "downgrade em schema descartavel",
+    "múltiplos itens e vencedores",
+    "dinheiro com 8 casas decimais",
+    "snapshots de bases distintas",
+    "hash repetido e versão corrigida",
+    "proveniência válida e idempotente",
+    "unicidade de score de processo com item NULL",
+    "alvo de análise coerente",
+    "uma publicação ativa",
+    "base do relatório consistente",
+    "revisão append-only",
+    "permissões de coletor e processamento",
+    "login runtime sem escalada para migração"
+  ],
+  "runtime": {
+    "usuario": "licita_api_local",
+    "pode_criar_schema_public": false,
+    "membro_migrator": false,
+    "processos_importados": 0
+  },
+  "revisao": "0003_proveniencia",
+  "ownership": [
+    {
+      "papel": "licita_migrator",
+      "tabelas_incluindo_alembic": 30
+    }
+  ],
+  "/api/v1/health": {
+    "http": 200,
+    "resposta": {
+      "status": "ok",
+      "service": "licita-backend",
+      "database": null
+    }
+  },
+  "/api/v1/ready": {
+    "http": 200,
+    "resposta": {
+      "status": "ok",
+      "service": "licita-backend",
+      "database": "ok"
+    }
+  }
+}

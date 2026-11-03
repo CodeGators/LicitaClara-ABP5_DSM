@@ -1,0 +1,215 @@
+{
+  "etapa": "04",
+  "verificado_em_utc": "2026-10-20T22:11:06.228634+00:00",
+  "responsavel": "Codex",
+  "fonte": "Compras.gov.br — repositório oficial",
+  "competencia": "2026-09",
+  "coleta_real": true,
+  "armazenamento": "local",
+  "login_restrito": "licita_collector_local",
+  "arquivos_unicos": 4,
+  "bytes_unicos": 53897627,
+  "execucoes_concluidas": 9,
+  "observacoes": 9,
+  "repeticao": "Mês completo coletado duas vezes; compra também repetido isoladamente. Quatro arquivos únicos e nove observações, sem duplicar conteúdo.",
+  "arquivos": [
+    {
+      "id": "f2f94c2e-971d-41d4-9af0-76af3e10d8bd",
+      "fonte": "comprasgov",
+      "modulo": "pesquisa_precos/material",
+      "competencia": "2026-09-01",
+      "url_origem": "https://repositorio.dados.gov.br/seges/comprasgov/pesquisa_precos/2026/09/material_2026_09.csv.zip",
+      "url_final": "https://repositorio.dados.gov.br/seges/comprasgov/pesquisa_precos/2026/09/material_2026_09.csv.zip",
+      "sha256": "2db1fa67fbd15afb3a4ad18faa1e9ba9c1f382beb81b3a19bb7c9c0ad7c50b13",
+      "tamanho_bytes": 19696451,
+      "chave_objeto": "raw/comprasgov/pesquisa_precos/material/2026/09/2db1fa67fbd15afb3a4ad18faa1e9ba9c1f382beb81b3a19bb7c9c0ad7c50b13/material_2026_09.csv.zip",
+      "etag": "\"6ad35041-12c8b43\"",
+      "coletado_em": "2026-10-20 22:08:40.876043+00:00"
+    },
+    {
+      "id": "2fb9368b-b7b1-47b2-9227-84c2abac0185",
+      "fonte": "comprasgov",
+      "modulo": "pncp/compra",
+      "competencia": "2026-09-01",
+      "url_origem": "https://repositorio.dados.gov.br/seges/comprasgov/pncp/2026/09/compra_2026_09.csv.zip",
+      "url_final": "https://repositorio.dados.gov.br/seges/comprasgov/pncp/2026/09/compra_2026_09.csv.zip",
+      "sha256": "e11d86146dbea4b2965f7de92545bf1fed0ef7153f41416f3eba61d0a04ae14e",
+      "tamanho_bytes": 6266130,
+      "chave_objeto": "raw/comprasgov/pncp/compra/2026/09/e11d86146dbea4b2965f7de92545bf1fed0ef7153f41416f3eba61d0a04ae14e/compra_2026_09.csv.zip",
+      "etag": "\"6ac444bf-5f9d12\"",
+      "coletado_em": "2026-10-20 22:06:58.296587+00:00"
+    },
+    {
+      "id": "ef7d0ec8-cd23-4d91-8437-7a61fae95b5e",
+      "fonte": "comprasgov",
+      "modulo": "pncp/compra_item",
+      "competencia": "2026-09-01",
+      "url_origem": "https://repositorio.dados.gov.br/seges/comprasgov/pncp/2026/09/compra_item_2026_09.csv.zip",
+      "url_final": "https://repositorio.dados.gov.br/seges/comprasgov/pncp/2026/09/compra_item_2026_09.csv.zip",
+      "sha256": "b240f85f8e85e3741da4cd2af11455153f2fc75fde34e3a8328f091dad97ae9f",
+      "tamanho_bytes": 25698133,
+      "chave_objeto": "raw/comprasgov/pncp/compra_item/2026/09/b240f85f8e85e3741da4cd2af11455153f2fc75fde34e3a8328f091dad97ae9f/compra_item_2026_09.csv.zip",
+      "etag": "\"6ac45ab0-1881f55\"",
+      "coletado_em": "2026-10-20 22:07:52.079503+00:00"
+    },
+    {
+      "id": "155cf95c-aa78-4db0-95af-ec803cbc0b57",
+      "fonte": "comprasgov",
+      "modulo": "pncp/item_resultado",
+      "competencia": "2026-09-01",
+      "url_origem": "https://repositorio.dados.gov.br/seges/comprasgov/pncp/2026/09/item_resultado_2026_09.csv.zip",
+      "url_final": "https://repositorio.dados.gov.br/seges/comprasgov/pncp/2026/09/item_resultado_2026_09.csv.zip",
+      "sha256": "e03179a0f29de9802019a7e108cb9fd563c0869b181b569d989fd2ef8722e073",
+      "tamanho_bytes": 2236913,
+      "chave_objeto": "raw/comprasgov/pncp/item_resultado/2026/09/e03179a0f29de9802019a7e108cb9fd563c0869b181b569d989fd2ef8722e073/item_resultado_2026_09.csv.zip",
+      "etag": "\"6ac46045-2221f1\"",
+      "coletado_em": "2026-10-20 22:08:00.573289+00:00"
+    }
+  ],
+  "execucoes": [
+    {
+      "id": "b71c212a-6aa8-466c-a2ca-6455956dc400",
+      "modulo": "pncp/compra",
+      "competencia_inicio": "2026-09-01",
+      "status": "concluido",
+      "iniciado_em": "2026-10-20 22:06:53.566632+00:00",
+      "concluido_em": "2026-10-20 22:06:58.301777+00:00",
+      "duracao_segundos": "4.735145"
+    },
+    {
+      "id": "c49f1b55-9563-4b5e-8aa0-22cb0b550a9a",
+      "modulo": "pncp/compra_item",
+      "competencia_inicio": "2026-09-01",
+      "status": "concluido",
+      "iniciado_em": "2026-10-20 22:06:58.306014+00:00",
+      "concluido_em": "2026-10-20 22:07:52.083062+00:00",
+      "duracao_segundos": "53.777048"
+    },
+    {
+      "id": "e549fc4b-d714-4957-8ff9-637a600401f5",
+      "modulo": "pncp/compra",
+      "competencia_inicio": "2026-09-01",
+      "status": "concluido",
+      "iniciado_em": "2026-10-20 22:07:42.921717+00:00",
+      "concluido_em": "2026-10-20 22:07:50.160584+00:00",
+      "duracao_segundos": "7.238867"
+    },
+    {
+      "id": "03203eef-9c72-4fa3-90af-70df3e7d8070",
+      "modulo": "pncp/item_resultado",
+      "competencia_inicio": "2026-09-01",
+      "status": "concluido",
+      "iniciado_em": "2026-10-20 22:07:52.087040+00:00",
+      "concluido_em": "2026-10-20 22:08:00.575052+00:00",
+      "duracao_segundos": "8.488012"
+    },
+    {
+      "id": "19f0b007-edab-4ad6-96ed-be6319903379",
+      "modulo": "pesquisa_precos/material",
+      "competencia_inicio": "2026-09-01",
+      "status": "concluido",
+      "iniciado_em": "2026-10-20 22:08:00.577866+00:00",
+      "concluido_em": "2026-10-20 22:08:40.879463+00:00",
+      "duracao_segundos": "40.301597"
+    },
+    {
+      "id": "5aa1f01e-46eb-4216-a3b4-67d3b98ba221",
+      "modulo": "pncp/compra",
+      "competencia_inicio": "2026-09-01",
+      "status": "concluido",
+      "iniciado_em": "2026-10-20 22:08:48.958494+00:00",
+      "concluido_em": "2026-10-20 22:09:24.238518+00:00",
+      "duracao_segundos": "35.280024"
+    },
+    {
+      "id": "4521cb90-a425-485b-a81c-f45fb04c779b",
+      "modulo": "pncp/compra_item",
+      "competencia_inicio": "2026-09-01",
+      "status": "concluido",
+      "iniciado_em": "2026-10-20 22:09:24.242837+00:00",
+      "concluido_em": "2026-10-20 22:10:05.948361+00:00",
+      "duracao_segundos": "41.705524"
+    },
+    {
+      "id": "6193c693-614b-478c-9bfa-9877fc820740",
+      "modulo": "pncp/item_resultado",
+      "competencia_inicio": "2026-09-01",
+      "status": "concluido",
+      "iniciado_em": "2026-10-20 22:10:05.957063+00:00",
+      "concluido_em": "2026-10-20 22:10:09.066818+00:00",
+      "duracao_segundos": "3.109755"
+    },
+    {
+      "id": "50cf71dc-fae7-4702-9d8e-40826ccfd10e",
+      "modulo": "pesquisa_precos/material",
+      "competencia_inicio": "2026-09-01",
+      "status": "concluido",
+      "iniciado_em": "2026-10-20 22:10:09.073543+00:00",
+      "concluido_em": "2026-10-20 22:10:30.028751+00:00",
+      "duracao_segundos": "20.955208"
+    }
+  ],
+  "reprocessamento_local": [
+    {
+      "status": "validado",
+      "arquivo_id": "f2f94c2e-971d-41d4-9af0-76af3e10d8bd",
+      "sha256": "2db1fa67fbd15afb3a4ad18faa1e9ba9c1f382beb81b3a19bb7c9c0ad7c50b13",
+      "bytes": 19696451,
+      "membros": 1,
+      "bytes_descompactados": 129275984
+    },
+    {
+      "status": "validado",
+      "arquivo_id": "2fb9368b-b7b1-47b2-9227-84c2abac0185",
+      "sha256": "e11d86146dbea4b2965f7de92545bf1fed0ef7153f41416f3eba61d0a04ae14e",
+      "bytes": 6266130,
+      "membros": 1,
+      "bytes_descompactados": 29361628
+    },
+    {
+      "status": "validado",
+      "arquivo_id": "ef7d0ec8-cd23-4d91-8437-7a61fae95b5e",
+      "sha256": "b240f85f8e85e3741da4cd2af11455153f2fc75fde34e3a8328f091dad97ae9f",
+      "bytes": 25698133,
+      "membros": 1,
+      "bytes_descompactados": 178847874
+    },
+    {
+      "status": "validado",
+      "arquivo_id": "155cf95c-aa78-4db0-95af-ec803cbc0b57",
+      "sha256": "e03179a0f29de9802019a7e108cb9fd563c0869b181b569d989fd2ef8722e073",
+      "bytes": 2236913,
+      "membros": 1,
+      "bytes_descompactados": 20724047
+    }
+  ],
+  "extracao_verificada": "data/extracted/2fb9368b-b7b1-47b2-9227-84c2abac0185",
+  "retomada_concluida_verificada": "b71c212a-6aa8-466c-a2ca-6455956dc400",
+  "testes": {
+    "pytest": "38 passed, sem skips",
+    "ruff_check": "aprovado",
+    "ruff_format_check": "aprovado",
+    "alembic_check": "No new upgrade operations detected.",
+    "casos": [
+      "HTTP válido e 404",
+      "503 transitório",
+      "HTML",
+      "arquivo incompleto",
+      "retomada de blocos e mudança ETag",
+      "CRC inválido",
+      "travessia e symlink",
+      "limites de expansão",
+      "extração atômica",
+      "locks PostgreSQL",
+      "deduplicação e versões",
+      "retomada de execução falha",
+      "S3 simulado"
+    ]
+  },
+  "limites": {
+    "s3_r2_real": "Adaptador testado com cliente simulado; conta/bucket não provisionados nem teste remoto realizado.",
+    "linhas_processos_importadas": 0,
+    "importacao_e_treinamento": "Etapas seguintes, não executadas.",
+    "ci_remoto": "Workflow atualizado; verificações executadas localmente."
+  }
+}

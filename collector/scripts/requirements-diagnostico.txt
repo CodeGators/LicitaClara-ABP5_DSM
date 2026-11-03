@@ -1,0 +1,2 @@
+# Somente para medir a conversão exploratória para Parquet.
+pyarrow==23.0.1

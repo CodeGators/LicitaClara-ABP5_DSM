@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "licita-ml"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = ["licita-shared", "sqlalchemy>=2,<2.1", "psycopg[binary]>=3.2,<4", "pydantic-settings>=2.8,<3", "pyarrow==23.0.1"]
+
+[project.optional-dependencies]
+validation = ["scikit-learn>=1.6,<2", "joblib>=1.4,<2"]
+
+[project.scripts]
+licita-ml = "licita_ml.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.uv.sources]
+licita-shared = { workspace = true }

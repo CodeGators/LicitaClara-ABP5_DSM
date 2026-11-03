@@ -1,0 +1,537 @@
+{
+  "etapa": "05",
+  "responsavel": "Codex",
+  "verificado_em_utc": "2026-10-20T22:49:46.148599+00:00",
+  "tarefas_concluidas": "15/15",
+  "base_id_final": "a21534e3-e1a9-5d31-9a4e-c3beb608914f",
+  "manifesto": "datasets/base=ee41ee313d2ac1417d56f493f4dd18f902c9fe0fbd6c36375d75aa1349f0189b/catalogo=486054/manifesto.json",
+  "sha256_manifesto": "df733c88bccd0e774621f06529280312e232881d9dcada86abc70fcc1a8ebce3",
+  "codigo_transformacao_sha256": "717dcdc604e289934bbfc9eaf9b17890051f39b851161a4c71dbf1913698640a",
+  "periodo": [
+    "2026-09-01",
+    "2026-09-30"
+  ],
+  "catalogo": "CATMAT 486054",
+  "reconciliacao_global": {
+    "total": 434964,
+    "filtrados": 434671,
+    "aceitos": 165,
+    "rejeitados": 121,
+    "descartados": 7
+  },
+  "execucao_final": {
+    "status": "validada",
+    "base_id": "a21534e3-e1a9-5d31-9a4e-c3beb608914f",
+    "reutilizada": false,
+    "manifesto": "datasets/base=ee41ee313d2ac1417d56f493f4dd18f902c9fe0fbd6c36375d75aa1349f0189b/catalogo=486054/manifesto.json",
+    "sha256_manifesto": "df733c88bccd0e774621f06529280312e232881d9dcada86abc70fcc1a8ebce3",
+    "contagens": {
+      "orgaos": 7,
+      "modalidades": 2,
+      "processos": 7,
+      "processos_versoes": 7,
+      "proveniencias_registros": 165,
+      "itens_catalogo": 1,
+      "fornecedores": 18,
+      "referencias_precos": 130,
+      "itens_processo": 10,
+      "itens_versoes": 10,
+      "resultados_itens": 8,
+      "documentos": 10
+    },
+    "origem": {
+      "9b30c510-b4e2-47ea-a4d1-7f4ff3acd3a1": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "de244720-168f-4afc-b2ad-f5c9d4f164f2": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "7da752cd-4c6e-412d-aaba-01a4195cb2d1": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "e31f9e98-bd6e-4847-94be-d7cade4d2e16": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "c64b93aa-8886-43c8-bfc8-52319a42e921": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "734fca6a-9300-4a3a-a310-d0a020508216": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "a192e601-409d-466d-aeea-1f12709d8580": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "cfb80eb1-09a3-4e74-aead-135ed6d2d94d": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "cc43770e-2e77-432a-9ab1-bc981807a5d1": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "c7ad160c-154f-4d94-bec8-16c1efdffe7e": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "749086ba-1345-4e0f-82d6-011a3bc4ea0b": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "a00cd19a-cefb-4dac-b316-a5b528e15040": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "3a52f975-e93b-49d0-b3e4-185390e05880": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "80faa066-0152-4ddc-9037-336b3e2db801": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "d34b1152-fbf7-4ff0-9d5a-445571cec844": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "62f6783b-a9e1-4fe9-a4a4-90de3f7f223e": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "7d24e561-e12a-4095-a58e-1e704e8f22f1": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "e6869ba7-271b-411f-af7a-1281c9ff492e": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "03e8d61b-828e-4399-bf94-a5711857ddd2": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "f66bae4e-3a40-46a9-b677-a7e0874f49e3": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "674ea22a-ecfc-408d-944b-08f7be008a8e": {
+        "total": 168,
+        "filtrados": 166,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 1
+      },
+      "3dcb6a0c-3660-4923-a723-4b8f4de8d447": {
+        "total": 118,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 118,
+        "descartados": 0
+      },
+      "8cce5fad-0834-41a8-bf19-1362b6892565": {
+        "total": 245,
+        "filtrados": 244,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "0d7708ce-f281-4241-8c41-d58d07515fc3": {
+        "total": 164,
+        "filtrados": 162,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 1
+      },
+      "1106b046-e4ba-43b4-b145-dd8d23361609": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "2c358254-94ce-44d0-bb68-11aabf9eac11": {
+        "total": 14,
+        "filtrados": 13,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "2fb89b2b-4b14-4456-bb31-28c0a8c00972": {
+        "total": 48,
+        "filtrados": 47,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "2dc68873-826a-4354-bf0f-79563c924a91": {
+        "total": 318,
+        "filtrados": 314,
+        "aceitos": 4,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "b8f70bcc-4309-4be4-9a11-c1c2a2858f09": {
+        "total": 121,
+        "filtrados": 119,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 1
+      },
+      "7628c3e7-12c2-4b1c-982e-0394c66cd537": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "b0d58bab-3669-4f29-a421-f3d684c7deab": {
+        "total": 70,
+        "filtrados": 69,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "03ebfa11-9151-404a-b9a2-f50a9451e6e8": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "48965be2-3894-4780-b344-7698a3d0cae1": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "ece5c871-0934-4bfb-96ef-476892468ba8": {
+        "total": 82,
+        "filtrados": 81,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "5a6109a0-d389-4bed-87e0-417ad34e7846": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "43be179e-607d-4eed-9b29-57b2f55f2f1a": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "8dbc7713-abc3-42d2-8262-bd4f33163e21": {
+        "total": 48,
+        "filtrados": 47,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "4e391e9d-9486-4ad7-ac1d-f5ccb942aa29": {
+        "total": 266,
+        "filtrados": 262,
+        "aceitos": 4,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "d10a8c17-1a36-4291-8db2-6452ae7de5d6": {
+        "total": 59,
+        "filtrados": 58,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "b44371de-8f00-4924-b4f3-dfb6b63ed485": {
+        "total": 0,
+        "filtrados": 0,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "f2f94c2e-971d-41d4-9af0-76af3e10d8bd": {
+        "total": 114029,
+        "filtrados": 113899,
+        "aceitos": 130,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "2fb9368b-b7b1-47b2-9227-84c2abac0185": {
+        "total": 25861,
+        "filtrados": 25859,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 2
+      },
+      "ef7d0ec8-cd23-4d91-8437-7a61fae95b5e": {
+        "total": 242144,
+        "filtrados": 242140,
+        "aceitos": 0,
+        "rejeitados": 2,
+        "descartados": 2
+      },
+      "155cf95c-aa78-4db0-95af-ec803cbc0b57": {
+        "total": 40682,
+        "filtrados": 40681,
+        "aceitos": 0,
+        "rejeitados": 1,
+        "descartados": 0
+      },
+      "db6554d6-1054-41b2-a44d-dc7867668093": {
+        "total": 10510,
+        "filtrados": 10510,
+        "aceitos": 0,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "1c41d740-f8d5-4f56-b320-c3326b3dda40": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "539bea25-efe6-4712-82cb-d0698727b8b3": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "c302b7b7-bb4e-4ede-99ac-431c785b879b": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "c1db63c3-564b-4621-b833-bd3a9d31c6f2": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "976113f2-dfbf-4d9f-a4e8-dbe4b69930b8": {
+        "total": 4,
+        "filtrados": 0,
+        "aceitos": 4,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "13a29fc4-79ab-4055-92c0-f232991b9dbc": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      },
+      "bc96ca22-34c7-4048-82ea-b838e7ae1088": {
+        "total": 1,
+        "filtrados": 0,
+        "aceitos": 1,
+        "rejeitados": 0,
+        "descartados": 0
+      }
+    },
+    "qualidade": {
+      "itens_referencia": 130,
+      "compras_referencia": 10,
+      "processos_resolvidos": 7,
+      "itens_resolvidos": 10,
+      "participantes_cobertura": "apenas_itens_homologados_na_fonte",
+      "anexos": "metadados_sem_binarios",
+      "assinatura": "somente_quando_recebida_do_PNCP",
+      "historico_participantes_completo": false,
+      "referencias_sem_processo_pncp": 3,
+      "itens_referencia_nao_resolvidos": 120,
+      "referencias_sem_unidade": 3
+    },
+    "duracao_segundos": 7.123,
+    "memoria_pico_mib": 124.62,
+    "bytes_fontes": 60302924,
+    "bytes_manifesto": 33976,
+    "bytes_rejeicoes": 15053,
+    "bytes_parquet": 112473,
+    "postgres_bytes_com_indices_antes": {
+      "importacoes": 139264,
+      "versoes_base": 49152,
+      "base_importacoes": 24576,
+      "orgaos": 49152,
+      "fornecedores": 49152,
+      "modalidades": 49152,
+      "itens_catalogo": 49152,
+      "processos": 49152,
+      "itens_processo": 65536,
+      "processos_versoes": 163840,
+      "itens_versoes": 131072,
+      "resultados_itens": 114688,
+      "referencias_precos": 393216,
+      "participacoes": 49152,
+      "contratos": 24576,
+      "contratos_versoes": 40960,
+      "contratos_processos": 40960,
+      "documentos": 131072,
+      "proveniencias_registros": 122880
+    },
+    "postgres_bytes_com_indices_depois": {
+      "importacoes": 155648,
+      "versoes_base": 49152,
+      "base_importacoes": 24576,
+      "orgaos": 49152,
+      "fornecedores": 49152,
+      "modalidades": 49152,
+      "itens_catalogo": 49152,
+      "processos": 49152,
+      "itens_processo": 65536,
+      "processos_versoes": 204800,
+      "itens_versoes": 155648,
+      "resultados_itens": 131072,
+      "referencias_precos": 696320,
+      "participacoes": 49152,
+      "contratos": 24576,
+      "contratos_versoes": 40960,
+      "contratos_processos": 40960,
+      "documentos": 139264,
+      "proveniencias_registros": 188416
+    }
+  },
+  "repeticao_final": {
+    "status": "validada",
+    "base_id": "a21534e3-e1a9-5d31-9a4e-c3beb608914f",
+    "reutilizada": true,
+    "manifesto": "datasets/base=ee41ee313d2ac1417d56f493f4dd18f902c9fe0fbd6c36375d75aa1349f0189b/catalogo=486054/manifesto.json",
+    "duracao_segundos": 0.01
+  },
+  "verificacao_postgres": {
+    "bases_tecnicas_preservadas": 2,
+    "linhas_por_tabela_recorte": {
+      "orgaos": 7,
+      "modalidades": 2,
+      "processos": 7,
+      "processos_versoes": 7,
+      "proveniencias_registros": 165,
+      "itens_catalogo": 1,
+      "fornecedores": 18,
+      "referencias_precos": 130,
+      "itens_processo": 10,
+      "itens_versoes": 10,
+      "resultados_itens": 8,
+      "documentos": 10
+    },
+    "importacoes_base": 52,
+    "proveniencias_base": 165,
+    "login_processamento": "licita_processing_local"
+  },
+  "artefatos_conferidos": {
+    "originais": 52,
+    "parquets": 12,
+    "manifesto": true,
+    "rejeicoes": true
+  },
+  "testes": {
+    "pytest": "54 passed, sem skips",
+    "ruff_check": "aprovado",
+    "ruff_format_check": "aprovado",
+    "alembic_check": "No new upgrade operations detected.",
+    "casos": [
+      "paginação JSON completa e detecção de página repetida/incompleta",
+      "JSON preserva texto original e precisão decimal",
+      "campos obrigatórios interrompem importação com diagnóstico",
+      "identificadores preservam zeros",
+      "dinheiro decimal de escala 8 em PostgreSQL/Parquet",
+      "ausência de unidade e capacidade permanece NULL e quantidade zero permanece zero",
+      "linhas inválidas e conflitos vão para rejeições rastreáveis",
+      "reexecução não duplica domínios/importações",
+      "origem corrigida gera nova base e preserva anterior",
+      "falha intermediária faz rollback de domínio e repetição recupera",
+      "operações reais usam papel restrito de processamento"
+    ]
+  },
+  "ambiente": {
+    "pyarrow": "23.0.1",
+    "sqlalchemy": "2.0.55",
+    "psycopg": "3.3.6"
+  },
+  "limites": [
+    "Recorte com cobertura parcial: 120 itens sem pai resolvido e um resultado sem item resolvido.",
+    "Das dez compras referenciadas, três sem processo PNCP resolvido; três referências sem unidade.",
+    "Não houve propostas/contratos vinculáveis retornados neste recorte; cobertura não implica inexistência universal.",
+    "Anexos são metadados: binários não baixados; nenhum modelo ou score gerado.",
+    "Duas bases de revisões de código foram preservadas durante a validação; a repetição da revisão final reutilizou a mesma base.",
+    "Tamanho PostgreSQL mede relações listadas, incluindo índices, sem representar todo o banco/volume.",
+    "Processamento limitado a 20 mil itens/linhas selecionadas por execução; expansão exige nova medição.",
+    "Disco local validado; não houve execução em conta S3/R2 ou workflow remoto."
+  ]
+}

@@ -1,0 +1,963 @@
+{
+  "compra": {
+    "download": {
+      "url": "https://repositorio.dados.gov.br/seges/comprasgov/pncp/2026/09/compra_2026_09.csv.zip",
+      "url_final": "https://repositorio.dados.gov.br/seges/comprasgov/pncp/2026/09/compra_2026_09.csv.zip",
+      "coletado_em": "2026-10-19T23:31:48.715273+00:00",
+      "bytes": 6266130,
+      "sha256": "e11d86146dbea4b2965f7de92545bf1fed0ef7153f41416f3eba61d0a04ae14e",
+      "arquivo": "compra_2026_09.csv.zip"
+    },
+    "perfil": {
+      "arquivo": "compra_2026_09.csv.zip",
+      "tabelas": [
+        {
+          "membro": "compra_2026_09.csv",
+          "bytes_csv": 29361628,
+          "linhas": 25861,
+          "colunas": [
+            "cod_compra",
+            "modalidade_id_pncp",
+            "modo_disputa_id_pncp",
+            "id_compra",
+            "ind_atual",
+            "valor_total_estimado",
+            "valor_total_homologado",
+            "orgao_subrogado_cnpj",
+            "orgao_subrogado_razao_social",
+            "orgao_subrogado_esfera_id",
+            "orgao_subrogado_poder_id",
+            "codigo_orgao",
+            "unidade_orgao_uf_nome",
+            "unidade_orgao_codigo_unidade",
+            "unidade_orgao_nome_unidade",
+            "unidade_orgao_uf_sigla",
+            "unidade_orgao_municipio_nome",
+            "unidade_orgao_codigo_ibge",
+            "unidade_subrogada_uf_nome",
+            "unidade_subrogada_codigo_unidade",
+            "unidade_subrogada_nome_unidade",
+            "unidade_subrogada_uf_sigla",
+            "unidade_subrogada_municipio_nome",
+            "unidade_subrogada_codigo_ibge",
+            "numero_compra",
+            "data_atualizacao_pncp",
+            "data_publicacao_pncp",
+            "codigo_modo_disputa",
+            "codigo_modalidade",
+            "srp",
+            "ano_compra_pncp",
+            "sequencial_compra_pncp",
+            "orgao_entidade_cnpj",
+            "orgao_entidade_razao_social",
+            "orgao_entidade_esfera_id",
+            "orgao_entidade_poder_id",
+            "data_inclusao_pncp",
+            "amparo_legal_codigo_pncp",
+            "amparo_legal_nome",
+            "amparo_legal_descricao",
+            "data_abertura_proposta_pncp",
+            "data_encerramento_proposta_pncp",
+            "informacao_complementar",
+            "processo",
+            "objeto_compra",
+            "link_sistema_origem",
+            "justificativa_presencial",
+            "numero_controle_PNCP",
+            "existe_resultado",
+            "modalidade_nome",
+            "orcamento_sigiloso_codigo",
+            "orcamento_sigiloso_descricao",
+            "situacao_compra_id_pncp",
+            "situacao_compra_nome_pncp",
+            "tipo_instrumento_convocatorio_codigo_pncp",
+            "tipo_instrumento_convocatorio_nome",
+            "modo_disputa_nome_pncp",
+            "usuario_nome",
+            "contratacao_excluida"
+          ],
+          "vazios": {
+            "cod_compra": 0,
+            "modalidade_id_pncp": 0,
+            "modo_disputa_id_pncp": 0,
+            "id_compra": 0,
+            "ind_atual": 0,
+            "valor_total_estimado": 0,
+            "valor_total_homologado": 12817,
+            "orgao_subrogado_cnpj": 25726,
+            "orgao_subrogado_razao_social": 25726,
+            "orgao_subrogado_esfera_id": 25726,
+            "orgao_subrogado_poder_id": 25726,
+            "codigo_orgao": 0,
+            "unidade_orgao_uf_nome": 1,
+            "unidade_orgao_codigo_unidade": 0,
+            "unidade_orgao_nome_unidade": 0,
+            "unidade_orgao_uf_sigla": 1,
+            "unidade_orgao_municipio_nome": 1,
+            "unidade_orgao_codigo_ibge": 1,
+            "unidade_subrogada_uf_nome": 25726,
+            "unidade_subrogada_codigo_unidade": 25726,
+            "unidade_subrogada_nome_unidade": 25726,
+            "unidade_subrogada_uf_sigla": 25726,
+            "unidade_subrogada_municipio_nome": 25726,
+            "unidade_subrogada_codigo_ibge": 25726,
+            "numero_compra": 0,
+            "data_atualizacao_pncp": 0,
+            "data_publicacao_pncp": 0,
+            "codigo_modo_disputa": 0,
+            "codigo_modalidade": 0,
+            "srp": 0,
+            "ano_compra_pncp": 0,
+            "sequencial_compra_pncp": 0,
+            "orgao_entidade_cnpj": 0,
+            "orgao_entidade_razao_social": 0,
+            "orgao_entidade_esfera_id": 0,
+            "orgao_entidade_poder_id": 0,
+            "data_inclusao_pncp": 0,
+            "amparo_legal_codigo_pncp": 0,
+            "amparo_legal_nome": 0,
+            "amparo_legal_descricao": 0,
+            "data_abertura_proposta_pncp": 10254,
+            "data_encerramento_proposta_pncp": 10254,
+            "informacao_complementar": 19406,
+            "processo": 0,
+            "objeto_compra": 0,
+            "link_sistema_origem": 10492,
+            "justificativa_presencial": 25861,
+            "numero_controle_PNCP": 0,
+            "existe_resultado": 0,
+            "modalidade_nome": 0,
+            "orcamento_sigiloso_codigo": 0,
+            "orcamento_sigiloso_descricao": 0,
+            "situacao_compra_id_pncp": 0,
+            "situacao_compra_nome_pncp": 0,
+            "tipo_instrumento_convocatorio_codigo_pncp": 0,
+            "tipo_instrumento_convocatorio_nome": 0,
+            "modo_disputa_nome_pncp": 0,
+            "usuario_nome": 0,
+            "contratacao_excluida": 0
+          },
+          "zeros_numericos": {
+            "valor_total_estimado": 2593,
+            "valor_total_homologado": 143
+          },
+          "intervalos_datas_textuais": {
+            "data_atualizacao_pncp": [
+              "2026-09-01 00:59:07",
+              "2026-09-29 18:49:59"
+            ],
+            "data_publicacao_pncp": [
+              "2026-09-01 00:59:07",
+              "2026-09-29 18:49:59"
+            ],
+            "data_inclusao_pncp": [
+              "2026-09-01 00:59:07",
+              "2026-09-29 18:49:59"
+            ],
+            "data_abertura_proposta_pncp": [
+              "2026-07-13 18:00:00",
+              "2026-11-19 08:00:00"
+            ],
+            "data_encerramento_proposta_pncp": [
+              "2026-07-28 08:00:00",
+              "2036-09-29 09:00:00"
+            ]
+          },
+          "amostra_campos_catalogo_unidade": [
+            {
+              "unidade_orgao_uf_nome": "PARÁ",
+              "unidade_orgao_codigo_unidade": "980551",
+              "unidade_orgao_nome_unidade": "PREFEITURA MUNICIPAL SÃO MIGUEL DO GUAMÁ - PA",
+              "unidade_orgao_uf_sigla": "PA",
+              "unidade_orgao_municipio_nome": "SÃO MIGUEL DO GUAMÁ",
+              "unidade_orgao_codigo_ibge": "1507607",
+              "unidade_subrogada_uf_nome": "",
+              "unidade_subrogada_codigo_unidade": "",
+              "unidade_subrogada_nome_unidade": "",
+              "unidade_subrogada_uf_sigla": "",
+              "unidade_subrogada_municipio_nome": "",
+              "unidade_subrogada_codigo_ibge": ""
+            },
+            {
+              "unidade_orgao_uf_nome": "SERGIPE",
+              "unidade_orgao_codigo_unidade": "154050",
+              "unidade_orgao_nome_unidade": "MEC-UNIVERSIDADE FEDERAL/SE",
+              "unidade_orgao_uf_sigla": "SE",
+              "unidade_orgao_municipio_nome": "SÃO CRISTÓVÃO",
+              "unidade_orgao_codigo_ibge": "2806701",
+              "unidade_subrogada_uf_nome": "",
+              "unidade_subrogada_codigo_unidade": "",
+              "unidade_subrogada_nome_unidade": "",
+              "unidade_subrogada_uf_sigla": "",
+              "unidade_subrogada_municipio_nome": "",
+              "unidade_subrogada_codigo_ibge": ""
+            },
+            {
+              "unidade_orgao_uf_nome": "DISTRITO FEDERAL",
+              "unidade_orgao_codigo_unidade": "010001",
+              "unidade_orgao_nome_unidade": "CAMARA DOS DEPUTADOS",
+              "unidade_orgao_uf_sigla": "DF",
+              "unidade_orgao_municipio_nome": "BRASÍLIA",
+              "unidade_orgao_codigo_ibge": "5300108",
+              "unidade_subrogada_uf_nome": "",
+              "unidade_subrogada_codigo_unidade": "",
+              "unidade_subrogada_nome_unidade": "",
+              "unidade_subrogada_uf_sigla": "",
+              "unidade_subrogada_municipio_nome": "",
+              "unidade_subrogada_codigo_ibge": ""
+            },
+            {
+              "unidade_orgao_uf_nome": "DISTRITO FEDERAL",
+              "unidade_orgao_codigo_unidade": "020001",
+              "unidade_orgao_nome_unidade": "SENADO FEDERAL",
+              "unidade_orgao_uf_sigla": "DF",
+              "unidade_orgao_municipio_nome": "BRASÍLIA",
+              "unidade_orgao_codigo_ibge": "5300108",
+              "unidade_subrogada_uf_nome": "",
+              "unidade_subrogada_codigo_unidade": "",
+              "unidade_subrogada_nome_unidade": "",
+              "unidade_subrogada_uf_sigla": "",
+              "unidade_subrogada_municipio_nome": "",
+              "unidade_subrogada_codigo_ibge": ""
+            },
+            {
+              "unidade_orgao_uf_nome": "RIO DE JANEIRO",
+              "unidade_orgao_codigo_unidade": "250057",
+              "unidade_orgao_nome_unidade": "INSTITUTO NACIONAL DE TRAUMATO-ORTOPEDIA",
+              "unidade_orgao_uf_sigla": "RJ",
+              "unidade_orgao_municipio_nome": "RIO DE JANEIRO",
+              "unidade_orgao_codigo_ibge": "3304557",
+              "unidade_subrogada_uf_nome": "",
+              "unidade_subrogada_codigo_unidade": "",
+              "unidade_subrogada_nome_unidade": "",
+              "unidade_subrogada_uf_sigla": "",
+              "unidade_subrogada_municipio_nome": "",
+              "unidade_subrogada_codigo_ibge": ""
+            }
+          ]
+        }
+      ],
+      "ids_distintos_nao_vazios": 25811
+    }
+  },
+  "compra_item": {
+    "download": {
+      "url": "https://repositorio.dados.gov.br/seges/comprasgov/pncp/2026/09/compra_item_2026_09.csv.zip",
+      "url_final": "https://repositorio.dados.gov.br/seges/comprasgov/pncp/2026/09/compra_item_2026_09.csv.zip",
+      "coletado_em": "2026-10-19T23:35:58.188272+00:00",
+      "bytes": 25698133,
+      "sha256": "b240f85f8e85e3741da4cd2af11455153f2fc75fde34e3a8328f091dad97ae9f",
+      "arquivo": "compra_item_2026_09.csv.zip",
+      "etag": "\"6ac45ab0-1881f55\"",
+      "modo": "range_1MiB"
+    },
+    "perfil": {
+      "arquivo": "compra_item_2026_09.csv.zip",
+      "tabelas": [
+        {
+          "membro": "compra_item_2026_09.csv",
+          "bytes_csv": 178847874,
+          "linhas": 242144,
+          "colunas": [
+            "srk_pncp_item_compra",
+            "cod_compra",
+            "cod_item_compra",
+            "codigo_classe",
+            "codigo_grupo",
+            "numero_item_pncp",
+            "numero_grupo",
+            "numero_item_compra",
+            "descricao_detalhada",
+            "descricao_resumida",
+            "material_ou_servico",
+            "material_ou_servico_nome",
+            "valor_unitario_estimado",
+            "valor_total",
+            "quantidade",
+            "unidade_medida",
+            "orcamento_sigiloso",
+            "item_categoria_id_pncp",
+            "item_categoria_nome",
+            "patrimonio",
+            "codigo_registro_imobiliario",
+            "criterio_julgamento_id_pncp",
+            "criterio_julgamento_nome",
+            "situacao_compra_item",
+            "situacao_compra_item_nome",
+            "tipo_beneficio",
+            "tipo_beneficio_nome",
+            "incentivo_produtivo_basico",
+            "data_inclusao_pncp",
+            "data_atualizacao_pncp",
+            "tem_resultado",
+            "cod_item_catalogo",
+            "ID_contratacao_PNCP",
+            "cod_fornecedor",
+            "nome_fornecedor",
+            "data_resultado",
+            "valor_total_resultado",
+            "valor_unitario_resultado",
+            "quantidade_resultado",
+            "id_compra",
+            "id_compra_item",
+            "ano_compra",
+            "sequencial_compra",
+            "orgao_entidade_cnpj",
+            "unidade_orgao_codigo_unidade",
+            "margem_preferencia_normal",
+            "percentual_margem_preferencia_normal",
+            "margem_preferencia_adicional",
+            "percentual_margem_preferencia_adicional",
+            "codigo_NCM",
+            "descricao_NCM",
+            "numero_controle_PNCP_compra",
+            "TXT_LINK_MATERIAL",
+            "TXT_LINK_CLASSE",
+            "TXT_LINK_SERVICO",
+            "TXT_LINK_GRUPO",
+            "COD_RESULTADO_ITEM",
+            "codigo_pdm",
+            "nome_pdm"
+          ],
+          "vazios": {
+            "srk_pncp_item_compra": 0,
+            "cod_compra": 0,
+            "cod_item_compra": 0,
+            "codigo_classe": 242144,
+            "codigo_grupo": 242144,
+            "numero_item_pncp": 0,
+            "numero_grupo": 0,
+            "numero_item_compra": 0,
+            "descricao_detalhada": 242144,
+            "descricao_resumida": 0,
+            "material_ou_servico": 0,
+            "material_ou_servico_nome": 0,
+            "valor_unitario_estimado": 0,
+            "valor_total": 0,
+            "quantidade": 0,
+            "unidade_medida": 0,
+            "orcamento_sigiloso": 0,
+            "item_categoria_id_pncp": 0,
+            "item_categoria_nome": 0,
+            "patrimonio": 242142,
+            "codigo_registro_imobiliario": 242142,
+            "criterio_julgamento_id_pncp": 0,
+            "criterio_julgamento_nome": 0,
+            "situacao_compra_item": 0,
+            "situacao_compra_item_nome": 0,
+            "tipo_beneficio": 0,
+            "tipo_beneficio_nome": 0,
+            "incentivo_produtivo_basico": 0,
+            "data_inclusao_pncp": 0,
+            "data_atualizacao_pncp": 0,
+            "tem_resultado": 200320,
+            "cod_item_catalogo": 242144,
+            "ID_contratacao_PNCP": 0,
+            "cod_fornecedor": 201572,
+            "nome_fornecedor": 201572,
+            "data_resultado": 201572,
+            "valor_total_resultado": 201572,
+            "valor_unitario_resultado": 201572,
+            "quantidade_resultado": 201572,
+            "id_compra": 0,
+            "id_compra_item": 0,
+            "ano_compra": 0,
+            "sequencial_compra": 0,
+            "orgao_entidade_cnpj": 0,
+            "unidade_orgao_codigo_unidade": 0,
+            "margem_preferencia_normal": 0,
+            "percentual_margem_preferencia_normal": 238858,
+            "margem_preferencia_adicional": 0,
+            "percentual_margem_preferencia_adicional": 240881,
+            "codigo_NCM": 162227,
+            "descricao_NCM": 242144,
+            "numero_controle_PNCP_compra": 0,
+            "TXT_LINK_MATERIAL": 242144,
+            "TXT_LINK_CLASSE": 242144,
+            "TXT_LINK_SERVICO": 242144,
+            "TXT_LINK_GRUPO": 242144,
+            "COD_RESULTADO_ITEM": 0,
+            "codigo_pdm": 242144,
+            "nome_pdm": 242144
+          },
+          "zeros_numericos": {
+            "valor_unitario_estimado": 34896,
+            "valor_total": 34902,
+            "quantidade": 6,
+            "valor_total_resultado": 170,
+            "valor_unitario_resultado": 38,
+            "quantidade_resultado": 31
+          },
+          "intervalos_datas_textuais": {
+            "data_inclusao_pncp": [
+              "2026-09-01 00:59:07",
+              "2026-09-29 18:49:59"
+            ],
+            "data_atualizacao_pncp": [
+              "2026-09-01 01:00:09",
+              "2026-09-29 18:51:00"
+            ],
+            "data_resultado": [
+              "2024-06-27 00:00:00",
+              "2026-09-29 00:00:00"
+            ]
+          },
+          "amostra_campos_catalogo_unidade": [
+            {
+              "unidade_medida": "UNIDADE",
+              "cod_item_catalogo": "",
+              "unidade_orgao_codigo_unidade": "980551"
+            },
+            {
+              "unidade_medida": "Unidade",
+              "cod_item_catalogo": "",
+              "unidade_orgao_codigo_unidade": "154050"
+            },
+            {
+              "unidade_medida": "Unidade",
+              "cod_item_catalogo": "",
+              "unidade_orgao_codigo_unidade": "010001"
+            },
+            {
+              "unidade_medida": "Unidade",
+              "cod_item_catalogo": "",
+              "unidade_orgao_codigo_unidade": "010001"
+            },
+            {
+              "unidade_medida": "Comprimido",
+              "cod_item_catalogo": "",
+              "unidade_orgao_codigo_unidade": "020001"
+            }
+          ]
+        }
+      ],
+      "ids_distintos_nao_vazios": 226365
+    }
+  },
+  "item_resultado": {
+    "download": {
+      "url": "https://repositorio.dados.gov.br/seges/comprasgov/pncp/2026/09/item_resultado_2026_09.csv.zip",
+      "url_final": "https://repositorio.dados.gov.br/seges/comprasgov/pncp/2026/09/item_resultado_2026_09.csv.zip",
+      "coletado_em": "2026-10-19T23:31:51.327684+00:00",
+      "bytes": 2236913,
+      "sha256": "e03179a0f29de9802019a7e108cb9fd563c0869b181b569d989fd2ef8722e073",
+      "arquivo": "item_resultado_2026_09.csv.zip"
+    },
+    "perfil": {
+      "arquivo": "item_resultado_2026_09.csv.zip",
+      "tabelas": [
+        {
+          "membro": "item_resultado_2026_09.csv",
+          "bytes_csv": 20724047,
+          "linhas": 40682,
+          "colunas": [
+            "srk_item_resultado",
+            "id_compra",
+            "id_compra_item",
+            "id_contratacao_pncp",
+            "data_atualizacao_pncp",
+            "ni_fornecedor",
+            "tipo_pessoa",
+            "data_inclusao_pncp",
+            "numero_item_pncp",
+            "data_cancelamento_pncp",
+            "nome_razao_social_fornecedor",
+            "codigo_pais",
+            "porte_fornecedor_id",
+            "quantidade_homologada",
+            "valor_unitario_homologado",
+            "valor_total_homologado",
+            "percentual_desconto",
+            "indicador_subcontratacao",
+            "ordem_classificacao_srp",
+            "data_resultado_pncp",
+            "motivo_cancelamento",
+            "numero_controle_PNCP_compra",
+            "porte_fornecedor_nome",
+            "situacao_compra_item_resultado_nome",
+            "sequencial_resultado",
+            "natureza_juridica_nome",
+            "natureza_juridica_id",
+            "situacao_compra_item_resultado_id",
+            "orgao_entidade_cnpj",
+            "sequencial_compra",
+            "ano_compra",
+            "unidade_orgao_codigo_unidade",
+            "aplicacao_margem_preferencia",
+            "amparo_legal_margem_preferencia_id",
+            "amparo_legal_margem_preferencia_nome",
+            "amparo_legal_margem_preferencia_descricao",
+            "aplicacao_beneficio_meepp",
+            "aplicacao_criterio_desempate",
+            "amparo_legal_criterio_desempate_id",
+            "amparo_legal_criterio_desempate_nome",
+            "amparo_legal_criterio_desempate_descricao",
+            "moeda_estrangeira_id",
+            "data_cotacao_moeda_estrangeira",
+            "valor_nominal_moeda_estrangeira",
+            "pais_origem_produto_servico_id",
+            "timezone_cotacao_moeda_estrangeira",
+            "unidade_orgao_uf_sigla",
+            "COD_RESULTADO_ITEM"
+          ],
+          "vazios": {
+            "srk_item_resultado": 0,
+            "id_compra": 0,
+            "id_compra_item": 0,
+            "id_contratacao_pncp": 0,
+            "data_atualizacao_pncp": 0,
+            "ni_fornecedor": 0,
+            "tipo_pessoa": 0,
+            "data_inclusao_pncp": 0,
+            "numero_item_pncp": 0,
+            "data_cancelamento_pncp": 40549,
+            "nome_razao_social_fornecedor": 0,
+            "codigo_pais": 0,
+            "porte_fornecedor_id": 0,
+            "quantidade_homologada": 0,
+            "valor_unitario_homologado": 0,
+            "valor_total_homologado": 0,
+            "percentual_desconto": 0,
+            "indicador_subcontratacao": 0,
+            "ordem_classificacao_srp": 12802,
+            "data_resultado_pncp": 0,
+            "motivo_cancelamento": 40549,
+            "numero_controle_PNCP_compra": 0,
+            "porte_fornecedor_nome": 0,
+            "situacao_compra_item_resultado_nome": 0,
+            "sequencial_resultado": 0,
+            "natureza_juridica_nome": 3869,
+            "natureza_juridica_id": 3869,
+            "situacao_compra_item_resultado_id": 0,
+            "orgao_entidade_cnpj": 0,
+            "sequencial_compra": 0,
+            "ano_compra": 0,
+            "unidade_orgao_codigo_unidade": 0,
+            "aplicacao_margem_preferencia": 0,
+            "amparo_legal_margem_preferencia_id": 40681,
+            "amparo_legal_margem_preferencia_nome": 40681,
+            "amparo_legal_margem_preferencia_descricao": 40682,
+            "aplicacao_beneficio_meepp": 0,
+            "aplicacao_criterio_desempate": 0,
+            "amparo_legal_criterio_desempate_id": 40440,
+            "amparo_legal_criterio_desempate_nome": 40681,
+            "amparo_legal_criterio_desempate_descricao": 40682,
+            "moeda_estrangeira_id": 40682,
+            "data_cotacao_moeda_estrangeira": 40682,
+            "valor_nominal_moeda_estrangeira": 40682,
+            "pais_origem_produto_servico_id": 40681,
+            "timezone_cotacao_moeda_estrangeira": 40682,
+            "unidade_orgao_uf_sigla": 1,
+            "COD_RESULTADO_ITEM": 0
+          },
+          "zeros_numericos": {
+            "valor_total_homologado": 170,
+            "valor_unitario_homologado": 38,
+            "quantidade_homologada": 31
+          },
+          "intervalos_datas_textuais": {
+            "data_atualizacao_pncp": [
+              "2026-09-01 07:44:01",
+              "2026-09-29 18:44:09"
+            ],
+            "data_inclusao_pncp": [
+              "2026-09-01 07:44:01",
+              "2026-09-29 18:44:09"
+            ],
+            "data_resultado_pncp": [
+              "2024-06-27 00:00:00",
+              "2026-09-29 00:00:00"
+            ],
+            "data_cancelamento_pncp": [
+              "2026-09-02 00:00:00",
+              "2026-09-29 00:00:00"
+            ]
+          },
+          "amostra_campos_catalogo_unidade": [
+            {
+              "unidade_orgao_codigo_unidade": "080004",
+              "unidade_orgao_uf_sigla": "CE"
+            },
+            {
+              "unidade_orgao_codigo_unidade": "783701",
+              "unidade_orgao_uf_sigla": "RN"
+            },
+            {
+              "unidade_orgao_codigo_unidade": "194046",
+              "unidade_orgao_uf_sigla": "SP"
+            },
+            {
+              "unidade_orgao_codigo_unidade": "194046",
+              "unidade_orgao_uf_sigla": "SP"
+            },
+            {
+              "unidade_orgao_codigo_unidade": "194046",
+              "unidade_orgao_uf_sigla": "SP"
+            }
+          ]
+        }
+      ],
+      "ids_distintos_nao_vazios": 40580
+    }
+  },
+  "material": {
+    "download": {
+      "url": "https://repositorio.dados.gov.br/seges/comprasgov/pesquisa_precos/2026/09/material_2026_09.csv.zip",
+      "url_final": "https://repositorio.dados.gov.br/seges/comprasgov/pesquisa_precos/2026/09/material_2026_09.csv.zip",
+      "coletado_em": "2026-10-19T23:32:42.354594+00:00",
+      "bytes": 19696451,
+      "sha256": "2db1fa67fbd15afb3a4ad18faa1e9ba9c1f382beb81b3a19bb7c9c0ad7c50b13",
+      "arquivo": "material_2026_09.csv.zip"
+    },
+    "perfil": {
+      "arquivo": "material_2026_09.csv.zip",
+      "tabelas": [
+        {
+          "membro": "material_2026_09.csv",
+          "bytes_csv": 129275984,
+          "linhas": 114029,
+          "colunas": [
+            "id_compra",
+            "data_compra",
+            "forma",
+            "modalidade",
+            "data_hora_atualizacao_compra",
+            "id_item_compra",
+            "numero_item_compra",
+            "ni_fornecedor",
+            "codigo_item_catalogo",
+            "quantidade",
+            "preco_unitario",
+            "descricao_item",
+            "sigla_unidade_fornecimento",
+            "nome_unidade_fornecimento",
+            "capacidade_unidade_fornecimento",
+            "sigla_unidade_medida",
+            "nome_unidade_medida",
+            "criterio_julgamento",
+            "percentual_maior_desconto",
+            "nome_fornecedor",
+            "marca",
+            "data_resultado",
+            "data_hora_atualizacao_item",
+            "codigo_uasg",
+            "nome_uasg",
+            "codigo_orgao",
+            "nome_orgao",
+            "estado",
+            "codigo_municipio",
+            "municipio",
+            "poder",
+            "esfera",
+            "data_hora_atualizacao_uasg",
+            "codigo_classe",
+            "nome_classe",
+            "id_compra_item",
+            "objeto_compra",
+            "descricao_detalhada_item",
+            "codigo_grupo",
+            "nome_grupo",
+            "codigo_pdm",
+            "nome_pdm"
+          ],
+          "vazios": {
+            "id_compra": 0,
+            "data_compra": 0,
+            "forma": 0,
+            "modalidade": 0,
+            "data_hora_atualizacao_compra": 0,
+            "id_item_compra": 0,
+            "numero_item_compra": 0,
+            "ni_fornecedor": 0,
+            "codigo_item_catalogo": 0,
+            "quantidade": 0,
+            "preco_unitario": 0,
+            "descricao_item": 0,
+            "sigla_unidade_fornecimento": 22950,
+            "nome_unidade_fornecimento": 29580,
+            "capacidade_unidade_fornecimento": 0,
+            "sigla_unidade_medida": 95470,
+            "nome_unidade_medida": 114029,
+            "criterio_julgamento": 15,
+            "percentual_maior_desconto": 0,
+            "nome_fornecedor": 0,
+            "marca": 53,
+            "data_resultado": 0,
+            "data_hora_atualizacao_item": 0,
+            "codigo_uasg": 0,
+            "nome_uasg": 0,
+            "codigo_orgao": 0,
+            "nome_orgao": 0,
+            "estado": 0,
+            "codigo_municipio": 763,
+            "municipio": 763,
+            "poder": 775,
+            "esfera": 0,
+            "data_hora_atualizacao_uasg": 0,
+            "codigo_classe": 0,
+            "nome_classe": 0,
+            "id_compra_item": 0,
+            "objeto_compra": 0,
+            "descricao_detalhada_item": 0,
+            "codigo_grupo": 0,
+            "nome_grupo": 0,
+            "codigo_pdm": 0,
+            "nome_pdm": 0
+          },
+          "zeros_numericos": {
+            "quantidade": 4,
+            "preco_unitario": 4
+          },
+          "intervalos_datas_textuais": {
+            "data_compra": [
+              "2026-09-01",
+              "2026-09-30"
+            ],
+            "data_hora_atualizacao_compra": [
+              "2026-09-02 07:59:13.847426",
+              "2026-10-17 02:24:50.237696"
+            ],
+            "data_resultado": [
+              "2024-10-24",
+              "2026-10-16"
+            ],
+            "data_hora_atualizacao_item": [
+              "2025-10-24 03:05:29.071168",
+              "2026-10-17 03:44:17.382531"
+            ],
+            "data_hora_atualizacao_uasg": [
+              "2010-07-07 18:30:00",
+              "2026-10-15 14:50:00"
+            ]
+          },
+          "amostra_campos_catalogo_unidade": [
+            {
+              "codigo_item_catalogo": "298151",
+              "descricao_item": "AGENDA, TIPO: ANUAL , QUANTIDADE FOLHAS: 375 UN, GRAMATURA: 63 G/M2, LARGURA: 150 MM, CARACTERÍSTICAS ADICIONAIS: CAPA DURA ACOLCHOADA , ALTURA: 210 MM",
+              "sigla_unidade_fornecimento": "UN",
+              "nome_unidade_fornecimento": "UNIDADE",
+              "capacidade_unidade_fornecimento": "0.00000000",
+              "sigla_unidade_medida": "",
+              "nome_unidade_medida": ""
+            },
+            {
+              "codigo_item_catalogo": "235086",
+              "descricao_item": "BLOCO FLIP CHART, COR: BRANCA ",
+              "sigla_unidade_fornecimento": "BL",
+              "nome_unidade_fornecimento": "BLOCO",
+              "capacidade_unidade_fornecimento": "50.00000000",
+              "sigla_unidade_medida": "FL",
+              "nome_unidade_medida": ""
+            },
+            {
+              "codigo_item_catalogo": "261739",
+              "descricao_item": "BLOCO RASCUNHO, MATERIAL: PAPEL OFF-SET , TIPO: SEM PAUTA , COMPRIMENTO: 210 MM, GRAMATURA: 75 G/M2, QUANTIDADE FOLHAS: 50 , LARGURA: 140 MM, QUANTIDADE VIAS: 1 , APLICAÇÃO: ANOTAÇÕES DIVERSAS , CARACTERÍSTICAS ADICIONAIS: IMPRESSÃO 1/0 COR, RECICLADO, COM ARTE , COR: BRANCA ",
+              "sigla_unidade_fornecimento": "BL",
+              "nome_unidade_fornecimento": "BLOCO",
+              "capacidade_unidade_fornecimento": "50.00000000",
+              "sigla_unidade_medida": "FL",
+              "nome_unidade_medida": ""
+            },
+            {
+              "codigo_item_catalogo": "231836",
+              "descricao_item": "CLASSIFICADOR, MATERIAL: PVC TRANSPARENTE , COR: BRANCO , COMPRIMENTO: 315 MM, LARGURA: 210 MM, CAPACIDADE: 200 FL, CARACTERÍSTICAS ADICIONAIS: COM ELÁSTICO ",
+              "sigla_unidade_fornecimento": "UN",
+              "nome_unidade_fornecimento": "UNIDADE",
+              "capacidade_unidade_fornecimento": "0.00000000",
+              "sigla_unidade_medida": "",
+              "nome_unidade_medida": ""
+            },
+            {
+              "codigo_item_catalogo": "272501",
+              "descricao_item": "CLIPE, TRATAMENTO SUPERFICIAL: NIQUELADO , TAMANHO: 2/0 , MATERIAL: METAL , FORMATO: PARALELO ",
+              "sigla_unidade_fornecimento": "CX",
+              "nome_unidade_fornecimento": "CAIXA",
+              "capacidade_unidade_fornecimento": "100.00000000",
+              "sigla_unidade_medida": "UN",
+              "nome_unidade_medida": ""
+            }
+          ]
+        }
+      ],
+      "categorias_mais_frequentes": [
+        {
+          "codigo": "623755",
+          "descricao": "LIVRO C. SOC/ESTAT/POLÍT/ECON/COMÉRCIO E DIREITO, TEMA: PSICOLOGIA E ANÁLISE , ASSUNTO: REPENCE - REGULAÇÃO EMOCIONAL , FORMATO: IMPRESSO , IDIOMA: PORTUGUÊS , NÍVEL: PUBLICO EM GERAL , CARACTERÍSTICAS ADICIONAIS: Autores: FONSECA, ROCHELE PAZ | CARDOSO, CAROLINE , REFERENCIA DA PUBLICAÇÃO: CONFORME ESPECIFICAÇÃO ",
+          "unidade": "UNIDADE",
+          "sigla": "UN",
+          "linhas": 214
+        },
+        {
+          "codigo": "628182",
+          "descricao": "PEÇA / ACESSÓRIO - FIBRA ÓPTICA, TIPO: CONJUNTO DE CONECTORES ÓPTICOS , USO: Conectar cabo óptico - DROP 1FO 1 , APLICAÇÃO: Sistemas de Vigilância , DIÂMETRO NÚCLEO: 125 MICROM",
+          "unidade": "UNIDADE",
+          "sigla": "UN",
+          "linhas": 212
+        },
+        {
+          "codigo": "464380",
+          "descricao": "FRUTA, TIPO: BANANA NANICA / BANANA D'ÁGUA , APRESENTAÇÃO: NATURAL ",
+          "unidade": "QUILOGRAMA",
+          "sigla": "KG",
+          "linhas": 181
+        },
+        {
+          "codigo": "463806",
+          "descricao": "LEGUME IN NATURA, TIPO: TOMATE SALADA ",
+          "unidade": "QUILOGRAMA",
+          "sigla": "KG",
+          "linhas": 171
+        },
+        {
+          "codigo": "463796",
+          "descricao": "LEGUME IN NATURA, TIPO: PEPINO ",
+          "unidade": "QUILOGRAMA",
+          "sigla": "KG",
+          "linhas": 168
+        },
+        {
+          "codigo": "630110",
+          "descricao": "ALIMENTO SEMIPRONTO OU PRONTO, TIPO: Marmita CASEIRA , INGREDIENTES PRINCIPAIS: Arroz (250g), Feijão (150g), Proteína( 150g) , INGREDIENTES ADICIONAIS: Farofa (25g), Macarrão(75g) , INGREDIENTE OPCIONAL: Salada legumes e verduras (100g) , CARACTERÍSTICA ADICIONAL: não consumida no estabelecimento (artigo 17 do Ane ",
+          "unidade": "QUILOGRAMA",
+          "sigla": "KG",
+          "linhas": 160
+        },
+        {
+          "codigo": "464393",
+          "descricao": "FRUTA, TIPO: LARANJA PERA , APRESENTAÇÃO: NATURAL ",
+          "unidade": "QUILOGRAMA",
+          "sigla": "KG",
+          "linhas": 151
+        },
+        {
+          "codigo": "620868",
+          "descricao": "PÃO, BASE: FARINHA DE ARROZ, AMIDO DE MILHO , TIPO: DE FORMA , INGREDIENTES ADICIONAIS: MULTIGRÃOS , APRESENTAÇÃO: FATIADO , CARACTERÍSTICA ADICIONAL: SEM GLÚTEN ",
+          "unidade": "",
+          "sigla": "",
+          "linhas": 134
+        },
+        {
+          "codigo": "463770",
+          "descricao": "LEGUME IN NATURA, TIPO: CENOURA ",
+          "unidade": "QUILOGRAMA",
+          "sigla": "KG",
+          "linhas": 132
+        },
+        {
+          "codigo": "463795",
+          "descricao": "LEGUME IN NATURA, TIPO: MANDIOCA / AIPIM ",
+          "unidade": "QUILOGRAMA",
+          "sigla": "KG",
+          "linhas": 130
+        },
+        {
+          "codigo": "463767",
+          "descricao": "LEGUME IN NATURA, TIPO: BETERRABA ",
+          "unidade": "QUILOGRAMA",
+          "sigla": "KG",
+          "linhas": 125
+        },
+        {
+          "codigo": "486054",
+          "descricao": "BORRACHA APAGADORA ESCRITA, MATERIAL: BORRACHA , COMPRIMENTO: 53 MM, LARGURA: 18 MM, ALTURA: 8 MM, TIPO: MACIA , APLICAÇÃO: PARA LÁPIS E TINTA ",
+          "unidade": "UNIDADE",
+          "sigla": "UN",
+          "linhas": 125
+        },
+        {
+          "codigo": "463753",
+          "descricao": "LEGUME IN NATURA, TIPO: BATATA DOCE ",
+          "unidade": "QUILOGRAMA",
+          "sigla": "KG",
+          "linhas": 124
+        },
+        {
+          "codigo": "464418",
+          "descricao": "FRUTA, TIPO: MELANCIA VERMELHA , APRESENTAÇÃO: NATURAL ",
+          "unidade": "QUILOGRAMA",
+          "sigla": "KG",
+          "linhas": 119
+        },
+        {
+          "codigo": "463751",
+          "descricao": "LEGUME IN NATURA, TIPO: ABOBRINHA DE PESCOÇO / MENINA ",
+          "unidade": "QUILOGRAMA",
+          "sigla": "KG",
+          "linhas": 107
+        }
+      ],
+      "ids_distintos_nao_vazios": 112538
+    }
+  },
+  "relacoes": {
+    "itens_sem_compra": 4,
+    "resultados_sem_compra": 1,
+    "ids_resultado_sem_item": 126,
+    "material_ids_com_item_pncp_no_mes": 49795,
+    "material_ids_distintos": 112538
+  },
+  "verificacao_vinculos": {
+    "por_arquivo": {
+      "compra": {
+        "linhas": 25861,
+        "duplicatas_exatas": 0
+      },
+      "compra_item": {
+        "linhas": 242144,
+        "duplicatas_exatas": 0
+      },
+      "item_resultado": {
+        "linhas": 40682,
+        "duplicatas_exatas": 0
+      },
+      "material": {
+        "linhas": 114029,
+        "duplicatas_exatas": 0
+      }
+    },
+    "ind_atual_compras": {
+      "True": 25861
+    },
+    "material_ids_com_codigos_catalogo_divergentes": 0,
+    "ids_enriqueciveis_no_mes": 49795,
+    "piloto": {
+      "catalogo": "486054",
+      "linhas": 125,
+      "ids_distintos": 125,
+      "compras_distintas": 5,
+      "orgaos_distintos": 5,
+      "fornecedores_distintos": 13,
+      "ids_com_item_pncp_no_mes": 2
+    }
+  },
+  "parquet_amostras": [
+    {
+      "arquivo": "compra",
+      "linhas_amostra": 5000,
+      "bytes_parquet": 957242,
+      "schema": "todas as colunas string",
+      "compressao": "zstd"
+    },
+    {
+      "arquivo": "compra_item",
+      "linhas_amostra": 5000,
+      "bytes_parquet": 442623,
+      "schema": "todas as colunas string",
+      "compressao": "zstd"
+    },
+    {
+      "arquivo": "item_resultado",
+      "linhas_amostra": 5000,
+      "bytes_parquet": 300831,
+      "schema": "todas as colunas string",
+      "compressao": "zstd"
+    },
+    {
+      "arquivo": "material",
+      "linhas_amostra": 5000,
+      "bytes_parquet": 558465,
+      "schema": "todas as colunas string",
+      "compressao": "zstd"
+    }
+  ]
+}

@@ -24,7 +24,7 @@ Este é o ponto de entrada para continuar o projeto. Ler este arquivo antes de i
 
 - `main` foi atualizada por fast-forward para `e2a5a84`, igual à `origin/main` na consulta realizada; atualização do frontend integrada pelo PR #3 em 01/11/2026.
 - A organização local difere do GitHub: frontend em `Frontend-licita-clara/` e protótipos em `docs/prototipo/`.
-- Backend, coletor, ML, shared, infraestrutura, docs e CI ainda estavam sem rastreamento no Git na revisão. Há exclusões dos caminhos antigos e alterações locais em README e `.gitignore`. Consolidar na etapa 01.
+- No início da revisão, backend, coletor, ML, shared, infraestrutura, docs e CI estavam sem rastreamento no Git. A etapa 01 consolidou esses arquivos e a reorganização em branch própria; a integração na `main` ainda está pendente.
 - Backup anterior à atualização: `../abp-backup-antes-atualizacao-20261103-092407/`. Contém arquivos locais, diff e estado do Git; não é backup completo do banco/datasets ignorados.
 - PostgreSQL local saudável, com duas bases validadas de setembro/2026. Cada versão tem 7 processos, 10 itens e 130 referências; não somar versões como cobertura adicional.
 - Banco possui 34 tabelas de aplicação e quatro migrações documentadas. Ter tabela não significa ter serviço implementado.
@@ -59,16 +59,16 @@ Documentos de apoio:
 
 ## Etapa atual e próximo passo
 
-**Etapa atual:** 00 — documentação do plano, branch `docs/00-contexto-conclusao`.
+**Etapa atual:** 01 — consolidação concluída e validada localmente, branch `chore/01-consolidar-repositorio`; pronta para revisão e integração.
 
-**Próxima etapa:** 01 — consolidar o trabalho local e o repositório antes de distribuir novas entregas em branches.
+**Próxima etapa:** integrar a base consolidada conforme autorização do usuário e iniciar 02 — contratos de itens/processos. Nenhum push ou merge na `main` foi realizado nesta entrega.
 
 **Pendências externas:** acesso ao Figma; pareceres humanos independentes; definição/provisionamento da hospedagem. Não impedem iniciar consolidação, contratos e consultas reais.
 
 ## Checklist geral
 
 - [x] 00 — Criar contexto, checklist, branches e critérios de teste.
-- [ ] 01 — Consolidar código local, organização e documentação no Git.
+- [x] 01 — Consolidar código local, organização e documentação no Git.
 - [ ] 02 — Definir contratos de itens, processos, resultados e análises.
 - [ ] 03 — Integrar consultas reais ao frontend.
 - [ ] 04 — Preparar base analítica operacional e atributos reproduzíveis.
@@ -82,7 +82,7 @@ Documentos de apoio:
 - [ ] 12 — Hospedar e automatizar operação com recuperação.
 - [ ] 13 — Validar fluxo completo e preparar entrega acadêmica reproduzível.
 
-As branches abaixo são planejadas; só a branch 00 foi criada nesta entrega. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
+As branches 00 e 01 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
 
 ## Entregas, branches e aceitação
 
@@ -101,10 +101,10 @@ Branch: `docs/00-contexto-conclusao`.
 
 Branch: `chore/01-consolidar-repositorio`. Dependência: 00.
 
-- [ ] Inventariar alterações anteriores e registrar a reorganização como tal, sem perder arquivos.
-- [ ] Versionar código, migrações, documentação, lockfiles e CI pertinentes; excluir segredos e artefatos ignorados.
-- [ ] Conciliar README, comandos, fonte Compras.gov.br/PNCP e estado real das entregas.
-- [ ] Preparar integração dessa base para que as próximas branches tenham todos os componentes.
+- [x] Inventariar alterações anteriores e registrar a reorganização como tal, sem perder arquivos.
+- [x] Versionar código, migrações, documentação, lockfiles e CI pertinentes; excluir segredos e artefatos ignorados.
+- [x] Conciliar README, comandos, fonte Compras.gov.br/PNCP e estado real das entregas.
+- [x] Preparar integração dessa base para que as próximas branches tenham todos os componentes.
 
 **Como testar:** revisar diff e arquivos rastreados; instalar pelos lockfiles; executar CI Python e build frontend. **Conclusão:** checkout limpo da entrega reproduz o código e a estrutura, sem credenciais/dados privados incluídos. A execução remota do CI deve ser registrada separadamente da local.
 
@@ -301,3 +301,15 @@ Checklist atualizado:
 - Verificação: links Markdown relativos e estrutura das 14 etapas conferidos localmente; Figma recusou acesso nas duas tentativas.
 - Resultado: **OK para a documentação do plano**. Acesso ao Figma permanece pendente; nenhuma funcionalidade futura foi marcada como concluída.
 - Próximo passo: etapa 01. As alterações anteriores continuam locais e precisam de consolidação própria.
+
+### Entrega 01 — 03/11/2026
+
+- Branch: `chore/01-consolidar-repositorio`; commit de conclusão identificado no histórico pelo título `chore: consolidar monorepositorio e validar instalacao limpa`.
+- Mudança: registrado o código local, migrações, testes, docs e lockfiles; reconhecidas as movimentações de frontend/protótipos; corrigidos exemplos antigos de CLI/paginação e acrescentado CI de build frontend.
+- Pré-requisitos/passos: seguir [consolidação do repositório](CONSOLIDACAO_REPOSITORIO.md), incluindo ambiente PostgreSQL `_test` para integração.
+- Verificações: instalação em cópia limpa com ambiente virtual novo, 95 testes aprovados sem skips, lint e formatação aprovados (94 arquivos), instalação/build frontend aprovados e versões de ambas as CLIs `0.1.0`.
+- Preservação: fontes frontend e imagens movidas comparadas byte a byte; dados, modelos, dependências e `.env` fora do índice; valores de credenciais locais e assinaturas comuns de segredos não encontrados na seleção. Essa checagem não é uma auditoria de segurança completa.
+- Evidência: [resultado agregado da etapa 01](diagnostico/conclusao_etapa01.json).
+- Não verificado: execução remota do CI, implantação e fluxos de negócio das etapas futuras. Testes de integração usaram schemas descartáveis do banco de testes existente; não foi necessário migrar ou importar na base da aplicação.
+- Resultado: **OK para a consolidação local**; integração na `main` e publicação remota ainda pendentes.
+- Próxima etapa: 02, após integração autorizada da base consolidada.

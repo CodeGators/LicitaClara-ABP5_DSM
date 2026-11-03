@@ -1,0 +1,24 @@
+name: Frontend CI
+on:
+  push:
+    paths: ["Frontend-licita-clara/**", ".github/workflows/frontend-ci.yml"]
+  pull_request:
+    paths: ["Frontend-licita-clara/**", ".github/workflows/frontend-ci.yml"]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: Frontend-licita-clara
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.19.0"
+          cache: npm
+          cache-dependency-path: Frontend-licita-clara/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build

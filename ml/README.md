@@ -1,0 +1,63 @@
+# Preparação e modelagem
+
+O pacote `licita-ml` implementa a etapa 05: leitura, resolução de registros, exportação Parquet e importação PostgreSQL de um recorte CATMAT. Há também um ensaio independente de treinamento e avaliação de Isolation Forest com dados reais. A inferência de produção ainda não está implementada; a utilidade do ranking aguarda revisão documental. Veja o [resultado e reprodução do ensaio](../docs/validacao_nucleo/RESULTADO.md).
+
+Na raiz do repositório, com PostgreSQL migrado e `PROCESSING_DATABASE_URL` restrita já configurada:
+
+```bash
+uv sync --locked --all-packages
+uv run --locked --package licita-ml licita-ml preparar --inicio 2026-09-01 --fim 2026-09-30 --catalogo 486054
+```
+
+Sem `--arquivos`, seleciona a versão mais recentemente **observada** de cada módulo/competência no período. Uma nova observação de conteúdo antigo pode torná-lo a versão selecionada; hashes e IDs são congelados no manifesto. Para reproduzir uma seleção histórica, informe todos os IDs originais:
+
+```bash
+uv run --locked --package licita-ml licita-ml preparar --inicio 2026-09-01 --fim 2026-09-30 --catalogo 486054 --arquivos UUID_1 UUID_2 UUID_3 UUID_4
+```
+
+O exemplo representa quatro ou mais IDs reais; se houve aquisição complementar, inclua também esses arquivos. A seleção exige `compra`, `compra_item`, `item_resultado` e `material`. Propostas e envelopes JSON oficiais são opcionais e têm cobertura registrada. Não há acesso a endpoints HTTP neste comando; a aquisição é responsabilidade do coletor.
+
+Repetir período, catálogo, seleção e código reutiliza a base, conferindo os hashes do manifesto, dos Parquets e das rejeições. Uma alteração na origem ou no código gera outra base e mantém o histórico. O status `validada` confirma integridade técnica e reconciliação; não afirma que a base está pronta para treinamento.
+
+Veja [regras, comandos e evidências da etapa 05](../docs/PREPARACAO_E_IMPORTACAO.md).
+
+## Configuração
+
+- `PROCESSING_DATABASE_URL`: exclusivamente o login de processamento, sem credencial administrativa.
+- `STORAGE_BACKEND`, `STORAGE_ROOT` e variáveis de objetos: mesmos adaptadores compartilhados do coletor. Disco local está configurado. Para S3/R2, instalar o extra `s3` do workspace e configurar bucket/credenciais conforme README do coletor; não houve teste com conta remota.
+- `PROCESSING_WORK_DIR=data/processing`: relatórios locais de execução, fora do Git.
+- `PROCESSING_BATCH_SIZE=500`: tamanho dos lotes SQL, entre 1 e 2.000.
+- `PROCESSING_MAX_FILE_BYTES=104857600`: limite compactado/JSON por objeto.
+- `PROCESSING_MAX_UNCOMPRESSED_BYTES=2147483648`: limite de expansão de ZIP.
+
+O processamento lê os arquivos em streaming e mantém apenas o recorte selecionado em memória. Há limite de 20 mil itens e 20 mil linhas selecionadas por execução, antes da deduplicação. Para volumes maiores, dividir o recorte e planejar evolução para staging em disco; não ampliar o limite por suposição sobre a memória disponível.
+
+Há um lock PostgreSQL global de preparação para serializar publicação e criação de identidades. Importações operacionais ficam separadas da transação de dados; todos os snapshots, vínculos, proveniências e validação da base são confirmados juntos. Uma falha deixa importações marcadas como `falhou`, sem base parcial publicada; repetir a mesma seleção retoma sem duplicar registros.
+
+## Ensaio do núcleo de ML
+
+```bash
+uv sync --locked --all-packages --extra validation
+uv run --locked --all-packages --extra validation python -m licita_ml.experiments.core --offline
+```
+
+O cache histórico fica em `data/validacao_nucleo/`. Sem `--offline`, consultas ausentes podem ser adquiridas na API oficial; caches existentes são conferidos por URL/hash. Os artefatos e planilhas de revisão ficam fora do Git. O ensaio não escreve no PostgreSQL nem publica scores; a categoria original insuficiente continua separada da coorte alternativa. Consulte o [protocolo](../docs/validacao_nucleo/PROTOCOLO.md) antes de interpretar as métricas. Usar outro `--saida` preserva execuções anteriores; planilhas com pareceres preenchidos não são sobrescritas.
+
+## Revisão documental e confirmação
+
+A [revisão aprofundada](../docs/validacao_nucleo/REVISAO_E_CONFIRMACAO.md) encontrou divergências de especificação apesar de valores corroborados. O ranking não está aprovado para publicação como prioridade de auditoria. O ensaio corrigido exige resultado até o corte; a replicação histórica e a consulta de outubro são reportadas separadamente.
+
+Com o extra `validation` instalado, na raiz do repositório:
+
+```bash
+uv run --locked --all-packages --extra validation python -m licita_ml.review_validation
+uv run --locked --all-packages --extra validation python -m licita_ml.review_validation.documents
+uv run --locked --all-packages --extra validation python -m licita_ml.review_validation.confirmation
+uv run --locked --all-packages --extra validation python -m licita_ml.review_validation.replication
+uv run --locked --all-packages --extra validation python -m licita_ml.review_validation.result_dates
+uv run --locked --all-packages --extra validation python -m licita_ml.review_validation.report
+```
+
+Esses comandos usam snapshots existentes conferidos por hash; consultas ausentes acessam as fontes oficiais. Não sobrescrever os caches para simular dados novos. O módulo `documents` requer `pdftotext` (Poppler) no sistema. Downloads têm limite de 16 MiB por documento, transferências por partes, prazo global de 45 segundos e quatro tarefas concorrentes. ZIPs são lidos em memória, com até 100 membros, 64 MiB de expansão total e até seis PDFs por documento; nomes internos não viram caminhos locais. Formatos não suportados e falhas permanecem registrados. Nem todos os anexos puderam ser obtidos.
+
+Os quatro modelos originais não são alterados pelos novos ensaios; os novos artefatos têm diretórios próprios. O dossiê independente não contém flags de algoritmo nem achados do assistente e se recusa a sobrescrever pareceres preenchidos. Nenhum desses comandos publica resultados no PostgreSQL.

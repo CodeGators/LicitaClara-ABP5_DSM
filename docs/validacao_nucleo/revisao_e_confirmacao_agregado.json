@@ -1,0 +1,590 @@
+{
+  "executado_em_utc": "2026-10-20T23:58:44.166021+00:00",
+  "sha256_protocolo": "1874955038c38fd9026a5c0ff1f96331c2462e482763a006d87787effe6b701c",
+  "sha256_codigo": "8ae190eb43324c03d04068ba7ba2dcba238643c13f3fae2601508456928960f0",
+  "codigo_experimento_original_preservado": "data/validacao_nucleo/revisao_assistida/experiments_original.tar.gz",
+  "sha256_codigo_original_arquivado": "1bc61bfd2d546cff3589dae81026b3b9a6f9bd7989fc3123f508fa5425733a66",
+  "conferencia": {
+    "amostra": 18,
+    "compras_distintas": 17,
+    "estados": {
+      "corroborado_estruturalmente": 18
+    },
+    "casos": [
+      {
+        "id": "01b5aa2913f899c9852a",
+        "id_compra": "92661805000142026",
+        "id_compra_original": "92661805000142026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 30,
+        "preco_unitario": "1.00000000",
+        "quantidade": "96.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/56319882000107/2026/21",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/56319882000107/compras/2026/21/arquivos/1"
+        ],
+        "indice_paginas": [],
+        "texto_disponivel": false,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "01c07d7c28af0c52089c",
+        "id_compra": "98769105901712024",
+        "id_compra_original": "98769105901712024",
+        "vinculo_textual_explicito": false,
+        "numero_item": 33,
+        "preco_unitario": "0.56000000",
+        "quantidade": "44467.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "confere",
+        "pncp_url": "https://pncp.gov.br/app/editais/76282656000106/2024/516",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/76282656000106/compras/2024/516/arquivos/1"
+        ],
+        "indice_paginas": [
+          {
+            "url": "https://pncp.gov.br/pncp-api/v1/orgaos/76282656000106/compras/2024/516/arquivos/1",
+            "membro": "EDITAL_PE_171_2024.pdf",
+            "paginas": [
+              15
+            ]
+          },
+          {
+            "url": "https://pncp.gov.br/pncp-api/v1/orgaos/76282656000106/compras/2024/516/arquivos/1",
+            "membro": "RelacaoItens98769105901712024000.pdf",
+            "paginas": [
+              7
+            ]
+          }
+        ],
+        "texto_disponivel": true,
+        "top5_if_preco_quantidade": true,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": [
+          {
+            "id_caso": "01c07d7c28af0c52089c",
+            "tipo": "quantidade_prevista_no_edital",
+            "item": 33,
+            "pagina": 7,
+            "pdf_sha256": "061c22ef31ebe3d40f7d53ec9aa4bdee490afa37374c77428519110c3ad4d42a",
+            "documento_url": "https://pncp.gov.br/api/pncp/v1/orgaos/76282656000106/compras/2024/516/arquivos/1",
+            "descricao": "A relação de itens prevê 44.467 unidades de marca-texto amarelo, entrega em Maringá/PR e estimativa unitária de R$ 0,88. A referência homologada de R$ 0,56 e 44.467 unidades foi corroborada. A quantidade grande estava prevista; isso não comprova irregularidade nem justifica integralmente a contratação."
+          }
+        ]
+      },
+      {
+        "id": "043a1491b6a5c17d8f07",
+        "id_compra": "08000805900232025",
+        "id_compra_original": "8000805900232025",
+        "vinculo_textual_explicito": true,
+        "numero_item": 6,
+        "preco_unitario": "0.97000000",
+        "quantidade": "1000.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "confere",
+        "pncp_url": "https://pncp.gov.br/app/editais/00509968000148/2025/2222",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/00509968000148/compras/2025/2222/arquivos/2"
+        ],
+        "indice_paginas": [],
+        "texto_disponivel": false,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "07e708e4ab4053ede40d",
+        "id_compra": "92828505900622026",
+        "id_compra_original": "92828505900622026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 19,
+        "preco_unitario": "0.51000000",
+        "quantidade": "2000.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/14814139000183/2026/93",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/14814139000183/compras/2026/93/arquivos/1"
+        ],
+        "indice_paginas": [],
+        "texto_disponivel": false,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "0a7efb8673b25e82ca19",
+        "id_compra": "15816105000012026",
+        "id_compra_original": "15816105000012026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 4,
+        "preco_unitario": "0.45000000",
+        "quantidade": "1000.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/21040001000130/2026/135",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/21040001000130/compras/2026/135/arquivos/2",
+          "https://pncp.gov.br/pncp-api/v1/orgaos/21040001000130/compras/2026/135/arquivos/3"
+        ],
+        "indice_paginas": [
+          {
+            "url": "https://pncp.gov.br/pncp-api/v1/orgaos/21040001000130/compras/2026/135/arquivos/2",
+            "membro": "documento.pdf",
+            "paginas": [
+              2
+            ]
+          }
+        ],
+        "texto_disponivel": true,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "0d8de6063c1b863d1f7e",
+        "id_compra": "92544905900292026",
+        "id_compra_original": "92544905900292026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 3,
+        "preco_unitario": "0.76000000",
+        "quantidade": "1000.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/22980973000177/2026/81",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/22980973000177/compras/2026/81/arquivos/1"
+        ],
+        "indice_paginas": [],
+        "texto_disponivel": false,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "0e1abcbdf2e54fcb842f",
+        "id_compra": "16043605000982026",
+        "id_compra_original": "16043605000982026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 30,
+        "preco_unitario": "0.68000000",
+        "quantidade": "1450.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/00394452000103/2026/16724",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/00394452000103/compras/2026/16724/arquivos/1",
+          "https://pncp.gov.br/pncp-api/v1/orgaos/00394452000103/compras/2026/16724/arquivos/3"
+        ],
+        "indice_paginas": [],
+        "texto_disponivel": false,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "227a527f2809824295e7",
+        "id_compra": "98749305000072026",
+        "id_compra_original": "98749305000072026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 134,
+        "preco_unitario": "0.83000000",
+        "quantidade": "15546.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/76208867000107/2026/310",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/76208867000107/compras/2026/310/arquivos/1"
+        ],
+        "indice_paginas": [],
+        "texto_disponivel": false,
+        "top5_if_preco_quantidade": true,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "2a5ddab14ca3a36815e0",
+        "id_compra": "92974706000222026",
+        "id_compra_original": "92974706000222026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 6,
+        "preco_unitario": "2.50000000",
+        "quantidade": "5.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/57614976000171/2026/24",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/57614976000171/compras/2026/24/arquivos/2",
+          "https://pncp.gov.br/pncp-api/v1/orgaos/57614976000171/compras/2026/24/arquivos/1"
+        ],
+        "indice_paginas": [],
+        "texto_disponivel": true,
+        "top5_if_preco_quantidade": true,
+        "top5_regra_preco": true,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "39a33c57cc71462b7fb4",
+        "id_compra": "79534006000402026",
+        "id_compra_original": "79534006000402026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 32,
+        "preco_unitario": "1.76500000",
+        "quantidade": "20.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/00394502000144/2026/11003",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/00394502000144/compras/2026/11003/arquivos/4",
+          "https://pncp.gov.br/pncp-api/v1/orgaos/00394502000144/compras/2026/11003/arquivos/1"
+        ],
+        "indice_paginas": [],
+        "texto_disponivel": true,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "7b5c7de575dbe6d8ef16",
+        "id_compra": "92658405900172026",
+        "id_compra_original": "92658405900172026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 12,
+        "preco_unitario": "2.00000000",
+        "quantidade": "576.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/05888813000183/2026/21",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/05888813000183/compras/2026/21/arquivos/2"
+        ],
+        "indice_paginas": [],
+        "texto_disponivel": false,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": true,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "7dc3ea0853045e35d52d",
+        "id_compra": "98705305900202026",
+        "id_compra_original": "98705305900202026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 17,
+        "preco_unitario": "0.44000000",
+        "quantidade": "600.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/45368545000193/2026/43",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/45368545000193/compras/2026/43/arquivos/1"
+        ],
+        "indice_paginas": [],
+        "texto_disponivel": false,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "8163d86d63dfbecb2061",
+        "id_compra": "18013405000182026",
+        "id_compra_original": "18013405000182026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 2,
+        "preco_unitario": "2.00000000",
+        "quantidade": "200.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/46377800000127/2026/3385",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/46377800000127/compras/2026/3385/arquivos/1"
+        ],
+        "indice_paginas": [],
+        "texto_disponivel": false,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": true,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "b033776b69e5dcfd76c0",
+        "id_compra": "13503905000122026",
+        "id_compra_original": "13503905000122026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 12,
+        "preco_unitario": "0.51000000",
+        "quantidade": "10.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/00348003000110/2026/696",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/00348003000110/compras/2026/696/arquivos/1"
+        ],
+        "indice_paginas": [
+          {
+            "url": "https://pncp.gov.br/pncp-api/v1/orgaos/00348003000110/compras/2026/696/arquivos/1",
+            "membro": "documento.pdf",
+            "paginas": [
+              15
+            ]
+          }
+        ],
+        "texto_disponivel": true,
+        "top5_if_preco_quantidade": true,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "b1ef12f8060dbecee758",
+        "id_compra": "37303206000252026",
+        "id_compra_original": "37303206000252026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 17,
+        "preco_unitario": "2.00000000",
+        "quantidade": "50.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/03204421000122/2026/185",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/03204421000122/compras/2026/185/arquivos/1"
+        ],
+        "indice_paginas": [],
+        "texto_disponivel": true,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": true,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "d9fb091e10cd7de5a83d",
+        "id_compra": "38025706000672026",
+        "id_compra_original": "38025706000672026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 17,
+        "preco_unitario": "1.00000000",
+        "quantidade": "10.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/96291141000180/2026/6394",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/96291141000180/compras/2026/6394/arquivos/6",
+          "https://pncp.gov.br/pncp-api/v1/orgaos/96291141000180/compras/2026/6394/arquivos/1"
+        ],
+        "indice_paginas": [
+          {
+            "url": "https://pncp.gov.br/pncp-api/v1/orgaos/96291141000180/compras/2026/6394/arquivos/6",
+            "membro": "documento.pdf",
+            "paginas": [
+              3,
+              4
+            ]
+          }
+        ],
+        "texto_disponivel": true,
+        "top5_if_preco_quantidade": true,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": [
+          {
+            "id_caso": "d9fb091e10cd7de5a83d",
+            "tipo": "divergencia_especificacao_documental",
+            "item": 17,
+            "pagina": 4,
+            "pdf_sha256": "13f96b6240c8ca3dddd04d9e5edab054a675e4ade1e6e4d240a1bab5ba646f26",
+            "documento_url": "https://pncp.gov.br/api/pncp/v1/orgaos/96291141000180/compras/2026/6394/arquivos/6",
+            "descricao": "O termo descreve detector de falsidade em papel-moeda em formato de caneta, com garantia mínima de 20 mil testes. A referência de pesquisa de preços o agrupa como marca-texto amarelo CATMAT 486374. Identidade, preço de R$ 1,00 e quantidade 10 coincidem, mas a especificação documental diverge. Não presumir que seja marca-texto comum; suspender comparação até esclarecer versões e objeto efetivo."
+          }
+        ]
+      },
+      {
+        "id": "dbc927b2540de755d227",
+        "id_compra": "38918406000352026",
+        "id_compra_original": "38918406000352026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 10,
+        "preco_unitario": "1.98000000",
+        "quantidade": "10.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/10764033000161/2026/30",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/10764033000161/compras/2026/30/arquivos/3",
+          "https://pncp.gov.br/pncp-api/v1/orgaos/10764033000161/compras/2026/30/arquivos/1"
+        ],
+        "indice_paginas": [
+          {
+            "url": "https://pncp.gov.br/pncp-api/v1/orgaos/10764033000161/compras/2026/30/arquivos/3",
+            "membro": "documento.pdf",
+            "paginas": [
+              1,
+              2
+            ]
+          }
+        ],
+        "texto_disponivel": true,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": true,
+        "parecer_humano": "pendente",
+        "achados_assistidos": []
+      },
+      {
+        "id": "e173028921b187804539",
+        "id_compra": "38918406000352026",
+        "id_compra_original": "38918406000352026",
+        "vinculo_textual_explicito": false,
+        "numero_item": 11,
+        "preco_unitario": "1.80000000",
+        "quantidade": "10.00000000",
+        "estado_documental": "corroborado_estruturalmente",
+        "catalogo_complementar_status": "ausente",
+        "pncp_url": "https://pncp.gov.br/app/editais/10764033000161/2026/30",
+        "documentos_urls": [
+          "https://pncp.gov.br/pncp-api/v1/orgaos/10764033000161/compras/2026/30/arquivos/3",
+          "https://pncp.gov.br/pncp-api/v1/orgaos/10764033000161/compras/2026/30/arquivos/1"
+        ],
+        "indice_paginas": [
+          {
+            "url": "https://pncp.gov.br/pncp-api/v1/orgaos/10764033000161/compras/2026/30/arquivos/3",
+            "membro": "documento.pdf",
+            "paginas": [
+              1,
+              2
+            ]
+          }
+        ],
+        "texto_disponivel": true,
+        "top5_if_preco_quantidade": false,
+        "top5_regra_preco": false,
+        "parecer_humano": "pendente",
+        "achados_assistidos": [
+          {
+            "id_caso": "e173028921b187804539",
+            "tipo": "divergencia_especificacao_documental",
+            "item": 11,
+            "pagina": 2,
+            "pdf_sha256": "2aaeab3529c5f941787315c9e6aac0d9b35c48a55880a6e5ba2ab7135b7b6456",
+            "documento_url": "https://pncp.gov.br/api/pncp/v1/orgaos/10764033000161/compras/2026/30/arquivos/3",
+            "descricao": "O termo descreve o item 11 como destaca-texto verde e o item 10 como amarelo, ambos com código 486374. A referência do item 11 foi agrupada como amarela. Preço de R$ 1,80 e quantidade 10 conferem no resultado, mas a cor diverge do grupo. Suspender a comparação desse item como amarelo até esclarecer a especificação."
+          }
+        ]
+      }
+    ]
+  },
+  "documentos": {
+    "total": 23,
+    "estados": {
+      "texto_extraido": 10,
+      "falha_acesso_ou_extracao": 13
+    },
+    "casos_com_texto": 9,
+    "casos_com_paginas_item_localizadas": 6
+  },
+  "cobertura_top5": {
+    "if": 5,
+    "regra_preco": 5,
+    "nao_e_precisao": true
+  },
+  "ensaio_data_resultado": {
+    "decisao": "ESTAVEL_APOS_FILTRO_RESULTADO_UTILIDADE_PENDENTE",
+    "modelos": [
+      {
+        "treino": 140,
+        "teste": 35,
+        "estabilidade": {
+          "spearman": 0.9826281871672737,
+          "jaccard": 1.0,
+          "aprovada": true,
+          "top_k": 4
+        }
+      }
+    ]
+  },
+  "replicacao_historica": {
+    "linhas_origem": 474,
+    "decisao": "REPLICACAO_HISTORICA_ESTAVEL_UTILIDADE_PENDENTE",
+    "modelos": [
+      {
+        "treino": 177,
+        "teste": 107,
+        "estabilidade": {
+          "spearman": 0.9849765856143581,
+          "jaccard": 0.8181818181818182,
+          "aprovada": true,
+          "top_k": 10
+        }
+      }
+    ]
+  },
+  "confirmacao_temporal": {
+    "periodo": [
+      "2026-10-01",
+      "2026-10-19"
+    ],
+    "linhas_origem": 5,
+    "eventos_validacao": {
+      "UNIDADE_AUSENTE": 2
+    },
+    "referencias_avaliaveis": 0,
+    "minimos_atingidos": false,
+    "decisao": "CONFIRMACAO_TEMPORAL_INCONCLUSIVA_POR_AMOSTRA"
+  },
+  "dossie_revisao_independente": "data/validacao_nucleo/revisao_assistida/dossie_revisao_independente.csv",
+  "achados_documentais": {
+    "tipo": "achados_do_assistente_nao_sao_pareceres_humanos_independentes",
+    "achados": [
+      {
+        "id_caso": "01c07d7c28af0c52089c",
+        "tipo": "quantidade_prevista_no_edital",
+        "item": 33,
+        "pagina": 7,
+        "pdf_sha256": "061c22ef31ebe3d40f7d53ec9aa4bdee490afa37374c77428519110c3ad4d42a",
+        "documento_url": "https://pncp.gov.br/api/pncp/v1/orgaos/76282656000106/compras/2024/516/arquivos/1",
+        "descricao": "A relação de itens prevê 44.467 unidades de marca-texto amarelo, entrega em Maringá/PR e estimativa unitária de R$ 0,88. A referência homologada de R$ 0,56 e 44.467 unidades foi corroborada. A quantidade grande estava prevista; isso não comprova irregularidade nem justifica integralmente a contratação."
+      },
+      {
+        "id_caso": "d9fb091e10cd7de5a83d",
+        "tipo": "divergencia_especificacao_documental",
+        "item": 17,
+        "pagina": 4,
+        "pdf_sha256": "13f96b6240c8ca3dddd04d9e5edab054a675e4ade1e6e4d240a1bab5ba646f26",
+        "documento_url": "https://pncp.gov.br/api/pncp/v1/orgaos/96291141000180/compras/2026/6394/arquivos/6",
+        "descricao": "O termo descreve detector de falsidade em papel-moeda em formato de caneta, com garantia mínima de 20 mil testes. A referência de pesquisa de preços o agrupa como marca-texto amarelo CATMAT 486374. Identidade, preço de R$ 1,00 e quantidade 10 coincidem, mas a especificação documental diverge. Não presumir que seja marca-texto comum; suspender comparação até esclarecer versões e objeto efetivo."
+      },
+      {
+        "id_caso": "e173028921b187804539",
+        "tipo": "divergencia_especificacao_documental",
+        "item": 11,
+        "pagina": 2,
+        "pdf_sha256": "2aaeab3529c5f941787315c9e6aac0d9b35c48a55880a6e5ba2ab7135b7b6456",
+        "documento_url": "https://pncp.gov.br/api/pncp/v1/orgaos/10764033000161/compras/2026/30/arquivos/3",
+        "descricao": "O termo descreve o item 11 como destaca-texto verde e o item 10 como amarelo, ambos com código 486374. A referência do item 11 foi agrupada como amarela. Preço de R$ 1,80 e quantidade 10 conferem no resultado, mas a cor diverge do grupo. Suspender a comparação desse item como amarelo até esclarecer a especificação."
+      }
+    ],
+    "fraude_comprovada": false,
+    "superioridade_ml_comprovada": false
+  },
+  "pareceres_humanos_preenchidos": 0,
+  "quarentena_experimental_recomendada": [
+    "d9fb091e10cd7de5a83d",
+    "e173028921b187804539"
+  ],
+  "superioridade_sobre_regra_simples_comprovada": false,
+  "validado_para_publicacao": false,
+  "decisao": "NUCLEO_TECNICO_REPRODUZIDO_UTILIDADE_NAO_COMPROVADA"
+}

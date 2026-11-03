@@ -1,0 +1,480 @@
+@startuml
+title Licita Clara — PostgreSQL (34 tabelas)
+hide methods
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+left to right direction
+package "Coleta e bases" #0f766e {
+class execucoes_coleta <<table>> {
+  id : UUID [PK]
+  fonte : TEXT
+  modulo : TEXT
+  competencia_inicio : DATE
+  competencia_fim : DATE
+  status : TEXT
+  parametros : JSONB
+  criado_em : TIMESTAMP WITH TIME ZONE
+  iniciado_em : TIMESTAMP WITH TIME ZONE ?
+  concluido_em : TIMESTAMP WITH TIME ZONE ?
+  erro : TEXT ?
+}
+class arquivos_coletados <<table>> {
+  id : UUID [PK]
+  fonte : TEXT
+  modulo : TEXT
+  competencia : DATE
+  url_origem : TEXT
+  url_final : TEXT
+  sha256 : TEXT
+  tamanho_bytes : BIGINT
+  chave_objeto : TEXT
+  etag : TEXT ?
+  coletado_em : TIMESTAMP WITH TIME ZONE
+}
+class execucoes_arquivos <<table>> {
+  execucao_id : UUID [PK,FK]
+  arquivo_id : UUID [PK,FK]
+  observado_em : TIMESTAMP WITH TIME ZONE
+}
+class importacoes <<table>> {
+  id : UUID [PK]
+  arquivo_id : UUID [FK]
+  versao_importador : TEXT
+  status : TEXT
+  aceitos : BIGINT
+  rejeitados : BIGINT
+  diagnostico : JSONB
+  criado_em : TIMESTAMP WITH TIME ZONE
+  concluido_em : TIMESTAMP WITH TIME ZONE ?
+}
+class versoes_base <<table>> {
+  id : UUID [PK]
+  versao : TEXT
+  versao_transformador : TEXT
+  versao_codigo : TEXT
+  chave_manifesto : TEXT
+  sha256_manifesto : TEXT
+  periodo_inicio : DATE
+  periodo_fim : DATE
+  status : TEXT
+  recorte : JSONB
+  qualidade : JSONB
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class base_importacoes <<table>> {
+  base_id : UUID [PK,FK]
+  importacao_id : UUID [PK,FK]
+}
+}
+package "Cadastros e identidades" #2563eb {
+class orgaos <<table>> {
+  id : UUID [PK]
+  fonte : TEXT
+  chave_oficial : TEXT
+  nome : TEXT
+  cnpj : TEXT ?
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class fornecedores <<table>> {
+  id : UUID [PK]
+  fonte : TEXT
+  tipo_identificacao : TEXT
+  identificacao : TEXT
+  nome : TEXT
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class modalidades <<table>> {
+  id : UUID [PK]
+  fonte : TEXT
+  codigo : TEXT
+  nome : TEXT
+}
+class itens_catalogo <<table>> {
+  id : UUID [PK]
+  catalogo : TEXT
+  codigo : TEXT
+  descricao : TEXT
+  codigo_grupo : TEXT ?
+  codigo_classe : TEXT ?
+  codigo_pdm : TEXT ?
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class processos <<table>> {
+  id : UUID [PK]
+  fonte : TEXT
+  chave_oficial : TEXT
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class itens_processo <<table>> {
+  id : UUID [PK]
+  processo_id : UUID [FK]
+  chave_oficial : TEXT
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class contratos <<table>> {
+  id : UUID [PK]
+  fonte : TEXT
+  chave_oficial : TEXT
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+}
+package "Compras e propostas" #7c3aed {
+class processos_versoes <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  processo_id : UUID [FK]
+  orgao_id : UUID [FK]
+  modalidade_id : UUID [FK] ?
+  orgao_nome : TEXT
+  codigo_unidade : TEXT
+  nome_unidade : TEXT ?
+  numero_compra : TEXT
+  numero_controle_pncp : TEXT ?
+  numero_processo : TEXT ?
+  ano : INTEGER
+  objeto : TEXT
+  situacao : TEXT
+  data_publicacao : DATE ?
+  data_abertura : DATE ?
+  data_resultado : DATE ?
+  valor_estimado : NUMERIC(28, 8) ?
+  valor_homologado : NUMERIC(28, 8) ?
+  orcamento_sigiloso : BOOLEAN ?
+  atributos_origem : JSONB
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class itens_versoes <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  item_id : UUID [FK]
+  processo_id : UUID [FK]
+  processo_versao_id : UUID [FK]
+  catalogo_id : UUID [FK] ?
+  numero_item : TEXT
+  descricao : TEXT
+  unidade_medida : TEXT ?
+  quantidade : NUMERIC(28, 8) ?
+  valor_unitario_estimado : NUMERIC(28, 8) ?
+  orcamento_sigiloso : BOOLEAN ?
+  atributos_origem : JSONB
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class resultados_itens <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  item_versao_id : UUID [FK]
+  fornecedor_id : UUID [FK]
+  fornecedor_nome : TEXT
+  sequencial_resultado : INTEGER
+  chave_origem : TEXT
+  situacao : TEXT
+  cancelado : BOOLEAN
+  quantidade_homologada : NUMERIC(28, 8) ?
+  valor_unitario_homologado : NUMERIC(28, 8) ?
+  valor_total_homologado : NUMERIC(28, 8) ?
+  data_resultado : DATE ?
+  atributos_origem : JSONB
+}
+class referencias_precos <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  catalogo_id : UUID [FK]
+  fornecedor_id : UUID [FK] ?
+  fonte : TEXT
+  chave_origem : TEXT
+  id_compra_oficial : TEXT
+  id_item_oficial : TEXT
+  descricao : TEXT
+  unidade_fornecimento : TEXT ?
+  sigla_unidade_fornecimento : TEXT ?
+  capacidade_fornecimento : NUMERIC(28, 8) ?
+  sigla_medida : TEXT ?
+  quantidade : NUMERIC(28, 8) ?
+  preco_unitario : NUMERIC(28, 8)
+  data_compra : DATE
+  atributos_origem : JSONB
+}
+class participacoes <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  processo_versao_id : UUID [FK]
+  item_versao_id : UUID [FK]
+  fornecedor_id : UUID [FK] ?
+  fonte : TEXT
+  chave_origem : TEXT
+  identificacao_participante : TEXT ?
+  nome_participante : TEXT ?
+  valor_proposta : NUMERIC(28, 8) ?
+  valor_lance : NUMERIC(28, 8) ?
+  valor_negociado : NUMERIC(28, 8) ?
+  classificacao : INTEGER ?
+  situacao_proposta : TEXT ?
+  situacao_item : TEXT ?
+  homologado : BOOLEAN ?
+  incluido_na_origem_em : TIMESTAMP WITHOUT TIME ZONE ?
+  alterado_na_origem_em : TIMESTAMP WITHOUT TIME ZONE ?
+  atributos_origem : JSONB
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+}
+package "Contratos e proveniência" #b45309 {
+class contratos_versoes <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  contrato_id : UUID [FK]
+  orgao_id : UUID [FK] ?
+  fornecedor_id : UUID [FK] ?
+  numero_contrato : TEXT
+  numero_controle_pncp : TEXT ?
+  codigo_unidade_gestora : TEXT ?
+  fornecedor_nome : TEXT ?
+  objeto : TEXT ?
+  data_assinatura : DATE ?
+  data_vigencia_inicio : DATE ?
+  data_vigencia_fim : DATE ?
+  valor_global : NUMERIC(28, 8) ?
+  valor_acumulado : NUMERIC(28, 8) ?
+  excluido : BOOLEAN ?
+  atributos_origem : JSONB
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class contratos_processos <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  contrato_versao_id : UUID [FK]
+  processo_versao_id : UUID [FK]
+  tipo_chave_vinculo : TEXT
+  chave_vinculo : TEXT
+  atributos_origem : JSONB
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class documentos <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  processo_versao_id : UUID [FK] ?
+  contrato_versao_id : UUID [FK] ?
+  fonte : TEXT
+  chave_origem : TEXT
+  sequencial_documento : INTEGER
+  tipo_codigo : TEXT ?
+  tipo_nome : TEXT ?
+  titulo : TEXT ?
+  url_origem : TEXT
+  ativo : BOOLEAN ?
+  publicado_na_origem_em : TIMESTAMP WITHOUT TIME ZONE ?
+  chave_objeto : TEXT ?
+  sha256 : TEXT ?
+  tamanho_bytes : BIGINT ?
+  atributos_origem : JSONB
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class proveniencias_registros <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  importacao_id : UUID [FK]
+  membro_arquivo : TEXT
+  numero_linha : BIGINT
+  processo_versao_id : UUID [FK] ?
+  item_versao_id : UUID [FK] ?
+  resultado_item_id : UUID [FK] ?
+  referencia_preco_id : UUID [FK] ?
+  participacao_id : UUID [FK] ?
+  contrato_versao_id : UUID [FK] ?
+  contrato_processo_id : UUID [FK] ?
+  documento_id : UUID [FK] ?
+}
+}
+package "Modelos e análises" #be185d {
+class versoes_modelo <<table>> {
+  id : UUID [PK]
+  base_treino_id : UUID [FK]
+  algoritmo : TEXT
+  versao : TEXT
+  versao_codigo : TEXT
+  chave_artefato : TEXT
+  sha256_artefato : TEXT
+  parametros : JSONB
+  metricas : JSONB
+  preprocessamento : JSONB
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class execucoes_analise <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  versao_politica_score : TEXT
+  configuracao : JSONB
+  status : TEXT
+  criado_em : TIMESTAMP WITH TIME ZONE
+  concluido_em : TIMESTAMP WITH TIME ZONE ?
+  erro : TEXT ?
+}
+class execucoes_modelos <<table>> {
+  execucao_id : UUID [PK,FK]
+  modelo_id : UUID [PK,FK]
+}
+class resultados_modelo <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  execucao_id : UUID [FK]
+  modelo_id : UUID [FK]
+  processo_versao_id : UUID [FK]
+  item_versao_id : UUID [FK] ?
+  tipo_alvo : TEXT
+  score_bruto : NUMERIC(30, 12)
+  score_normalizado : NUMERIC(6, 3)
+  versao_normalizacao : TEXT
+  atributos : JSONB
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class avaliacoes_processo <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  execucao_id : UUID [FK]
+  processo_versao_id : UUID [FK]
+  score : NUMERIC(6, 3) ?
+  prioridade : TEXT
+  motivo_indisponibilidade : TEXT ?
+  politica : JSONB
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class comparacoes_itens <<table>> {
+  id : UUID [PK]
+  base_id : UUID [FK]
+  execucao_id : UUID [FK]
+  item_versao_id : UUID [FK]
+  versao_criterio : TEXT
+  grupo_comparavel : JSONB
+  periodo_inicio : DATE
+  periodo_fim : DATE
+  tamanho_amostra : INTEGER
+  mediana : NUMERIC(28, 8)
+  limite_inferior : NUMERIC(28, 8) ?
+  limite_superior : NUMERIC(28, 8) ?
+}
+class comparacoes_referencias <<table>> {
+  base_id : UUID [FK]
+  comparacao_id : UUID [PK,FK]
+  referencia_id : UUID [PK,FK]
+}
+class fatores_sinalizacao <<table>> {
+  id : UUID [PK]
+  resultado_modelo_id : UUID [FK]
+  atributo : TEXT
+  metodo : TEXT
+  versao_metodo : TEXT
+  observado : JSONB
+  referencia : JSONB
+  contribuicao : NUMERIC(30, 12) ?
+  descricao : TEXT
+}
+}
+package "Publicação e revisão" #475569 {
+class publicacoes_analise <<table>> {
+  id : UUID [PK]
+  nome : TEXT
+  base_id : UUID [FK]
+  execucao_id : UUID [FK]
+  ativa : BOOLEAN
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class usuarios <<table>> {
+  id : UUID [PK]
+  issuer : TEXT
+  subject : TEXT
+  nome : TEXT
+  papel : TEXT
+  ativo : BOOLEAN
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class revisoes <<table>> {
+  id : UUID [PK]
+  usuario_id : UUID [FK]
+  processo_versao_id : UUID [FK]
+  execucao_id : UUID [FK]
+  status : TEXT
+  observacao : TEXT
+  conclusao : TEXT ?
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+class relatorios <<table>> {
+  id : UUID [PK]
+  usuario_id : UUID [FK]
+  base_id : UUID [FK]
+  execucao_id : UUID [FK]
+  titulo : TEXT
+  formato : TEXT
+  parametros : JSONB
+  snapshot : JSONB
+  status : TEXT
+  chave_objeto : TEXT ?
+  sha256 : TEXT ?
+  erro : TEXT ?
+  criado_em : TIMESTAMP WITH TIME ZONE
+  concluido_em : TIMESTAMP WITH TIME ZONE ?
+}
+}
+versoes_base "1" -- "0..*" versoes_modelo : base_treino_id
+versoes_base "1" -- "0..*" execucoes_analise : base_id
+execucoes_analise "1" -- "0..*" execucoes_modelos : execucao_id
+versoes_modelo "1" -- "0..*" execucoes_modelos : modelo_id
+processos_versoes "1" -- "0..*" resultados_modelo : processo_versao_id, base_id
+execucoes_modelos "1" -- "0..*" resultados_modelo : execucao_id, modelo_id
+itens_versoes "0..1" -- "0..*" resultados_modelo : item_versao_id, processo_versao_id, base_id
+execucoes_analise "1" -- "0..*" resultados_modelo : execucao_id, base_id
+processos_versoes "1" -- "0..*" avaliacoes_processo : processo_versao_id, base_id
+execucoes_analise "1" -- "0..*" avaliacoes_processo : execucao_id, base_id
+resultados_modelo "1" -- "0..*" fatores_sinalizacao : resultado_modelo_id
+itens_versoes "1" -- "0..*" comparacoes_itens : item_versao_id, base_id
+execucoes_analise "1" -- "0..*" comparacoes_itens : execucao_id, base_id
+referencias_precos "1" -- "0..*" comparacoes_referencias : referencia_id, base_id
+comparacoes_itens "1" -- "0..*" comparacoes_referencias : comparacao_id, base_id
+execucoes_analise "1" -- "0..*" publicacoes_analise : execucao_id, base_id
+usuarios "1" -- "0..*" revisoes : usuario_id
+processos_versoes "1" -- "0..*" revisoes : processo_versao_id
+avaliacoes_processo "1" -- "0..*" revisoes : processo_versao_id, execucao_id
+execucoes_analise "1" -- "0..*" relatorios : execucao_id, base_id
+usuarios "1" -- "0..*" relatorios : usuario_id
+execucoes_coleta "1" -- "0..*" execucoes_arquivos : execucao_id
+arquivos_coletados "1" -- "0..*" execucoes_arquivos : arquivo_id
+arquivos_coletados "1" -- "0..*" importacoes : arquivo_id
+importacoes "1" -- "0..*" base_importacoes : importacao_id
+versoes_base "1" -- "0..*" base_importacoes : base_id
+processos_versoes "1" -- "0..*" participacoes : processo_versao_id, base_id
+versoes_base "1" -- "0..*" participacoes : base_id
+itens_versoes "1" -- "0..*" participacoes : item_versao_id, processo_versao_id, base_id
+fornecedores "0..1" -- "0..*" participacoes : fornecedor_id
+versoes_base "1" -- "0..*" contratos_versoes : base_id
+orgaos "0..1" -- "0..*" contratos_versoes : orgao_id
+contratos "1" -- "0..*" contratos_versoes : contrato_id
+fornecedores "0..1" -- "0..*" contratos_versoes : fornecedor_id
+processos_versoes "1" -- "0..*" contratos_processos : processo_versao_id, base_id
+versoes_base "1" -- "0..*" contratos_processos : base_id
+contratos_versoes "1" -- "0..*" contratos_processos : contrato_versao_id, base_id
+versoes_base "1" -- "0..*" documentos : base_id
+contratos_versoes "0..1" -- "0..*" documentos : contrato_versao_id, base_id
+processos_versoes "0..1" -- "0..*" documentos : processo_versao_id, base_id
+modalidades "0..1" -- "0..*" processos_versoes : modalidade_id
+orgaos "1" -- "0..*" processos_versoes : orgao_id
+processos "1" -- "0..*" processos_versoes : processo_id
+versoes_base "1" -- "0..*" processos_versoes : base_id
+processos "1" -- "0..*" itens_processo : processo_id
+itens_processo "1" -- "0..*" itens_versoes : item_id, processo_id
+processos_versoes "1" -- "0..*" itens_versoes : processo_versao_id, processo_id, base_id
+itens_catalogo "0..1" -- "0..*" itens_versoes : catalogo_id
+versoes_base "1" -- "0..*" itens_versoes : base_id
+fornecedores "1" -- "0..*" resultados_itens : fornecedor_id
+versoes_base "1" -- "0..*" resultados_itens : base_id
+itens_versoes "1" -- "0..*" resultados_itens : item_versao_id, base_id
+itens_catalogo "1" -- "0..*" referencias_precos : catalogo_id
+versoes_base "1" -- "0..*" referencias_precos : base_id
+fornecedores "0..1" -- "0..*" referencias_precos : fornecedor_id
+base_importacoes "1" -- "0..*" proveniencias_registros : base_id, importacao_id
+contratos_processos "0..1" -- "0..*" proveniencias_registros : contrato_processo_id, base_id
+referencias_precos "0..1" -- "0..*" proveniencias_registros : referencia_preco_id, base_id
+documentos "0..1" -- "0..*" proveniencias_registros : documento_id, base_id
+processos_versoes "0..1" -- "0..*" proveniencias_registros : processo_versao_id, base_id
+participacoes "0..1" -- "0..*" proveniencias_registros : participacao_id, base_id
+itens_versoes "0..1" -- "0..*" proveniencias_registros : item_versao_id, base_id
+contratos_versoes "0..1" -- "0..*" proveniencias_registros : contrato_versao_id, base_id
+resultados_itens "0..1" -- "0..*" proveniencias_registros : resultado_item_id, base_id
+@enduml
