@@ -146,7 +146,8 @@ uv run --locked --all-packages --extra validation pytest ml/tests/test_organized
 
 ```bash
 uv run --locked --all-packages --extra validation python -m licita_ml.temporal \
-  --base data/organizados/base=c434aaad56c4d8f20510692ac1271081b2525b2e39086f1c36b82c18d5dfc07d
+  --base data/organizados/base=12ee7c68c6d4d7c37a937fd2f6d1c0d02b3a46f27db46ed26908aa7508c38261 \
+  --treino-inicio 2025-07-01
 uv run --locked --all-packages --extra validation pytest ml/tests/test_temporal.py -q
 ```
 
@@ -181,11 +182,15 @@ compra. Exige-se variação de preço e quantidade para comparar os dois modelos
 Esses limites são operacionais do piloto, não garantias estatísticas universais.
 
 Somente grupos tecnicamente elegíveis produzem matrizes liberadas para treino.
-O lote inicial real terminou como `insuficiente_para_modelagem`: as matrizes
-ficam vazias, com esquema/cabeçalho, e a auditoria preserva dados, motivos e
-atributos exploratórios quando há referência mínima (20 registros/dez compras).
-Não treinar só porque o CSV existe. A expansão do histórico deve ser medida antes
-de prosseguir, sem reduzir critérios para obter um resultado.
+O lote inicial do trimestre terminou como `insuficiente_para_modelagem` e foi
+preservado com matrizes vazias e auditoria. Com treino ampliado para julho–dezembro/2025, o grupo 39b446b8528b8da9 (CATMAT 425226, grampo 26/6 em caixa de 5.000 UN)
+atingiu 173 referências de treino e 44 de avaliação. Há três referências de
+aplicação; os resultados operacionais ainda não têm todos os vínculos necessários.
+O estado `apto_avaliacao_tecnica` libera estudo dos modelos nesse grupo, sem
+aprovar utilidade de auditoria ou os demais produtos. Grupos insuficientes ficam
+na auditoria, com atributos exploratórios quando há referência mínima de
+20 registros/dez compras. Não treinar só porque o CSV existe nem reduzir os
+critérios para obter um resultado.
 
 Aplicação em referências e em resultados operacionais são observações distintas.
 Resultados precisam de cadeia compra/item resolvida, situação confirmada, ausência
