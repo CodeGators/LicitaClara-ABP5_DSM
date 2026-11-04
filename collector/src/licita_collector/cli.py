@@ -27,6 +27,15 @@ def main():
         choices=list(FILES),
         default=["compra", "compra_item", "item_resultado", "material"],
     )
+    targets = commands.add_parser("coletar-ids")
+    targets.add_argument("--competencia", required=True, type=month)
+    targets.add_argument("--compras", required=True, nargs="+")
+    targets.add_argument(
+        "--arquivos",
+        nargs="+",
+        choices=["compra_api", "itens_api", "resultados_api"],
+        default=["compra_api", "itens_api", "resultados_api"],
+    )
     complement = commands.add_parser("complementar")
     complement.add_argument("--competencia", required=True, type=month)
     complement.add_argument("--material-arquivo", required=True, type=UUID)
@@ -80,12 +89,17 @@ def main():
             result = complement(service, purchases, args.competencia)
             print(json.dumps(result, ensure_ascii=False), flush=True)
             return int(bool(result["falhas"]))
-        if args.command == "coletar":
-            scopes = [
-                Scope(kind, date)
-                for date in months(args.inicio, args.fim)
-                for kind in dict.fromkeys(args.arquivos)
-            ]
+        if args.command in {"coletar", "coletar-ids"}:
+            if args.command == "coletar-ids":
+                from licita_collector.api import target_scopes
+
+                scopes = target_scopes(args.compras, args.competencia, args.arquivos)
+            else:
+                scopes = [
+                    Scope(kind, date)
+                    for date in months(args.inicio, args.fim)
+                    for kind in dict.fromkeys(args.arquivos)
+                ]
             failed = False
             for scope in scopes:
                 try:
@@ -99,7 +113,10 @@ def main():
                         "execucao_id": getattr(error, "execucao_id", None),
                     }
                 print(
-                    json.dumps({"arquivo": scope.filename, **result}, ensure_ascii=False),
+                    json.dumps(
+                        {"arquivo": scope.filename, "parametros": scope.parameters, **result},
+                        ensure_ascii=False,
+                    ),
                     flush=True,
                 )
             return int(failed)

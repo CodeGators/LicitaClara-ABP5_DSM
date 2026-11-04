@@ -197,3 +197,17 @@ def validate_json(path):
         "bytes": len(raw),
         "membros": len(data["paginas"]),
     }
+
+
+def target_scopes(purchases, competence, kinds):
+    """Coleta pequena por IDs explícitos; não varre períodos ou catálogo nacional."""
+    purchases = list(dict.fromkeys(purchases))
+    if not purchases or len(purchases) > 20:
+        raise ValueError("Informe de uma a 20 compras")
+    if not kinds or not set(kinds) <= {"compra_api", "itens_api", "resultados_api"}:
+        raise ValueError("Módulos de alvos inválidos")
+    return [
+        JsonScope(kind, competence, {"idCompra": uid})
+        for uid in purchases
+        for kind in dict.fromkeys(kinds)
+    ]

@@ -122,3 +122,19 @@ def test_offline_history_requires_matching_hash_url_size_and_preserves_original(
     path.write_bytes(raw + b" ")
     with pytest.raises(CollectionError, match="Cache histórico diverge"):
         http.request(scope.url())
+
+
+def test_target_collection_is_bounded_and_preserves_purchase_ids():
+    from licita_collector.api import target_scopes
+
+    scopes = target_scopes(["0001", "0001", "0002"], date(2026, 9, 1), ["compra_api", "itens_api"])
+    assert len(scopes) == 4
+    assert scopes[0].query == {"idCompra": "0001"}
+    for purchases, kinds in (
+        ([], ["compra_api"]),
+        ([str(i) for i in range(21)], ["compra_api"]),
+        (["../x"], ["compra_api"]),
+        (["1"], ["contratos_api"]),
+    ):
+        with pytest.raises(ValueError):
+            target_scopes(purchases, date(2026, 9, 1), kinds)

@@ -220,9 +220,6 @@ class InferencePipeline:
             "normalizacao": "cdf-treino-v1",
             "modelos": [str(m["id"]) for m in models],
         }
-        fingerprint = digest(config)
-        execution_id = identifier("execucoes_analise", fingerprint)
-        execution = self.tables["execucoes_analise"]
         with self.repo.locked() as cn:
             base, data = read_base(self.repo, cn, base_id)
             with self.objects.open(base["chave_manifesto"]) as stream:
@@ -244,168 +241,178 @@ class InferencePipeline:
             if canonical(stable_targets(actual)) != canonical(stable_targets(frozen)):
                 raise ValueError("Atributos operacionais divergem do snapshot SQL")
             scores, coverage, factors = infer_targets(models, base, data, references, policy)
-            score_ids = {}
-            for record in scores:
-                old_id = record["id"]
-                record["id"] = identifier(
-                    "resultados_modelo", str(execution_id) + ":" + str(old_id)
+            return self.persist(
+                cn, models, bases, base, data, config, scores, coverage, factors, fail_after
+            )
+
+    def persist(
+        self, cn, models, bases, base, data, config, scores, coverage, factors, fail_after=None
+    ):
+        """Reconciliação/transação comum aos contratos antigo e temporal."""
+        base_id = base["id"]
+        fingerprint = digest(config)
+        execution_id = identifier("execucoes_analise", fingerprint)
+        execution = self.tables["execucoes_analise"]
+        score_ids = {}
+        for record in scores:
+            old_id = record["id"]
+            record["id"] = identifier("resultados_modelo", str(execution_id) + ":" + str(old_id))
+            score_ids[old_id] = record["id"]
+            record["execucao_id"] = execution_id
+        for factor in factors:
+            factor["resultado_modelo_id"] = score_ids[factor["resultado_modelo_id"]]
+        summary = {
+            "itens": len(data["itens_versoes"]),
+            "alvos_modelos": len(coverage),
+            "scores": len(scores),
+            "motivos": dict(Counter(r["motivo"] for r in coverage if r["motivo"])),
+        }
+        manifest = {
+            "schema": "licita-inferencia-v1",
+            "execucao_id": str(execution_id),
+            "configuracao": config,
+            "base_id": str(base_id),
+            "cobertura": coverage,
+            "contagens": summary,
+            "scores": scores,
+            "fatores": factors,
+            "modelos": [m["record"] for m in models],
+            "bases_treino": bases,
+            "processos": sorted(str(r["id"]) for r in data["processos_versoes"]),
+            "prioridade_auditoria": None,
+            "agregacao_processo": "indisponivel_sem_politica_validada",
+        }
+        serialized = (canonical(manifest) + "\n").encode()
+        if len(serialized) > 64 * 1024**2:
+            raise ValueError("Manifesto excede 64 MiB; dividir lote")
+        stored = put_immutable(
+            self.objects,
+            f"inferencia/execucao={fingerprint}/manifesto.json",
+            serialized,
+        )
+        recorded_config = {
+            **config,
+            "manifesto": stored,
+            "cobertura": coverage,
+            "contagens": summary,
+        }
+        old = (
+            cn.execute(sa.select(execution).where(execution.c.id == execution_id))
+            .mappings()
+            .one_or_none()
+        )
+        cn.commit()
+        if old:
+            if old["configuracao"] != recorded_config:
+                raise ValueError("Execução existente diverge")
+            if old["status"] == "concluida":
+                self.reconcile(cn, execution_id, base_id, recorded_config)
+                cn.rollback()
+                return {
+                    "execucao_id": str(execution_id),
+                    "base_id": str(base_id),
+                    "status": "concluida",
+                    "reutilizada": True,
+                    "contagens": summary,
+                    "manifesto": stored,
+                }
+        with cn.begin():
+            cn.execute(
+                insert(execution)
+                .values(
+                    id=execution_id,
+                    base_id=base_id,
+                    versao_politica_score="experimental-v1",
+                    configuracao=recorded_config,
                 )
-                score_ids[old_id] = record["id"]
-                record["execucao_id"] = execution_id
-            for factor in factors:
-                factor["resultado_modelo_id"] = score_ids[factor["resultado_modelo_id"]]
-            summary = {
-                "itens": len(data["itens_versoes"]),
-                "alvos_modelos": len(coverage),
-                "scores": len(scores),
-                "motivos": dict(Counter(r["motivo"] for r in coverage if r["motivo"])),
-            }
-            manifest = {
-                "schema": "licita-inferencia-v1",
-                "execucao_id": str(execution_id),
-                "configuracao": config,
-                "base_id": str(base_id),
-                "cobertura": coverage,
-                "contagens": summary,
-                "scores": scores,
-                "fatores": factors,
-                "modelos": [m["record"] for m in models],
-                "bases_treino": bases,
-                "processos": sorted(str(r["id"]) for r in data["processos_versoes"]),
-                "prioridade_auditoria": None,
-                "agregacao_processo": "indisponivel_sem_politica_validada",
-            }
-            serialized = (canonical(manifest) + "\n").encode()
-            if len(serialized) > 64 * 1024**2:
-                raise ValueError("Manifesto excede 64 MiB; dividir lote")
-            stored = put_immutable(
-                self.objects,
-                f"inferencia/execucao={fingerprint}/manifesto.json",
-                serialized,
+                .on_conflict_do_nothing()
             )
-            recorded_config = {
-                **config,
-                "manifesto": stored,
-                "cobertura": coverage,
-                "contagens": summary,
-            }
-            old = (
-                cn.execute(sa.select(execution).where(execution.c.id == execution_id))
-                .mappings()
-                .one_or_none()
+            cn.execute(
+                execution.update()
+                .where(execution.c.id == execution_id)
+                .values(status="executando", erro=None, concluido_em=None)
             )
-            cn.commit()
-            if old:
-                if old["configuracao"] != recorded_config:
-                    raise ValueError("Execução existente diverge")
-                if old["status"] == "concluida":
-                    self.reconcile(cn, execution_id, base_id, recorded_config)
-                    cn.rollback()
-                    return {
-                        "execucao_id": str(execution_id),
-                        "base_id": str(base_id),
-                        "status": "concluida",
-                        "reutilizada": True,
-                        "contagens": summary,
-                        "manifesto": stored,
-                    }
+        try:
             with cn.begin():
-                cn.execute(
-                    insert(execution)
-                    .values(
-                        id=execution_id,
-                        base_id=base_id,
-                        versao_politica_score="experimental-v1",
-                        configuracao=recorded_config,
+                for b in bases:
+                    cn.execute(
+                        insert(self.tables["versoes_base"]).values(**b).on_conflict_do_nothing()
                     )
-                    .on_conflict_do_nothing()
-                )
+                    saved = (
+                        cn.execute(
+                            sa.select(self.tables["versoes_base"]).where(
+                                self.tables["versoes_base"].c.id == b["id"]
+                            )
+                        )
+                        .mappings()
+                        .one()
+                    )
+                    if canonical({k: saved[k] for k in b}) != canonical(b):
+                        raise ValueError("Registro imutável de treino diverge")
+                for model in models:
+                    cn.execute(
+                        insert(self.tables["versoes_modelo"])
+                        .values(**model["record"])
+                        .on_conflict_do_nothing()
+                    )
+                    saved = (
+                        cn.execute(
+                            sa.select(self.tables["versoes_modelo"]).where(
+                                self.tables["versoes_modelo"].c.id == model["id"]
+                            )
+                        )
+                        .mappings()
+                        .one()
+                    )
+                    if canonical({k: saved[k] for k in model["record"]}) != canonical(
+                        model["record"]
+                    ):
+                        raise ValueError("Registro imutável do modelo diverge")
+                    cn.execute(
+                        insert(self.tables["execucoes_modelos"]).values(
+                            execucao_id=execution_id, modelo_id=model["id"]
+                        )
+                    )
+                for n, row in enumerate(scores, 1):
+                    cn.execute(self.tables["resultados_modelo"].insert().values(**row))
+                    if fail_after and n >= fail_after:
+                        raise RuntimeError("Falha controlada no lote")
+                if fail_after == 0:
+                    raise RuntimeError("Falha controlada antes da cobertura")
+                if factors:
+                    cn.execute(self.tables["fatores_sinalizacao"].insert(), factors)
+                for process in data["processos_versoes"]:
+                    cn.execute(
+                        self.tables["avaliacoes_processo"]
+                        .insert()
+                        .values(
+                            base_id=base_id,
+                            execucao_id=execution_id,
+                            processo_versao_id=process["id"],
+                            prioridade="nao_analisado",
+                            motivo_indisponibilidade="SEM_POLITICA_AGREGACAO_PROCESSO",
+                            politica={"experimental": True, "score_processo": None},
+                        )
+                    )
+                self.reconcile(cn, execution_id, base_id, recorded_config)
                 cn.execute(
                     execution.update()
                     .where(execution.c.id == execution_id)
-                    .values(status="executando", erro=None, concluido_em=None)
+                    .values(status="concluida", concluido_em=datetime.now(timezone.utc))
                 )
-            try:
-                with cn.begin():
-                    for b in bases:
-                        cn.execute(
-                            insert(self.tables["versoes_base"]).values(**b).on_conflict_do_nothing()
-                        )
-                        saved = (
-                            cn.execute(
-                                sa.select(self.tables["versoes_base"]).where(
-                                    self.tables["versoes_base"].c.id == b["id"]
-                                )
-                            )
-                            .mappings()
-                            .one()
-                        )
-                        if canonical({k: saved[k] for k in b}) != canonical(b):
-                            raise ValueError("Registro imutável de treino diverge")
-                    for model in models:
-                        cn.execute(
-                            insert(self.tables["versoes_modelo"])
-                            .values(**model["record"])
-                            .on_conflict_do_nothing()
-                        )
-                        saved = (
-                            cn.execute(
-                                sa.select(self.tables["versoes_modelo"]).where(
-                                    self.tables["versoes_modelo"].c.id == model["id"]
-                                )
-                            )
-                            .mappings()
-                            .one()
-                        )
-                        if canonical({k: saved[k] for k in model["record"]}) != canonical(
-                            model["record"]
-                        ):
-                            raise ValueError("Registro imutável do modelo diverge")
-                        cn.execute(
-                            insert(self.tables["execucoes_modelos"]).values(
-                                execucao_id=execution_id, modelo_id=model["id"]
-                            )
-                        )
-                    for n, row in enumerate(scores, 1):
-                        cn.execute(self.tables["resultados_modelo"].insert().values(**row))
-                        if fail_after and n >= fail_after:
-                            raise RuntimeError("Falha controlada no lote")
-                    if fail_after == 0:
-                        raise RuntimeError("Falha controlada antes da cobertura")
-                    if factors:
-                        cn.execute(self.tables["fatores_sinalizacao"].insert(), factors)
-                    for process in data["processos_versoes"]:
-                        cn.execute(
-                            self.tables["avaliacoes_processo"]
-                            .insert()
-                            .values(
-                                base_id=base_id,
-                                execucao_id=execution_id,
-                                processo_versao_id=process["id"],
-                                prioridade="nao_analisado",
-                                motivo_indisponibilidade="SEM_POLITICA_AGREGACAO_PROCESSO",
-                                politica={"experimental": True, "score_processo": None},
-                            )
-                        )
-                    self.reconcile(cn, execution_id, base_id, recorded_config)
-                    cn.execute(
-                        execution.update()
-                        .where(execution.c.id == execution_id)
-                        .values(status="concluida", concluido_em=datetime.now(timezone.utc))
+        except Exception:
+            cn.rollback()
+            with cn.begin():
+                cn.execute(
+                    execution.update()
+                    .where(execution.c.id == execution_id)
+                    .values(
+                        status="falhou",
+                        erro="FALHA_LOTE",
+                        concluido_em=datetime.now(timezone.utc),
                     )
-            except Exception:
-                cn.rollback()
-                with cn.begin():
-                    cn.execute(
-                        execution.update()
-                        .where(execution.c.id == execution_id)
-                        .values(
-                            status="falhou",
-                            erro="FALHA_LOTE",
-                            concluido_em=datetime.now(timezone.utc),
-                        )
-                    )
-                raise
+                )
+            raise
         return {
             "execucao_id": str(execution_id),
             "base_id": str(base_id),

@@ -250,3 +250,69 @@ independência pelo software. Nenhum parecer aprova utilidade/publicação ou es
 vencedor automaticamente. O resultado atual é comparação técnica concluída com
 utilidade inconclusiva por revisão pendente; os dois algoritmos passaram na
 estabilidade deste grupo, sem prova de superioridade ou eficácia de auditoria.
+
+## Inferência dos modelos temporais e integração operacional
+
+Executar na raiz do monorepositório, com `.env`, PostgreSQL migrado e o extra
+`validation`. `inferir-temporal` exige um diretório **privado e confiável** gerado
+pela ML-04 e o SHA-256 de seu manifesto; não recebe modelos por HTTP.
+
+```bash
+uv run --locked --all-packages --extra validation licita-ml inferir-temporal \
+  --treino CAMINHO_DA_EXECUCAO_ML04 --sha256-treino SHA256_DO_MANIFESTO \
+  --dataset CAMINHO_DA_BASE_TEMPORAL --resultado-ate 2026-10-31
+```
+
+Sem `--base-id`, exporta apenas inferência nas referências: manifesto, CSV e
+Parquet privados em `data/objects/inferencia/referencias=FINGERPRINT/` quando
+usado armazenamento local. O CSV e o Parquet preservam decimais/IDs como texto;
+ambos são exportações para inspeção, não matrizes de treino. Manifesto contém
+cobertura e exclusões, scores brutos, CDF de treino e parcelas AE. Não são
+resultados de licitação e não entram artificialmente nas tabelas operacionais.
+
+Com `--base-id UUID_OPERACIONAL`, reconcilia o snapshot SQL com as referências
+e persiste modelos, dataset de treino, execução, scores, cobertura e parcelas
+em transação. O comando não publica automaticamente. Repetir a mesma seleção
+reconcilia e retorna `reutilizada: true`, sem duplicar resultados.
+
+```bash
+uv run --locked --all-packages --extra validation licita-ml inferir-temporal \
+  --treino CAMINHO_DA_EXECUCAO_ML04 --sha256-treino SHA256_DO_MANIFESTO \
+  --dataset CAMINHO_DA_BASE_TEMPORAL --resultado-ate 2026-10-31 \
+  --base-id UUID_OPERACIONAL
+uv run --locked --all-packages --extra validation licita-ml publicar-experimental \
+  --execucao UUID_DA_EXECUCAO_CONCLUIDA
+uv run --locked --all-packages --extra validation pytest ml/tests/test_temporal_inference.py -q
+```
+
+`--resultado-ate` é opcional: sem ele, vale o corte original da aplicação ML-03.
+Um corte posterior somente libera referências cujo **único** impedimento era
+resultado posterior ao corte antigo. O lote registra os motivos originais e
+reutiliza a mediana/escala/modelo congelados. Não altera treino, avaliação ou
+arquivos ML-03/04; não implica backtest ponto no tempo nem aprovação de utilidade.
+
+Para complementar compras conhecidas, sem varrer todo o catálogo ou baixar
+novos lotes mensais, o coletor aceita até 20 IDs oficiais explícitos:
+
+```bash
+uv run --locked --all-packages licita-collector coletar-ids \
+  --competencia 2026-09 --compras ID_COMPRA_1 ID_COMPRA_2
+```
+
+Coleta compra, itens e resultados pela API oficial, com originais e proveniência
+registrados. `--arquivos compra_api itens_api resultados_api` restringe módulos.
+São arquivos complementares para a preparação operacional já existente, não
+substitutos do histórico de treino. Versões diferentes podem mudar a base gerada.
+
+O ensaio local reconciliou **dois resultados reais** de outubro/2026 (mesma
+especificação de grampo, caixa de 5.000 UN), gerando quatro scores: IF e AE para
+cada resultado. Os três casos pontuados apenas nas referências de setembro
+apresentaram datas de resultado divergentes no PNCP e ficaram sem score SQL.
+A base complementar contém 20 itens/19 processos/nove resultados; cobertura de
+40 pares alvo/modelo: quatro analisados, 22 sem resultado, oito sem modelo do
+grupo e seis com data divergente. Esses motivos contam pares, não compras.
+
+A API existente `/api/v1/analises` consulta a publicação experimental e os
+resultados por base/execução explícitas. Valores 0–100 são posições na distribuição
+de treino, não probabilidade de fraude nem faixas de prioridade. Não há score
+por processo nesta entrega. A base antiga e suas publicações permanecem acessíveis.

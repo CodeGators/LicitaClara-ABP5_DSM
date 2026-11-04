@@ -13,3 +13,26 @@ Registrada antes da execução local da etapa 07 em 03/11/2026. A comparação t
 - Ativação é comando separado, só para execução completa/reconciliada. Canal permitido nesta versão: `experimental:{base_id}`. Trocar ativa em uma transação preservando publicações e execuções antigas. Não ativar canal de auditoria validada. Semântica pública atual `analise.nao_publicada` continua referente à ausência de publicação de auditoria validada; consultas experimentais são endpoints explícitos e sempre sinalizadas.
 - API de leitura permite listar publicações/execuções publicadas e consultar itens/resultados por execução/base explícitas. Publicações anteriores continuam acessíveis pelo ID; nunca misturar modelos ou bases pela seleção silenciosa da mais recente. Falhas/execuções não publicadas não são servidas como resultados públicos.
 - No piloto atual pode haver cobertura zero por falta de comparabilidade: é um resultado legítimo, que deve permanecer visível. Não fabricar inferência positiva ou expandir agrupamentos para preencher telas. Testes de sucesso usam exemplos controlados em schemas descartáveis, separados das evidências reais.
+
+## Contrato temporal ML-05
+
+A inferência temporal recebe o diretório privado ML-04 e seu SHA-256 explícito,
+valida os artefatos, código/dependências, dataset, âncoras e replay de treino e
+avaliação. Reutiliza mediana, escala e CDF de treino, sem fit. Referências de
+preços pontuadas são exportadas separadamente de resultados operacionais SQL.
+
+`--resultado-ate` cria um lote operacional com corte de resultados explícito,
+igual ou posterior ao corte de aplicação original. Preserva a janela de compras,
+treino, avaliação e arquivos ML-03/04. Somente o impedimento isolado
+`RESULTADO_POSTERIOR_AO_CORTE` pode ser reavaliado quando o resultado é conhecido
+até o novo corte. Outros motivos permanecem impeditivos. A nova configuração e
+os motivos originais ficam no manifesto; isso não é retreino nem backtest ponto
+no tempo, nem autoriza recalcular métricas de avaliação com a aplicação.
+
+Para persistir score de resultado SQL, exigir identidade oficial de compra,
+item e fornecedor, preço, quantidade e data de resultado coincidentes com uma
+referência elegível, especificação, catálogo, unidade/embalagem concordantes,
+situação informada, compra não excluída, ausência de cancelamento e de moeda
+estrangeira. Divergências de data não são corrigidas automaticamente. Embalagem
+expressa como `Caixa 5000,00 UN` só concorda com CX de capacidade 5000 e medida
+UN; não converter o preço para unidade nem aceitar outra capacidade.

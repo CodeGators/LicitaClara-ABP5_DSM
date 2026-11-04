@@ -4,6 +4,7 @@ import argparse
 import json
 from datetime import date
 from importlib.metadata import version
+from pathlib import Path
 from uuid import UUID
 
 from licita_shared.storage.factory import storage
@@ -53,12 +54,26 @@ def main():
     inference.add_argument("--sha256-comparacao", required=True)
     inference.add_argument("--atributos", required=True)
     inference.add_argument("--sha256-atributos", required=True)
+    temporal = commands.add_parser("inferir-temporal")
+    temporal.add_argument("--treino", required=True, type=Path)
+    temporal.add_argument("--sha256-treino", required=True)
+    temporal.add_argument("--dataset", required=True, type=Path)
+    temporal.add_argument("--base-id", type=UUID)
+    temporal.add_argument("--resultado-ate", type=date.fromisoformat)
     publish = commands.add_parser("publicar-experimental")
     publish.add_argument("--execucao", required=True, type=UUID)
     args = parser.parse_args()
     engine = None
     try:
         settings = Settings()
+        if args.command == "inferir-temporal" and args.base_id is None:
+            from licita_ml.inference.temporal import infer_references
+
+            result = infer_references(
+                args.treino, args.dataset, args.sha256_treino, storage(settings), args.resultado_ate
+            )
+            print(json.dumps(result, ensure_ascii=False, default=str), flush=True)
+            return 0
         engine = create_engine(
             settings.processing_database_url.get_secret_value(),
             pool_size=1,
@@ -67,7 +82,19 @@ def main():
             pool_pre_ping=True,
             connect_args={"connect_timeout": 10},
         )
-        if args.command in {"inferir", "publicar-experimental"}:
+        if args.command == "inferir-temporal":
+            from licita_ml.inference.pipeline import InferencePipeline
+            from licita_ml.inference.temporal import infer_sql
+
+            result = infer_sql(
+                InferencePipeline(settings, Repository(engine), storage(settings)),
+                args.treino,
+                args.dataset,
+                args.sha256_treino,
+                args.base_id,
+                result_end=args.resultado_ate,
+            )
+        elif args.command in {"inferir", "publicar-experimental"}:
             from licita_ml.inference.pipeline import InferencePipeline
 
             inference_pipeline = InferencePipeline(settings, Repository(engine), storage(settings))
