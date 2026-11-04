@@ -83,7 +83,16 @@ class ProcessAnalysisRepository:
                     "numero_compra": r["numero_compra"],
                     "objeto": r["objeto"],
                     "orgao_nome": r["orgao_nome"],
-                    "status": "disponivel" if by_process[r["id"]] else "sem_sintese",
+                    "cobertura_agrupada": execution["configuracao"]
+                    .get("cobertura_por_processo", {})
+                    .get(str(r["id"])),
+                    "status": "disponivel"
+                    if (
+                        by_process[r["id"]]
+                        or str(r["id"])
+                        in execution["configuracao"].get("cobertura_por_processo", {})
+                    )
+                    else "sem_sintese",
                     "resultados": by_process[r["id"]],
                     "prioridade_auditoria": None,
                 }

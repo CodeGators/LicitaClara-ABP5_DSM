@@ -62,6 +62,8 @@ class AnalysisRepository:
             "base_id": row["base_id"],
             "status": row["status"],
             "politica": row["versao_politica_score"],
+            "roteamento_automatico": row["configuracao"].get("contrato")
+            == "inferencia-agrupada-v1",
             "contagens": row["configuracao"]["contagens"],
             "manifesto": row["configuracao"]["manifesto"],
             "criado_em": row["criado_em"],
@@ -70,6 +72,8 @@ class AnalysisRepository:
                 {
                     "id": m["id"],
                     "algoritmo": m["algoritmo"],
+                    "grupo": m["parametros"].get("grupo"),
+                    "catalogo": m["parametros"].get("assinatura_catalogo", {}).get("catalogo"),
                     "base_treino_id": m["base_treino_id"],
                     "versao": m["versao"],
                     "sha256_artefato": m["sha256_artefato"],

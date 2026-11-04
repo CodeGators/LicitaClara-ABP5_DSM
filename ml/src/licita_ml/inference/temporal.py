@@ -32,7 +32,7 @@ from licita_ml.training.pipeline import code_hash as training_code_hash
 from licita_ml.training.pipeline import validate
 
 
-def frozen_models(training, dataset, expected_sha, objects):
+def frozen_models(training, dataset, expected_sha, objects, approved_only=False):
     # CLI local administrativa, sem upload HTTP. O hash fixado é exigido antes do pickle.
     if checksum(training / "manifesto.json") != expected_sha:
         raise ValueError("Hash do manifesto de treino diverge")
@@ -103,7 +103,7 @@ def frozen_models(training, dataset, expected_sha, objects):
         )
         if_fit = report["isolation_forest"]["modelos"]["preco_quantidade"]
         ae_fit = next(a for a in report["autoencoder"]["ajustes"] if a["seed"] == 42)
-        if (
+        if not approved_only and (
             not if_fit["estabilidade_aprovada"]
             or not report["autoencoder"]["aprovado_tecnicamente"]
         ):
@@ -118,6 +118,12 @@ def frozen_models(training, dataset, expected_sha, objects):
             ("isolation_forest", "if_preco_quantidade", if_fit, "sha256_artefato"),
             ("autoencoder", "ae", ae_fit, "sha256"),
         ):
+            if approved_only and not (
+                if_fit["estabilidade_aprovada"]
+                if algorithm == "isolation_forest"
+                else report["autoencoder"]["aprovado_tecnicamente"]
+            ):
+                continue
             path = training / fit["artefato"]
             if checksum(path) != fit[sha_field]:
                 raise ValueError("Artefato de modelo divergente")
@@ -402,7 +408,7 @@ def compatible_unit(observed, spec):
     )
 
 
-def sql_targets(base, data, rows, models):
+def sql_targets(base, data, rows, models, description_match=None, unit_match=None):
     """Vínculo por compra/item/fornecedor, valores, datas e embalagem exatos."""
     processes = {p["id"]: p for p in data["processos_versoes"]}
     references = {}
@@ -452,7 +458,11 @@ def sql_targets(base, data, rows, models):
                             reason = "GRUPO_SEM_MODELO_TREINADO"
                         elif not row["apto_modelagem"] or json.loads(row["motivos_json"]):
                             reason = "REFERENCIA_NAO_ELEGIVEL"
-                        elif normalize(item["descricao"]) != model["spec"][1]:
+                        elif not (
+                            description_match(item, row, model)
+                            if description_match
+                            else normalize(item["descricao"]) == model["spec"][1]
+                        ):
                             reason = "ESPECIFICACAO_ITEM_DIVERGENTE"
                         elif data["catalogos"].get(item["catalogo_id"]) != model["spec"][0]:
                             reason = "CATALOGO_ITEM_DIVERGENTE"
@@ -485,7 +495,11 @@ def sql_targets(base, data, rows, models):
                         ):
                             reason = "COMPRA_EXCLUIDA_OU_SITUACAO_NAO_CONFIRMADA"
                         # Embalagem provada pela referência exata e unidade SQL concordante.
-                        elif not compatible_unit(item["unidade_medida"], model["spec"]):
+                        elif not (
+                            unit_match(item["unidade_medida"], model)
+                            if unit_match
+                            else compatible_unit(item["unidade_medida"], model["spec"])
+                        ):
                             reason = "UNIDADE_OPERACIONAL_DIVERGENTE"
                         elif (
                             parent["atributos_origem"].get(

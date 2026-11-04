@@ -107,6 +107,19 @@ class ViewRepository:
                     raise QueryError(
                         "modelo_fora_execucao", "Modelo não pertence à execução selecionada.", 422
                     )
+        automatic = bool(
+            execution
+            and model is None
+            and execution["configuracao"].get("contrato") == "inferencia-agrupada-v1"
+        )
+        preferred = {}
+        if automatic:
+            # Fixed algorithm preference, never select a model by its observed score.
+            for candidate in sorted(
+                models, key=lambda m: (m["algoritmo"] != "isolation_forest", str(m["id"]))
+            ):
+                preferred.setdefault(candidate["parametros"]["grupo"], candidate["id"])
+        selected_models = {model["id"]} if model else set(preferred.values())
         rows = self.read(QueryRepository(self.session).item_query(base["id"]))
         events = self.read(
             sa.select(p.resultados_itens).where(
@@ -124,18 +137,20 @@ class ViewRepository:
             by_item[event["item_versao_id"]].append(event)
         scores = {}
         coverage = defaultdict(list)
-        if model:
+        if selected_models:
             for row in self.read(
                 sa.select(a.resultados_modelo).where(
                     a.resultados_modelo.c.base_id == base["id"],
                     a.resultados_modelo.c.execucao_id == execution["id"],
-                    a.resultados_modelo.c.modelo_id == model["id"],
+                    a.resultados_modelo.c.modelo_id.in_(selected_models),
                     a.resultados_modelo.c.tipo_alvo == "resultado",
                 )
             ):
                 scores[row["resultado_item_id"]] = row
             for row in execution["configuracao"]["cobertura"]:
-                if row["modelo_id"] == str(model["id"]):
+                if row["modelo_id"] in {str(uid) for uid in selected_models} or (
+                    automatic and row["modelo_id"] is None
+                ):
                     coverage[row["item_versao_id"]].append(row)
         selected = []
         for row in rows:
@@ -198,7 +213,7 @@ class ViewRepository:
                     "ANALISE_NAO_PUBLICADA"
                     if execution is None
                     else "MODELO_NAO_SELECIONADO"
-                    if model is None
+                    if model is None and not automatic
                     else "SEM_RESULTADO_OU_COBERTURA"
                 ] += 1
             selected.append(
@@ -260,6 +275,9 @@ class ViewRepository:
                 "homologacao_fim": filters.homologacao_fim,
                 "data_sem_filtro": "incluída em valores; grupo sem_data na evolução",
                 "prioridade_validada": False,
+                "selecao_modelo": "automatico_por_grupo_IF_preferencial_AE_se_IF_nao_estavel"
+                if automatic
+                else "modelo_explicito",
                 "valor": (
                     "totais homologados dos resultados selecionados; "
                     "não estimativa, contrato ou pagamento"

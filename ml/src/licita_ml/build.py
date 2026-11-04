@@ -135,7 +135,7 @@ class Builder:
                 codigo_classe=v.pop("codigo_classe"),
                 codigo_pdm=v.pop("codigo_pdm"),
             )
-            catalogs[v["item"]] = cat
+            catalogs.setdefault(v["item"], set()).add(cat)
             supplier = self.supplier(v.pop("fornecedor"), v.pop("fornecedor_nome"))
             values = {
                 k: v[k]
@@ -183,7 +183,7 @@ class Builder:
                 item_id=identity,
                 processo_id=process,
                 processo_versao_id=pversion,
-                catalogo_id=catalogs.get(key),
+                catalogo_id=next(iter(catalogs[key])) if len(catalogs.get(key, [])) == 1 else None,
                 atributos_origem=entry["raw"],
                 **v,
             )

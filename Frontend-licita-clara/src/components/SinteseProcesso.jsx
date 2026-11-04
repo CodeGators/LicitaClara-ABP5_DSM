@@ -16,8 +16,18 @@ export default function SinteseProcesso({ processId }) {
   const process = query.data?.dados[0]
   return <section className="card">
     <h2>Síntese experimental da licitação</h2>
-    <p className="sub">O score integral exige análise de todos os itens e resultados do universo oficial consultado. A média dos sinais disponíveis descreve apenas a parte analisada. Não representa probabilidade de fraude ou prioridade validada.</p>
+    {!process?.cobertura_agrupada && <p className="sub">O score integral exige análise de todos os itens e resultados do universo oficial consultado. A média dos sinais disponíveis descreve apenas a parte analisada. Não representa probabilidade de fraude ou prioridade validada.</p>}
     <QueryState query={query} loading="Consultando a cobertura da licitação…" />
+    {process?.cobertura_agrupada && <>
+      <p className="sub">Cada item é comparado com seu próprio grupo de produtos. Índices de grupos diferentes não são somados em um score da licitação.</p>
+      <div className="stats">
+        <Info label="Itens com análise / importados">{process.cobertura_agrupada.itens_com_analise} / {process.cobertura_agrupada.itens_importados}</Info>
+        <Info label="Resultados com análise / ativos importados">{process.cobertura_agrupada.resultados_com_analise} / {process.cobertura_agrupada.resultados_ativos_importados}</Info>
+        <Info label="Grupos com análise">{process.cobertura_agrupada.quantidade_grupos}</Info>
+        <Info label="Score integral da licitação">Indisponível</Info>
+      </div>
+      <p className="note">A cobertura acima se refere ao recorte importado, independentemente do filtro de modelo. {process.cobertura_agrupada.itens_oficiais === null ? 'O universo oficial completo ainda não está confirmado.' : `Universo oficial no snapshot: ${process.cobertura_agrupada.itens_oficiais} itens.`} Consulte os resultados de cada item para ver seus índices e limitações.</p>
+    </>}
     {process?.status === 'sem_sintese' && <p>Esta versão da análise ainda não contém síntese por processo.</p>}
     {process?.resultados.map(result => <div key={result.id}>
       <h3>{result.algoritmo === 'autoencoder' ? 'Autoencoder' : 'Isolation Forest'}</h3>

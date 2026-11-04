@@ -48,8 +48,10 @@ class Pipeline:
     def __init__(self, settings, repository, objects):
         self.settings, self.repo, self.objects = settings, repository, objects
 
-    def run(self, start, end, catalog, ids=None, fail_after=None):
-        if start > end or not catalog.isdigit():
+    def run(self, start, end, catalog, ids=None, fail_after=None, selected_items=None):
+        catalogs = [catalog] if isinstance(catalog, str) else sorted(set(catalog))
+        catalog = catalog if isinstance(catalog, str) else catalogs
+        if start > end or not catalogs or any(not c.isdigit() for c in catalogs):
             raise ValueError("Período ou CATMAT inválido")
         started = time.monotonic()
         with self.repo.locked() as connection:
@@ -79,6 +81,8 @@ class Pipeline:
                 "catalogo": catalog,
                 "fontes": inputs,
             }
+            if selected_items is not None:
+                config["itens_selecionados"] = sorted(set(selected_items))
             fingerprint = hashlib.sha256(encode(config).encode()).hexdigest()
             base_id = identifier("versoes_base", fingerprint)
             table = self.repo.tables["versoes_base"]
@@ -135,7 +139,7 @@ class Pipeline:
             committed = False
             try:
                 selected, purchases = stage.resolve(
-                    self.objects, files, self.settings, start, end, catalog
+                    self.objects, files, self.settings, start, end, catalog, selected_items
                 )
                 before = self.repo.sizes(connection)
                 builder = Builder(self.repo, connection, stage, base_id, import_ids)
@@ -184,7 +188,12 @@ class Pipeline:
                         "Não há scores ou modelo treinado.",
                     ],
                 }
-                prefix = f"datasets/base={fingerprint}/catalogo={catalog}"
+                catalog_key = (
+                    catalog
+                    if isinstance(catalog, str)
+                    else hashlib.sha256(encode(catalogs).encode()).hexdigest()[:16]
+                )
+                prefix = f"datasets/base={fingerprint}/catalogo={catalog_key}"
                 stored, manifest = publish(self.objects, self.repo, data, stage, prefix, manifest)
                 with connection.begin():
                     self.repo.batch(

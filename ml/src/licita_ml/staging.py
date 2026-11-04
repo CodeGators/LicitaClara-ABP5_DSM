@@ -25,14 +25,18 @@ class Stage:
             {"arquivo_id": origin[0], "membro": origin[1], "linha": origin[2], "motivo": reason}
         )
 
-    def resolve(self, objects, files, settings, start, end, catalog):
+    def resolve(self, objects, files, settings, start, end, catalog, selected_items=None):
+        catalogs = {catalog} if isinstance(catalog, str) else set(catalog)
+        allowed = set(selected_items) if selected_items is not None else None
         material = [f for f in files if kind_of(f) == "material"]
         if not material:
             raise ValueError("Recorte requer arquivo material")
         selected, purchases = set(), set()
         for file in material:
             for _, _, r, _ in records(objects, file, settings):
-                if r.get("codigo_item_catalogo") != catalog:
+                if r.get("codigo_item_catalogo") not in catalogs or (
+                    allowed is not None and r.get("id_compra_item") not in allowed
+                ):
                     continue
                 try:
                     if start <= day(r.get("data_compra"), True) <= end:
@@ -59,7 +63,9 @@ class Stage:
                 if (
                     (
                         kind == "material"
-                        and (raw.get("codigo_item_catalogo") != catalog or item not in selected)
+                        and (
+                            raw.get("codigo_item_catalogo") not in catalogs or item not in selected
+                        )
                     )
                     or (
                         kind in ("compra", "compra_api", "contratos_api")

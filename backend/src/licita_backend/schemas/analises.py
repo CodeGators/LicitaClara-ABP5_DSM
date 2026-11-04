@@ -20,6 +20,7 @@ class AnalysisPage(AnalysisSelection):
 
 
 class Run(BaseModel):
+    roteamento_automatico: bool = False
     id: UUID
     base_id: UUID
     status: Literal["concluida"]
@@ -106,6 +107,7 @@ class ProcessScore(BaseModel):
 
 
 class ProcessAnalysis(BaseModel):
+    cobertura_agrupada: dict[str, Any] | None = None
     id: UUID
     processo_versao_id: UUID
     numero_compra: str

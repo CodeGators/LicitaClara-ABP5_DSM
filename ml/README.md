@@ -476,3 +476,38 @@ por processo. Execuções completas são verificadas/reutilizadas; lotes já con
 podem ser reaproveitados após falha, sem sobrescrever revisões preenchidas. A lista
 de grupos, os impedimentos e os modelos estáveis são registrados. Estabilidade
 não comprova utilidade, fraude, acurácia ou superioridade entre IF e Autoencoder.
+
+## Aplicação dos modelos por grupo
+
+```bash
+uv run --locked --all-packages python -m licita_ml.grouped importar \
+  --preparacao CAMINHO_PREPARACAO
+uv run --locked --all-packages python -m licita_ml.grouped inferir \
+  --treino CAMINHO_TREINO_AGRUPADO --base-id UUID_BASE \
+  --resultado-ate 2026-10-31
+```
+
+A importação aceita os CATMATs e a lista de itens da janela de aplicação de todos
+os grupos preparados, mantendo as fontes, estados e proveniência. Um código
+ambíguo no mesmo item não é escolhido pela ordem do arquivo. Cria outra base;
+não substitui snapshots anteriores. Itens/pais/resultados ausentes ficam nas
+contagens de disponibilidade e não são fabricados para ampliar a cobertura.
+
+A inferência confere hashes, dependências e recarga dos modelos congelados.
+Estabilidade é exigida por algoritmo: um IF estável pode ser aplicado quando o
+AE do mesmo grupo falha e vice-versa. Cada resultado é encaminhado somente aos
+modelos de seu grupo; ausência de modelo é registrada sem score. A reconciliação
+verifica todos os alvos SQL, modelos aplicáveis, grupos e pares persistidos.
+Vínculos exigem compra, item, fornecedor, preço, quantidade e data exatos, além
+de especificação canônica e unidade/embalagem concordantes. Não converte preços.
+Somente o impedimento isolado de resultado tardio pode ser reavaliado pelo corte
+explícito. Nenhum fit, mediana ou escala é recalculado com a aplicação.
+
+A publicação usa o comando existente `licita-ml publicar-experimental --execucao UUID`.
+A consulta publicada oferece modo automático por item: IF quando estável; AE
+quando só ele está estável. Essa preferência é fixa, não depende dos scores.
+O detalhe mantém os algoritmos separados. Ranking e painel mostram posições
+relativas ao treino de cada grupo, sem interpretar percentis como probabilidade
+de fraude. A síntese de processo apresenta contagens de cobertura e grupos;
+não calcula média ou score integral combinando índices de grupos diferentes.
+A quantidade importada não comprova o universo oficial completo da compra.

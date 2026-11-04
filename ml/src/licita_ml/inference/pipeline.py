@@ -573,6 +573,21 @@ class InferencePipeline:
             sa.select(events.c.id, events.c.item_versao_id).where(events.c.base_id == base_id)
         ):
             by_item[str(event.item_versao_id)].append(str(event.id))
+        if config.get("contrato") == "inferencia-agrupada-v1":
+            from licita_ml.grouped.inference import validate_routing
+
+            model_table = self.tables["versoes_modelo"]
+            model_rows = (
+                cn.execute(
+                    sa.select(model_table).where(
+                        model_table.c.id.in_([UUID(uid) for uid in config["modelos"]])
+                    )
+                )
+                .mappings()
+                .all()
+            )
+            validate_routing(by_item, config, model_rows, config["cobertura"], actual)
+            return
         expected_coverage = {
             (uid, event, model)
             for uid, ids in by_item.items()

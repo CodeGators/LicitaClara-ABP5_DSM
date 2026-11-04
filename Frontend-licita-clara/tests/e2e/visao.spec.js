@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { BASE, ITEM, SUPPLIER, item, otherItem, mockApi } from './fixtures.js'
+import { BASE, ITEM, PROCESS, SUPPLIER, item, otherItem, mockApi } from './fixtures.js'
 
 const EXEC = '77777777-7777-4777-8777-777777777777'
 const NEW_EXEC = '77777777-7777-4777-8777-888888888888'
@@ -11,15 +11,16 @@ async function mockView(page, overrides = {}) {
     const done = async body => { await send(body); return true }
     const bad = async (message, status) => { await error(message, status); return true }
     if (path === '/analises/publicacao') return done({ base_id: BASE, execucao_id: state.active, status: state.active ? 'publicada_experimental' : 'nao_publicada', experimental: true })
-    const run = id => ({ id, base_id: BASE, concluido_em: '2026-11-03T15:00:00Z', modelos: [{ id: MODEL, algoritmo: 'isolation_forest' }, { id: AE, algoritmo: 'autoencoder' }] })
+    const run = id => ({ id, roteamento_automatico: !!state.automatic, base_id: BASE, concluido_em: '2026-11-03T15:00:00Z', modelos: [{ id: MODEL, algoritmo: 'isolation_forest' }, { id: AE, algoritmo: 'autoencoder' }] })
     if (path === '/analises/execucoes') return done({ dados: [run(EXEC), run(NEW_EXEC)], total: 2, total_paginas: 1 })
     if (path === `/analises/execucoes/${EXEC}` || path === `/analises/execucoes/${NEW_EXEC}`) return done(run(path.split('/').at(-1)))
+    if (state.automatic && path.startsWith('/analises/') && path.includes('/processos/')) return done({ dados: [{ id: PROCESS, status: 'disponivel', resultados: [], cobertura_agrupada: { itens_importados: 2, itens_com_analise: 1, resultados_ativos_importados: 2, resultados_com_analise: 1, quantidade_grupos: 1, itens_oficiais: null, score_processo: null } }] })
     if (path.startsWith('/analises/execucoes/') && !path.includes('/itens/')) return bad('Execução não publicada nesta base.', 404)
     if (path.includes(`/itens/${ITEM}`) && path.startsWith('/analises/')) return done({ dados: [{ cobertura: [{ modelo_id: MODEL, motivo: state.scored ? null : 'SEM_REFERENCIA_EXATA' }], resultados: state.scored ? [{ id: 'score-1', modelo_id: MODEL, resultado_item_id: item.resultados[0].id, algoritmo: 'isolation_forest', score_bruto: '0.514', indice_experimental: '88.125', explicacao: { status: 'indisponivel', parcelas: [] } }] : [] }] })
     if (!path.startsWith('/visao/')) return false
     if (state.viewOffline) return bad('Consulta do recorte indisponível.', 503)
     if (url.searchParams.get('modelo_id') === 'invalido') return bad('Modelo não pertence à execução selecionada.', 422)
-    const hasScore = state.scored && url.searchParams.get('execucao_id') && url.searchParams.get('modelo_id')
+    const hasScore = state.scored && url.searchParams.get('execucao_id') && (state.automatic || url.searchParams.get('modelo_id'))
     let rows = [item, otherItem].map((r, i) => ({ ...r, resultados: r.resultados.filter(e => !e.cancelado), valor_homologado: r.valor_homologado_item, soma_valores_conhecidos: r.valor_homologado_item, resultados_sem_total: 0, resultados_analisados: i === 0 && hasScore ? 1 : 0, status_analise: i === 0 && hasScore ? 'analisados' : 'nao_analisados', indice_experimental: i === 0 && hasScore ? '88.125' : null, motivos: i === 0 && hasScore ? {} : { SEM_REFERENCIA_EXATA: 1 } }))
     rows = rows.filter(r => r.descricao.toLowerCase().includes((url.searchParams.get('busca') || '').toLowerCase()))
     const filter = url.searchParams.get('analise') || 'todos'
@@ -124,4 +125,22 @@ test('painel real é utilizável em tela pequena e tema escuro', async ({ page }
   await expect(page.getByText('Nenhum índice disponível neste recorte.')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.screenshot({ path: testInfo.outputPath('painel-mobile.png'), fullPage: true })
+})
+
+
+test('modelo automático preserva roteamento por item e cobertura sem média entre grupos', async ({ page }) => {
+  await mockView(page, { automatic: true })
+  await page.goto(`/painel?base_id=${BASE}`)
+  await expect(page.getByRole('heading', { name: 'Painel do recorte' })).toBeVisible()
+  await expect(page.getByLabel('Modelo experimental')).toHaveValue('')
+  expect(new URL(page.url()).searchParams.get('modelo_id')).toBeNull()
+  await page.getByRole('link', { name: 'Ranking experimental', exact: true }).click()
+  await expect(page.getByRole('heading', { name: '2 item(ns) no ranking' })).toBeVisible()
+  await page.getByRole('link', { name: 'Borracha do recorte', exact: true }).click()
+  await expect(page.getByRole('cell', { name: '88,125', exact: true })).toBeVisible()
+  expect(new URL(page.url()).searchParams.get('modelo_id')).toBeNull()
+  await page.goto(`/processos/${PROCESS}?base_id=${BASE}&execucao_id=${EXEC}`)
+  await expect(page.getByText('Itens com análise / importados', { exact: true })).toBeVisible()
+  await expect(page.getByText('O universo oficial completo ainda não está confirmado.', { exact: false })).toBeVisible()
+  await expect(page.getByText('Média dos sinais disponíveis', { exact: true })).toHaveCount(0)
 })
