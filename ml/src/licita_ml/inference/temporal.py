@@ -408,6 +408,14 @@ def compatible_unit(observed, spec):
     )
 
 
+def has_foreign_currency(raw):
+    """CSV vazio e JSON null são ausência; qualquer identificador informado exige política."""
+    return any(
+        raw.get(key) is not None and str(raw[key]).strip() != ""
+        for key in ("moedaEstrangeiraId", "moeda_estrangeira_id")
+    )
+
+
 def sql_targets(base, data, rows, models, description_match=None, unit_match=None):
     """Vínculo por compra/item/fornecedor, valores, datas e embalagem exatos."""
     processes = {p["id"]: p for p in data["processos_versoes"]}
@@ -479,10 +487,7 @@ def sql_targets(base, data, rows, models, description_match=None, unit_match=Non
                             reason = "SITUACAO_RESULTADO_NAO_CONFIRMADA"
                         elif event["cancelado"]:
                             reason = "RESULTADO_CANCELADO"
-                        elif (
-                            raw.get("moedaEstrangeiraId") is not None
-                            or raw.get("moeda_estrangeira_id") is not None
-                        ):
+                        elif has_foreign_currency(raw):
                             reason = "MOEDA_ESTRANGEIRA_REQUER_POLITICA"
                         elif (
                             str(

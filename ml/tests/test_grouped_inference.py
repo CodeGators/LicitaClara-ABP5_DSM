@@ -90,6 +90,7 @@ def grouped_case(database, settings, sources, trained_groups):
                 data_resultado_pncp=str(row["data_resultado"]),
                 situacao_compra_item_resultado_id="1",
                 situacao_compra_item_resultado_nome="Informado",
+                moeda_estrangeira_id="",
                 data_atualizacao_pncp="2026-09-02T12:00:00",
             )
         )
@@ -312,3 +313,15 @@ def test_late_result_extension_cannot_bypass_purchase_concentration():
         for r in rows[:6]
     )
     assert rows[-1]["apto_modelagem"]
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [(None, False), ("", False), ("  ", False), (0, True), ("0", True), (1, True), ("BRL", True)],
+)
+def test_currency_absence_in_csv_and_json_is_not_foreign(value, expected):
+    from licita_ml.inference.temporal import has_foreign_currency
+
+    for key in ("moedaEstrangeiraId", "moeda_estrangeira_id"):
+        assert has_foreign_currency({key: value}) is expected
+    assert has_foreign_currency({"moedaEstrangeiraId": "", "moeda_estrangeira_id": "1"})
