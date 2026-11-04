@@ -97,3 +97,47 @@ A saída deve ser um caminho novo. O comando preserva as fontes, usa SQLite
 temporário em disco e não acessa rede, banco operacional ou modelos.
 Correspondência de IDs/campos e grupos exploratórios não comprovam
 elegibilidade analítica. O relatório é local, em `data/`, fora do Git.
+
+## Base organizada offline
+
+```bash
+uv run --locked --all-packages --extra validation python -m licita_ml.organized \
+  --entrada data/diagnostico/compras/2026-09 \
+  --saida data/organizados
+```
+
+A saída indica um diretório `base=FINGERPRINT`, com Parquet e CSV de compras,
+itens, resultados, referências, enriquecimento dos itens, vínculos, linhas de
+origem e rejeições. `dicionario.json` descreve campos e convenções;
+`manifesto.json` registra fontes, hashes, contagens e política. A repetição
+confere a integridade e retorna `reutilizada: true`. Uma fonte ou regra nova gera
+outra versão. Artefatos existentes divergentes são recusados, sem sobrescrita.
+
+O comando opera nos ZIPs locais e usa SQLite temporário em disco; não importa no
+PostgreSQL nem executa ML. `--historico CAMINHO.csv.zip ...` permite acrescentar
+arquivos de materiais de outros meses quando disponíveis. Cópias com o mesmo
+conteúdo são lidas uma única vez. Os originais e as versões anteriores são
+preservados; a pasta final só é publicada depois da conciliação.
+
+As versões usam atualização do registro; referências usam atualização do item e
+depois da compra. Empates com atributos divergentes, datas de versão inválidas
+ou fusos incompatíveis ficam em rejeições. Linhas que repetem os mesmos atributos
+da entidade, mas diferem em colunas de entidades filhas, são classificadas como
+`projecao_equivalente`; fornecedores continuam separados nos resultados. Todas
+as linhas têm destinação auditável em `linhas`.
+
+IDs são texto, valores são Decimal/decimal128(28,8), datas de evento são date32 e
+instantes conservam o offset conhecido em texto ISO. CSV usa UTF-8, `;`, ponto
+decimal e vazio para ausência. Ao importar em planilha, configurar IDs como
+texto para preservar zeros. `linha` identifica o ordinal do registro CSV,
+considerando cabeçalho=1; não é a linha física de um campo com quebras de linha.
+
+Catálogo/descrição vindos da pesquisa aparecem em `enriquecimento_itens`, sem
+alterar os campos originais. Vínculo de IDs ou coincidência de preço/quantidade
+não comprova comparabilidade nem elegibilidade. Unidade, embalagem, situação,
+corte temporal e cobertura precisam de validação na construção dos atributos.
+Não há mediana, ajuste de escala, divisão temporal ou score nesta entrega.
+
+```bash
+uv run --locked --all-packages --extra validation pytest ml/tests/test_organized.py -q
+```
