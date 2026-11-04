@@ -141,3 +141,56 @@ Não há mediana, ajuste de escala, divisão temporal ou score nesta entrega.
 ```bash
 uv run --locked --all-packages --extra validation pytest ml/tests/test_organized.py -q
 ```
+
+## Partições temporais e atributos
+
+```bash
+uv run --locked --all-packages --extra validation python -m licita_ml.temporal \
+  --base data/organizados/base=c434aaad56c4d8f20510692ac1271081b2525b2e39086f1c36b82c18d5dfc07d
+uv run --locked --all-packages --extra validation pytest ml/tests/test_temporal.py -q
+```
+
+O diretório de entrada é explícito e deve conter uma base organizada íntegra.
+Os padrões são treino outubro–dezembro/2025, avaliação julho–agosto/2026 e
+aplicação setembro/2026. As seis datas podem ser informadas pelos argumentos
+`--treino-inicio`, `--treino-fim`, `--avaliacao-inicio`, `--avaliacao-fim`,
+`--aplicacao-inicio` e `--aplicacao-fim`, sempre em ISO. O recorte versionado é
+classe 7510 ou os catálogos 486054, 486374 e 637468. Alterar cortes gera outra
+versão, não reescreve a anterior.
+
+A saída contém auditoria de referências, grupos e medianas de treino,
+matrizes de treino/avaliação/aplicação de referências e auditoria/matriz de
+resultados operacionais. CSV e Parquet têm as mesmas contagens. `contrato.json`
+define as únicas entradas dos modelos: `log_preco_mediana` e `log_quantidade`.
+IDs de observação, grupo e compra são rastreabilidade: não passam ao modelo.
+Treinar separadamente por grupo; escalas aprendidas ficam para a etapa de treino,
+ajustadas apenas nos dados de treino. Este comando não executa modelos.
+
+As referências são agrupadas por catálogo, descrição detalhada normalizada,
+sigla da unidade de fornecimento, capacidade e medida. Não inferir equivalência
+entre produtos ou converter caixas em unidades. A mediana usa somente treino
+com resultado conhecido até o corte. Compra observada em partição anterior é
+excluída das posteriores, inclusive quando o produto anterior está fora do
+recorte. Datas inconsistentes, grupos insuficientes e exclusões documentais
+continuam na auditoria com motivos; não viram zero.
+
+Os mínimos técnicos são 100 referências/20 compras no treino, 30 referências/dez
+compras na avaliação, três órgãos e três fornecedores no treino, até cinco
+referências por compra/grupo/partição e até 10% das referências do treino por
+compra. Exige-se variação de preço e quantidade para comparar os dois modelos.
+Esses limites são operacionais do piloto, não garantias estatísticas universais.
+
+Somente grupos tecnicamente elegíveis produzem matrizes liberadas para treino.
+O lote inicial real terminou como `insuficiente_para_modelagem`: as matrizes
+ficam vazias, com esquema/cabeçalho, e a auditoria preserva dados, motivos e
+atributos exploratórios quando há referência mínima (20 registros/dez compras).
+Não treinar só porque o CSV existe. A expansão do histórico deve ser medida antes
+de prosseguir, sem reduzir critérios para obter um resultado.
+
+Aplicação em referências e em resultados operacionais são observações distintas.
+Resultados precisam de cadeia compra/item resolvida, situação confirmada, ausência
+de cancelamento/moeda estrangeira, vínculo único por campos e especificação/unidade
+compatíveis. Nome e sigla só são aceitos quando fornecidos explicitamente na mesma
+referência vinculada. Isso não aprova comparabilidade documental nem utilidade de
+auditoria. Snapshots revisados após os cortes são sinalizados; o ensaio não é
+um backtest estritamente ponto no tempo. Não há score de processo ou fraude.
