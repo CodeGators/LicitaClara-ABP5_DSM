@@ -1,0 +1,32 @@
+{
+  "versao": "treino-temporal-v1",
+  "seeds": [11, 23, 42, 71, 101],
+  "isolation_forest": {
+    "arvores": [200, 500],
+    "amostras": [64, 256],
+    "variantes": ["preco", "preco_quantidade"],
+    "ancora": {"arvores": 200, "amostras_maximas": 256, "seed": 42},
+    "contamination": "auto"
+  },
+  "autoencoder": {
+    "arquitetura": [2, 1, 2],
+    "ancora_seed": 42,
+    "parametros": {
+      "hidden_layer_sizes": [1], "activation": "tanh", "solver": "lbfgs",
+      "alpha": 0.001, "max_iter": 2000, "max_fun": 50000,
+      "tol": 0.00001, "early_stopping": false
+    }
+  },
+  "top_k": "min(10,max(3,ceil(0.10*n_avaliacao)))",
+  "estabilidade": {"spearman_minimo": 0.8, "jaccard_minimo": 0.6},
+  "regras": ["preco_dividido_mediana_treino", "abs_log_preco_dividido_mediana_treino"],
+  "sensibilidade": {"multiplicadores_preco": [3, 10], "razao_controle_min": 0.8, "razao_controle_max": 1.2},
+  "revisao": {"amostra_treino": 20, "controles_avaliacao": 3, "parecer_automatico": false},
+  "politica": [
+    "As ancoras e configuracoes sao fixadas antes dos scores; nao escolher vencedor pelo holdout.",
+    "Nenhuma escala ou mediana e ajustada na avaliacao.",
+    "Aplicacao e resultados operacionais permanecem reservados para ML05.",
+    "Nao combinar scores, criar probabilidade de fraude ou aprovar utilidade pela estabilidade.",
+    "Revisao tecnica automatizada nao e parecer humano independente."
+  ]
+}

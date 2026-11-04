@@ -199,3 +199,54 @@ compatíveis. Nome e sigla só são aceitos quando fornecidos explicitamente na 
 referência vinculada. Isso não aprova comparabilidade documental nem utilidade de
 auditoria. Snapshots revisados após os cortes são sinalizados; o ensaio não é
 um backtest estritamente ponto no tempo. Não há score de processo ou fraude.
+
+## Treino e comparação sobre as matrizes temporais
+
+```bash
+uv run --locked --all-packages --extra validation python -m licita_ml.training treinar \
+  --base data/atributos_temporais/base=623b9e7c18c853ff1d7b28d0d6b4938f9f4fc95b837c41bda8cb075d1a27fe7a
+uv run --locked --all-packages --extra validation pytest ml/tests/test_training.py -q
+```
+
+O pacote confere a integridade temporal, reconcilia IDs, compras, datas, medianas
+e atributos antes do fit e consome somente treino/avaliação. As referências de
+aplicação ficam reservadas. O protocolo executável é
+`src/licita_ml/resources/PROTOCOLO_TREINO_TEMPORAL_V1.json`: IF com variantes
+preço e preço/quantidade, grade 200/500 árvores × 64/256 amostras × cinco sementes,
+âncora predefinida 200 árvores/min(256,n)/semente 42; AE 2→1→2 com cinco sementes
+e âncora 42, StandardScaler ajustado apenas no treino. Não escolhe parâmetros
+ou vencedor pelo ranking do holdout.
+
+Resultados em `data/treinamento_temporal/execucao=FINGERPRINT`, com sete modelos
+(dois IF âncora e cinco AE), scores brutos de treino/avaliação em CSV e Parquet,
+comparação com regras unilateral/bilateral, estabilidade, convergência,
+sensibilidade sintética, contexto dos casos e hashes. Os CSVs incluem preço,
+quantidade, unidade/capacidade da fonte e mediana. Os scores são de anomalia,
+não porcentagem de fraude; magnitudes de IF e AE não são comparáveis diretamente.
+As parcelas do erro AE não são causas nem contribuições do IF.
+
+A repetição verifica e reutiliza sem retreinar ou desserializar modelos salvos.
+Na geração, somente artefatos recém-criados pelo processo são carregados para
+verificar replay. Escalas, modelos, IDs e versões ficam associados ao dataset.
+Saída divergente não é sobrescrita; o manifesto só é publicado ao final. Nenhum
+score de aplicação, registro SQL ou publicação na API é feito por esse comando.
+
+Planilhas cegas originais ficam na execução imutável. Cópias editáveis são
+criadas em `data/revisoes_ml04/FINGERPRINT/GRUPO/`, sem sobrescrever respostas
+existentes. As planilhas omitem método, ranking e score e começam como pendentes.
+Amostra: 20 casos de treino, união dos top-k dos métodos/regras e até três
+controles de avaliação. A conferência técnica automatizada não é parecer humano.
+
+```bash
+uv run --locked --all-packages --extra validation python -m licita_ml.training revisar \
+  --execucao CAMINHO_DA_EXECUCAO --grupo GRUPO \
+  --treino COPIA_REVISAO_TREINO.csv --avaliacao COPIA_REVISAO_AVALIACAO.csv \
+  --natureza interna
+```
+
+A conferência exige IDs/contexto originais e evidência/autor/data para pareceres
+preenchidos. `independente_declarada` registra uma declaração, sem comprovar
+independência pelo software. Nenhum parecer aprova utilidade/publicação ou escolhe
+vencedor automaticamente. O resultado atual é comparação técnica concluída com
+utilidade inconclusiva por revisão pendente; os dois algoritmos passaram na
+estabilidade deste grupo, sem prova de superioridade ou eficácia de auditoria.
