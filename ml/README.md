@@ -444,3 +444,35 @@ anterior; base, janelas temporais ou regras documentais diferentes são rejeitad
 Essa opção só reconhece a cópia literal dos atributos do catálogo com formatação
 diferente. A geração completa e o refinamento produzem as mesmas tabelas; suas
 identidades de execução diferem por registrarem o caminho de preparação.
+
+## Treino por grupos do catálogo integral
+
+```bash
+uv run --locked --all-packages python -m licita_ml.grouped preparar \
+  --base CAMINHO_BASE_ORGANIZADA --catalogo CAMINHO_CATALOGO
+uv run --locked --all-packages python -m licita_ml.grouped treinar \
+  --preparacao CAMINHO_PREPARACAO --processos 2
+uv run --locked --all-packages --extra validation pytest ml/tests/test_grouped_temporal.py -q
+```
+
+A preparação verifica a origem e usa os 207 candidatos por contagens do catálogo,
+sem limitar a materiais de escritório. Reaplica os mínimos de compras, órgãos,
+fornecedores, variação, concentração e cortes da política temporal. Só prosseguem
+descrições estruturadas nas duas fontes; livros sem obra/edição/ISBN e acessórios
+sem modelo confirmado ficam para revisão. Essa triagem não aprova comparabilidade
+documental de todos os registros. Preços extremos não são removidos automaticamente.
+
+Todos os grupos elegíveis são ordenados por assinatura e divididos em lotes de
+até 20, sem selecionar os melhores resultados de avaliação. Cada lote mantém o
+contrato temporal validado pelo motor de treino existente: duas entradas, mediana
+e escala só do treino, 45 ajustes por grupo e modelos/avaliações rastreáveis.
+Compras que apareceram em partição anterior continuam excluídas, mesmo em outro
+grupo. Os resultados operacionais são reconciliados separadamente na inferência;
+as tabelas de alvos SQL da preparação permanecem vazias, sem substituí-los por
+referências de preço. A aplicação não participa do ajuste.
+
+O orquestrador admite até três processos independentes, com uma thread numérica
+por processo. Execuções completas são verificadas/reutilizadas; lotes já concluídos
+podem ser reaproveitados após falha, sem sobrescrever revisões preenchidas. A lista
+de grupos, os impedimentos e os modelos estáveis são registrados. Estabilidade
+não comprova utilidade, fraude, acurácia ou superioridade entre IF e Autoencoder.
