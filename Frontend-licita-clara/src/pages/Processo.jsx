@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { Head, Aviso } from '../components/ui.jsx'
-import { Documents, Info, NoAnalysis, Pager, QueryState } from '../components/consultas.jsx'
+import { Documents, Info, Pager, QueryState } from '../components/consultas.jsx'
 import { useBase } from '../BaseContext.jsx'
-import { baseLink, date, money } from '../api.mjs'
+import { baseLink, date, money, selectionLink } from '../api.mjs'
 import useApi from '../useApi.js'
+import SinteseProcesso from '../components/SinteseProcesso.jsx'
 
 export default function Processo() {
   const { id } = useParams()
+  const location = useLocation()
   const { baseId } = useBase()
   const [page, setPage] = useState(1)
   useEffect(() => setPage(1), [baseId, id])
@@ -24,9 +26,9 @@ export default function Processo() {
       <Info label="Homologado dos itens do recorte">{money(process.valor_homologado_itens_recorte)}</Info><Info label="Situação na origem">{process.situacao}</Info><Info label="Itens no recorte">{process.quantidade_itens_recorte}</Info>
     </div>
     <p className="note">O recorte pode conter apenas parte da compra. O valor global e o total dos itens do recorte são medidas distintas e não devem ser somados.</p>
-    <NoAnalysis />
+    <SinteseProcesso processId={id} />
     <section className="card"><h2>Itens deste processo</h2><QueryState query={items} loading="Carregando itens do processo…" />
-      {items.data && <>{items.data.dados.length ? <ul className="document-list">{items.data.dados.map(item => <li key={item.id}><Link className="link-a" to={baseLink(`/itens/${item.id}`, baseId)}>Item {item.numero_item} · {item.descricao}</Link></li>)}</ul> : <p className="sub">Nenhum item conhecido neste recorte.</p>}<Pager meta={items.data.meta} onChange={setPage} /></>}
+      {items.data && <>{items.data.dados.length ? <ul className="document-list">{items.data.dados.map(item => <li key={item.id}><Link className="link-a" to={selectionLink(`/itens/${item.id}`, location.search)}>Item {item.numero_item} · {item.descricao}</Link></li>)}</ul> : <p className="sub">Nenhum item conhecido neste recorte.</p>}<Pager meta={items.data.meta} onChange={setPage} /></>}
     </section>
     <Documents key={`${baseId}:${id}`} processId={id} baseId={baseId} />
     <Aviso detalhe />

@@ -83,3 +83,45 @@ class RunPage(BaseModel):
     tamanho_pagina: int
     total: int
     total_paginas: int
+
+
+class ProcessAnalysisSelection(AnalysisPage):
+    modelo_id: UUID | None = None
+
+
+class ProcessScore(BaseModel):
+    id: UUID
+    modelo_id: UUID
+    algoritmo: str
+    metodo: str
+    status: Literal["nao_analisado", "parcial", "analisado_experimental"]
+    score_processo: Money | None
+    indice_observado: Money | None
+    limite_inferior: Money | None
+    limite_superior: Money | None
+    motivo: str | None
+    cobertura: dict[str, Any]
+    sinais: dict[str, Any]
+    contexto: dict[str, Any]
+
+
+class ProcessAnalysis(BaseModel):
+    id: UUID
+    processo_versao_id: UUID
+    numero_compra: str
+    objeto: str
+    orgao_nome: str
+    status: Literal["disponivel", "sem_sintese"]
+    resultados: list[ProcessScore]
+    prioridade_auditoria: None = None
+
+
+class AnalysisProcessPage(BaseModel):
+    execucao_id: UUID
+    base_id: UUID
+    experimental: Literal[True] = True
+    dados: list[ProcessAnalysis]
+    pagina: int
+    tamanho_pagina: int
+    total: int
+    total_paginas: int

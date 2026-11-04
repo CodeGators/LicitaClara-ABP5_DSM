@@ -20,3 +20,9 @@ Testes: `npm test` (cliente HTTP/decimais), `npm run test:e2e` (browser com fixt
 Instruções completas e resultados em FRONTEND_CONSULTAS_REAIS.md (documentação local). Revisão persistente, ranking e exportação real continuam no plano de conclusão (documentação local). O botão de exportação da demonstração abre a impressão do navegador; a opção CSV demonstrativa ainda não gera CSV.
 
 O painel, ranking e fornecedores reais (documentação local) compartilha base/execução/modelo e filtros; leia as definições de universo, valores, HHI e indisponibilidade antes de interpretar os indicadores.
+
+O detalhe do processo apresenta a síntese experimental quando a URL fixa
+`base_id` e `execucao_id`. Exibe separadamente score integral, média dos sinais
+disponíveis, cobertura oficial e links para os itens. Cobertura parcial mantém
+o score integral indisponível. Os modelos continuam separados, sem botão de
+execução ou faixas de fraude. API e banco devem estar na migração `0006_sinteses`.

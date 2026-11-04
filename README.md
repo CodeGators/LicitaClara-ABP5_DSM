@@ -23,7 +23,7 @@ O frontend incorporou a entrega de 01/11/2026 e a integração de consultas reai
 | `infra/` | PostgreSQL local com Docker Compose e documentação |
 | `.github/workflows/` | CI Python com PostgreSQL descartável e build do frontend |
 
-Além do protótipo visual, há uma API FastAPI com consultas de processos, itens e documentos (documentação local) e ambiente PostgreSQL local. O esquema PostgreSQL tem 34 tabelas versionadas por Alembic. O coletor em lote já baixa e registra ZIPs reais; a preparação/importação de um recorte CATMAT está implementada. Um ensaio do núcleo de ML (documentação local) treinou Isolation Forest com dados reais; sua utilidade para auditoria aguarda revisão independente. Não há modelo ou score publicado em produção. Nenhuma infraestrutura de nuvem foi provisionada. Compras.gov.br é a fonte principal; PNCP complementa a aquisição de metadados de documentos e detalhe contratual; Portal da Transparência permanece como diagnóstico histórico.
+Além do protótipo visual, há uma API FastAPI com consultas de processos, itens e documentos (documentação local) e ambiente PostgreSQL local. O esquema PostgreSQL tem 35 tabelas versionadas por Alembic. O coletor em lote já baixa e registra ZIPs reais; a preparação/importação de um recorte CATMAT está implementada. Um ensaio do núcleo de ML (documentação local) treinou Isolation Forest com dados reais; sua utilidade para auditoria aguarda revisão independente. Não há modelo ou score publicado em produção. Nenhuma infraestrutura de nuvem foi provisionada. Compras.gov.br é a fonte principal; PNCP complementa a aquisição de metadados de documentos e detalhe contratual; Portal da Transparência permanece como diagnóstico histórico.
 
 ## Executar o frontend
 

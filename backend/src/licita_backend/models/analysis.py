@@ -202,3 +202,51 @@ sa.Index(
     unique=True,
     postgresql_where=publicacoes_analise.c.ativa.is_(True),
 )
+
+# Síntese descritiva por modelo: prioridade de auditoria permanece separada.
+sinteses_processo_modelo = table(
+    "sinteses_processo_modelo",
+    "analise",
+    pk(),
+    uid("base_id"),
+    uid("execucao_id"),
+    uid("modelo_id"),
+    uid("processo_versao_id"),
+    text("metodo"),
+    text("status"),
+    sa.Column("score", SCORE, nullable=True),
+    sa.Column("indice_observado", SCORE, nullable=True),
+    sa.Column("limite_inferior", SCORE, nullable=True),
+    sa.Column("limite_superior", SCORE, nullable=True),
+    text("motivo", nullable=True),
+    json("cobertura"),
+    json("sinais"),
+    json("contexto"),
+    timestamp(),
+    base_fk("execucoes_analise", "execucao_id"),
+    base_fk("processos_versoes", "processo_versao_id"),
+    sa.ForeignKeyConstraint(
+        ["execucao_id", "modelo_id"],
+        ["execucoes_modelos.execucao_id", "execucoes_modelos.modelo_id"],
+    ),
+    unique("execucao_id", "modelo_id", "processo_versao_id"),
+    choices("status", ["nao_analisado", "parcial", "analisado_experimental"]),
+    check(
+        "(status='analisado_experimental' AND score IS NOT NULL AND motivo IS NULL "
+        "AND indice_observado IS NOT NULL) OR "
+        "(status='parcial' AND score IS NULL AND indice_observado IS NOT NULL "
+        "AND motivo IS NOT NULL) OR "
+        "(status='nao_analisado' AND score IS NULL AND indice_observado IS NULL "
+        "AND motivo IS NOT NULL)",
+        "estado_score",
+    ),
+    check("score IS NULL OR score BETWEEN 0 AND 100", "score_intervalo"),
+    check("indice_observado IS NULL OR indice_observado BETWEEN 0 AND 100", "observado_intervalo"),
+    check(
+        "(limite_inferior IS NULL AND limite_superior IS NULL) OR "
+        "(limite_inferior IS NOT NULL AND limite_superior IS NOT NULL "
+        "AND limite_inferior BETWEEN 0 AND 100 "
+        "AND limite_superior BETWEEN limite_inferior AND 100)",
+        "limites_coerentes",
+    ),
+)

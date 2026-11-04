@@ -57,7 +57,7 @@ Configuração, propriedade do esquema, sessões e contratos: CONTRATOS_BACKEND_
 
 ## Migrações e papéis
 
-Revisão atual: `0004_complementos` (após `0001_coleta`, `0002_dominio` e `0003_proveniencia`). São 34 tabelas; propostas, contratos e anexos estão descritos no diagnóstico complementar (documentação local).
+Revisão atual: `0006_sinteses` (inclui análise por resultado da `0005_resultados`). São 35 tabelas; propostas, contratos e anexos estão descritos no diagnóstico complementar (documentação local).
 
 `MIGRATION_DATABASE_URL` é uma conexão administrativa separada de `DATABASE_URL`. Não é usada pela aplicação HTTP. Os comandos de instalação acima criam os grupos NOLOGIN, aplicam migrações sob o papel proprietário, concedem permissões e geram logins locais de API/coleta/processamento.
 
@@ -88,3 +88,10 @@ Os scores continuam nulos com análise `nao_publicada`. Valores globais do proce
 A inferência/publicação versionada (documentação local) registra treino/modelos, cobertura por resultado e canal experimental explícito; o piloto atual tem zero scores elegíveis.
 
 O painel, ranking e fornecedores reais (documentação local) compartilha base/execução/modelo e filtros; leia as definições de universo, valores, HHI e indisponibilidade antes de interpretar os indicadores.
+
+Sínteses experimentais por processo/modelo ficam em `sinteses_processo_modelo`,
+separadas da prioridade de auditoria. As consultas publicadas
+`/api/v1/analises/execucoes/{id}/processos` e `/processos/{processo_id}` exigem
+`base_id` explícito e aceitam `modelo_id`. Score integral permanece nulo se
+o universo oficial ou a cobertura forem insuficientes; a média observada é
+um campo distinto. Não há faixas de fraude ou combinação de algoritmos.

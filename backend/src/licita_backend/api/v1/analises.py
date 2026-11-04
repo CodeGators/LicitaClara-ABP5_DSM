@@ -6,11 +6,14 @@ from sqlalchemy.orm import Session
 
 from licita_backend.db.session import get_session
 from licita_backend.repositories.analises import AnalysisRepository
+from licita_backend.repositories.process_analysis import ProcessAnalysisRepository
 from licita_backend.schemas.analises import (
     ActivePublication,
     AnalysisItemPage,
     AnalysisPage,
+    AnalysisProcessPage,
     AnalysisSelection,
+    ProcessAnalysisSelection,
     Run,
     RunPage,
 )
@@ -56,3 +59,22 @@ def item(
         AnalysisPage(base_id=params.base_id),
         item_id,
     )
+
+
+@router.get("/execucoes/{execution_id}/processos", response_model=AnalysisProcessPage)
+def processes(
+    execution_id: UUID, session: DB, params: Annotated[ProcessAnalysisSelection, Query()]
+):
+    execution = AnalysisRepository(session).execution(params.base_id, execution_id)
+    return ProcessAnalysisRepository(session).page(execution, params)
+
+
+@router.get("/execucoes/{execution_id}/processos/{process_id}", response_model=AnalysisProcessPage)
+def process(
+    execution_id: UUID,
+    process_id: UUID,
+    session: DB,
+    params: Annotated[ProcessAnalysisSelection, Query()],
+):
+    execution = AnalysisRepository(session).execution(params.base_id, execution_id)
+    return ProcessAnalysisRepository(session).page(execution, params, process_id)

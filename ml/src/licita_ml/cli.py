@@ -60,6 +60,8 @@ def main():
     temporal.add_argument("--dataset", required=True, type=Path)
     temporal.add_argument("--base-id", type=UUID)
     temporal.add_argument("--resultado-ate", type=date.fromisoformat)
+    process = commands.add_parser("sintetizar-processos")
+    process.add_argument("--execucao-origem", required=True, type=UUID)
     publish = commands.add_parser("publicar-experimental")
     publish.add_argument("--execucao", required=True, type=UUID)
     args = parser.parse_args()
@@ -82,7 +84,15 @@ def main():
             pool_pre_ping=True,
             connect_args={"connect_timeout": 10},
         )
-        if args.command == "inferir-temporal":
+        if args.command == "sintetizar-processos":
+            from licita_ml.inference.pipeline import InferencePipeline
+            from licita_ml.inference.processes import run
+
+            result = run(
+                InferencePipeline(settings, Repository(engine), storage(settings)),
+                args.execucao_origem,
+            )
+        elif args.command == "inferir-temporal":
             from licita_ml.inference.pipeline import InferencePipeline
             from licita_ml.inference.temporal import infer_sql
 

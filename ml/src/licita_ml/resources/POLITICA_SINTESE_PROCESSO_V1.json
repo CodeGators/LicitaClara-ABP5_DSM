@@ -1,0 +1,16 @@
+{
+  "versao": "media-hierarquica-cobertura-integral-v1",
+  "tipo": "indice_descritivo_experimental",
+  "entrada": "cdf-treino-v1",
+  "algoritmos_combinados": false,
+  "grupos_modelos_combinados": false,
+  "media_resultados_por_item": "pesos_iguais_entre_resultados_ativos_do_item",
+  "media_itens_por_processo": "pesos_iguais_entre_todos_itens_do_snapshot_oficial",
+  "score_pontual": "somente_universo_oficial_confirmado_e_todos_itens_resultados_pontuados",
+  "ausencias": "intervalos_deterministicos_0_100_sem_imputacao",
+  "indice_observado": "media_hierarquica_apenas_dos_sinais_observados_nao_e_score_integral",
+  "limites": "identificacao_da_media_condicional_a_cobertura_nao_intervalo_de_confianca",
+  "prioridade_auditoria": null,
+  "utilidade_validada": false,
+  "condicao_limites": "hipotese_de_indices_compativeis_0_100_para_todos_os_alvos"
+}

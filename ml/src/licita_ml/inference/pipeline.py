@@ -246,7 +246,18 @@ class InferencePipeline:
             )
 
     def persist(
-        self, cn, models, bases, base, data, config, scores, coverage, factors, fail_after=None
+        self,
+        cn,
+        models,
+        bases,
+        base,
+        data,
+        config,
+        scores,
+        coverage,
+        factors,
+        fail_after=None,
+        process_summaries=None,
     ):
         """Reconciliação/transação comum aos contratos antigo e temporal."""
         base_id = base["id"]
@@ -261,6 +272,18 @@ class InferencePipeline:
             record["execucao_id"] = execution_id
         for factor in factors:
             factor["resultado_modelo_id"] = score_ids[factor["resultado_modelo_id"]]
+        if process_summaries is not None:
+            for row in process_summaries:
+                row["execucao_id"] = execution_id
+                row["id"] = identifier(
+                    "sinteses_processo_modelo",
+                    f"{execution_id}:{row['processo_versao_id']}:{row['modelo_id']}",
+                )
+                for item in row["sinais"]["itens"]:
+                    for result in item["resultados"]:
+                        result["resultado_modelo_id"] = str(
+                            score_ids[UUID(result["resultado_modelo_id"])]
+                        )
         summary = {
             "itens": len(data["itens_versoes"]),
             "alvos_modelos": len(coverage),
@@ -282,6 +305,13 @@ class InferencePipeline:
             "prioridade_auditoria": None,
             "agregacao_processo": "indisponivel_sem_politica_validada",
         }
+        if process_summaries is not None:
+            manifest["sinteses_processo"] = process_summaries
+            manifest["agregacao_processo"] = config["sintese_processo"]
+            summary["sinteses_processo"] = len(process_summaries)
+            summary["processos_modelos_com_score_integral"] = sum(
+                r["score"] is not None for r in process_summaries
+            )
         serialized = (canonical(manifest) + "\n").encode()
         if len(serialized) > 64 * 1024**2:
             raise ValueError("Manifesto excede 64 MiB; dividir lote")
@@ -322,7 +352,7 @@ class InferencePipeline:
                 .values(
                     id=execution_id,
                     base_id=base_id,
-                    versao_politica_score="experimental-v1",
+                    versao_politica_score=config.get("sintese_processo", "experimental-v1"),
                     configuracao=recorded_config,
                 )
                 .on_conflict_do_nothing()
@@ -381,6 +411,8 @@ class InferencePipeline:
                     raise RuntimeError("Falha controlada antes da cobertura")
                 if factors:
                     cn.execute(self.tables["fatores_sinalizacao"].insert(), factors)
+                if process_summaries:
+                    cn.execute(self.tables["sinteses_processo_modelo"].insert(), process_summaries)
                 for process in data["processos_versoes"]:
                     cn.execute(
                         self.tables["avaliacoes_processo"]
@@ -390,8 +422,20 @@ class InferencePipeline:
                             execucao_id=execution_id,
                             processo_versao_id=process["id"],
                             prioridade="nao_analisado",
-                            motivo_indisponibilidade="SEM_POLITICA_AGREGACAO_PROCESSO",
-                            politica={"experimental": True, "score_processo": None},
+                            motivo_indisponibilidade=(
+                                "PRIORIDADE_AUDITORIA_NAO_VALIDADA"
+                                if process_summaries is not None
+                                else "SEM_POLITICA_AGREGACAO_PROCESSO"
+                            ),
+                            politica={
+                                "experimental": True,
+                                "score_processo": None,
+                                **(
+                                    {"sintese_por_modelo": config["sintese_processo"]}
+                                    if process_summaries is not None
+                                    else {}
+                                ),
+                            },
                         )
                     )
                 self.reconcile(cn, execution_id, base_id, recorded_config)
@@ -485,6 +529,25 @@ class InferencePipeline:
             )
             if frozen is None or canonical({k: factor[k] for k in frozen}) != canonical(frozen):
                 raise ValueError("Explicação persistida diverge")
+        summaries = self.tables["sinteses_processo_modelo"]
+        actual_summaries = (
+            cn.execute(sa.select(summaries).where(summaries.c.execucao_id == execution_id))
+            .mappings()
+            .all()
+        )
+        frozen_summaries = {r["id"]: r for r in manifest.get("sinteses_processo", [])}
+        if len(actual_summaries) != len(frozen_summaries):
+            raise ValueError("Sínteses de processo incompletas")
+        for row in actual_summaries:
+            frozen = frozen_summaries.get(str(row["id"]))
+            if frozen is None or canonical({k: row[k] for k in frozen}) != canonical(frozen):
+                raise ValueError("Síntese de processo diverge do snapshot")
+        if "sinteses_processo" in manifest:
+            expected_pairs = {(p, m) for p in manifest["processos"] for m in config["modelos"]}
+            if {
+                (str(r["processo_versao_id"]), str(r["modelo_id"])) for r in actual_summaries
+            } != expected_pairs:
+                raise ValueError("Cobertura de sínteses por processo/modelo incompleta")
         assessments = self.tables["avaliacoes_processo"]
         processes = list(
             cn.scalars(

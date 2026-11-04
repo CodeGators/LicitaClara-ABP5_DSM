@@ -316,3 +316,61 @@ A API existente `/api/v1/analises` consulta a publicação experimental e os
 resultados por base/execução explícitas. Valores 0–100 são posições na distribuição
 de treino, não probabilidade de fraude nem faixas de prioridade. Não há score
 por processo nesta entrega. A base antiga e suas publicações permanecem acessíveis.
+
+## Síntese experimental por processo (ML-06)
+
+Após aplicar a migração `0006_sinteses`, a inferência de itens pode originar uma
+nova execução com sínteses por processo e por modelo, preservando a anterior:
+
+```bash
+uv run --locked --all-packages --extra validation licita-ml sintetizar-processos \
+  --execucao-origem UUID_DA_INFERENCIA_DE_ITENS
+uv run --locked --all-packages --extra validation licita-ml publicar-experimental \
+  --execucao UUID_DA_NOVA_EXECUCAO
+```
+
+Não retreina nem carrega modelos. Copia os scores e fatores verificados da origem,
+reconcilia seus vínculos, verifica os snapshots de itens/resultados API já
+vinculados à base e persiste tudo em transação. Não faz novas requisições HTTP.
+Repetir a mesma origem/código/política/fontes reutiliza a execução concluída.
+
+A política `POLITICA_SINTESE_PROCESSO_V1.json` define uma média hierárquica:
+primeiro média dos índices dos resultados ativos do mesmo item; depois média
+dos itens do processo. Cada item tem peso igual, independentemente da quantidade
+de vencedores, preço, quantidade física ou valor global. Não combina algoritmos
+nem modelos/grupos diferentes. A média é um índice descritivo, não o percentil
+do processo, risco de fraude ou evidência de utilidade validada. Pode diluir um
+sinal raro; os sinais e pesos permanecem disponíveis para inspeção.
+
+**Score integral só existe quando o universo oficial no snapshot foi confirmado
+e todos os seus itens têm todos os resultados ativos analisados pelo modelo.**
+CSV filtrado por catálogo e quantidade de itens importados não comprovam esse
+universo. Itens com várias versões na API contam uma vez; versões conflitantes
+impedem confirmar o universo. Itens sem resultados continuam sem índice.
+
+Com cobertura parcial, o score integral é nulo. A média dos sinais disponíveis
+é outra medida, acompanhada de fontes, contagens, pesos e IDs dos resultados.
+Quando o universo é confirmado, limites determinísticos indicam a amplitude da
+média sob a hipótese de índices comparáveis entre 0 e 100 para os alvos ausentes.
+Não imputam valores, não são intervalo de confiança e não garantem aplicabilidade
+do modelo a outras categorias. Sem universo confirmado, limites também são nulos.
+Prioridade de auditoria continua separada e indisponível, sem faixas arbitrárias.
+
+A API publicada expõe `/api/v1/analises/execucoes/{id}/processos` e
+`/api/v1/analises/execucoes/{id}/processos/{processo_id}`, com `base_id` explícito
+e `modelo_id` opcional. Filtros de itens não recalculam a síntese da compra.
+Versões antigas retornam `sem_sintese`; a publicação anterior continua acessível.
+O detalhe do processo no frontend apresenta cobertura e links para os sinais.
+
+No ensaio real, 19 processos geraram 38 sínteses, sem scores integrais: quatro
+sínteses têm sinais (dois processos × dois modelos), com cobertura de um item
+entre 78 e de um entre 221 nas fontes oficiais. Os quatro scores de resultados
+ML-05 foram preservados. Os demais processos não recebem zeros artificiais.
+O caminho de score integral é testado em dados controlados com cobertura completa;
+isso não é evidência de cobertura integral nas licitações reais ou validação humana.
+
+```bash
+uv run --locked --all-packages --extra validation pytest \
+  ml/tests/test_process_scores.py ml/tests/test_process_universe.py \
+  ml/tests/test_process_inference.py -q
+```

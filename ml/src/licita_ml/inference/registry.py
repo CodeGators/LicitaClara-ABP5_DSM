@@ -32,6 +32,7 @@ EXTRA = [
     "avaliacoes_processo",
     "fatores_sinalizacao",
     "publicacoes_analise",
+    "sinteses_processo_modelo",
 ]
 POLICY = RESOURCE_DIR / "POLITICA_INFERENCIA_EXPERIMENTAL_V1.md"
 
