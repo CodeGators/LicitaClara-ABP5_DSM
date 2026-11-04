@@ -70,9 +70,13 @@ Documentos de apoio:
 
 ## Etapa atual e próximo passo
 
-**Etapa atual:** 08 — painel, ranking experimental e fornecedores integrados e verificados na branch `feat/08-painel-ranking-fornecedores`, pronta para teste do usuário. As telas mostram dados oficiais e ausência de índices no piloto, sem fallback fictício.
+**Prioridade atual, definida pelo usuário:** corrigir e validar primeiro o núcleo de ML. Não iniciar 09–13, novas telas ou o botão de análise enquanto a trilha ML abaixo não tiver dados e resultados reais verificáveis. As entregas anteriores continuam preservadas; seus checkboxes representam o escopo técnico entregue, não a conclusão do objetivo analítico completo.
 
-**Próxima etapa:** após teste e integração autorizada de 08, implementar identidade/autorização e revisão persistente (09). Ainda não existe ranking validado de auditoria nem revisão humana independente concluída. A etapa 08 não foi integrada à `main` nem enviada ao GitHub.
+**Etapa 08:** código e testes concluídos na branch `feat/08-painel-ranking-fornecedores`, commit `49ec548`; ainda sem integração à `main` ou envio remoto. A consulta do usuário identificou que o seletor de execuções é pouco intuitivo. A mudança de fluxo está registrada abaixo para implementação posterior.
+
+**Próximo trabalho:** ML-01 — diagnosticar os arquivos locais e propor recorte, vínculos e divisão temporal, antes de solicitar novos downloads ou treinar novamente. Não assumir que todos os anos ou categorias têm dados suficientes.
+
+**Esta atualização documental:** branch `docs/replanejamento-ml`, derivada de 08 para preservar seu contexto. Exceção limitada à documentação: não integra 08 implicitamente. Antes da implementação ML-01, consolidar a base das branches conforme autorização do usuário; não fazer merge/push automático.
 
 **Pendências externas:** acesso ao Figma; pareceres humanos independentes (usuário não tem revisor confirmado; alternativa técnica documentada sem aprovar utilidade); definição/provisionamento da hospedagem. Não impedem iniciar consolidação, contratos e consultas reais.
 
@@ -94,6 +98,56 @@ Documentos de apoio:
 - [ ] 13 — Validar fluxo completo e preparar entrega acadêmica reproduzível.
 
 As branches 00–08 foram criadas; as demais são planejadas. Etapas grandes podem ser divididas em tarefas com branches próprias, mantendo o ID e atualizando este plano. Não marcar todas as etapas como prontas só porque a interface compila.
+
+## Replanejamento prioritário — ML antes das próximas funcionalidades
+
+Decisões acordadas em 03/11/2026 após revisão da proposta original e esclarecimentos ao usuário. Esta ordem substitui a indicação anterior de iniciar 09 imediatamente após 08.
+
+### Objetivo e lacunas reais
+
+- A proposta original exige **score explicável por processo/licitação**. Scores por resultado de item ajudam a explicar a compra, mas não substituem esse requisito.
+- Hoje IF e Autoencoder usam duas entradas: log(preço/mediana de treino) e log(1+quantidade), em um grupo restrito. Identificadores, descrições e unidades são usados na preparação e rastreabilidade, não como números contínuos no modelo.
+- Existem duas execuções publicadas sobre a mesma base piloto de dez itens. Ambas verificaram elegibilidade, mas produziram zero scores: quatro itens anteriores ao corte de treino, quatro sem referência exata compatível e dois sem resultado conhecido. Reexecutar sem resolver os impedimentos não gera scores.
+- Os modelos foram tecnicamente treinados e recarregados; isso não comprova utilidade para auditoria. A nova trilha deve demonstrar inferência real em dados posteriores elegíveis e concluir a análise por processo.
+- Anomalia não é prova nem probabilidade de fraude. Não definir faixas, pesos ou agregações arbitrárias para preencher a interface.
+
+### Organização dos dados acordada
+
+**Originais preservados → Python reproduzível → base organizada → tabelas analíticas temporais → modelos → inferência e resultados rastreáveis.**
+
+- Preservar os CSVs/ZIPs originais; não corrigir manualmente nem sobrescrever fontes, ensaios ou modelos existentes.
+- Gerar cópias organizadas por scripts Python: cruzamento por chaves oficiais, tipos, versões/duplicatas, datas, unidades, situações e rejeições justificadas. Não inventar vínculos ou completar ausências com zero.
+- Salvar a base organizada em Parquet e disponibilizar exportação CSV para inspeção humana. Documentar granularidade, colunas, unidades, chaves, contagens e proveniência. Arquivos gerados ficam fora do Git; versionar scripts, regras, dicionário e evidências agregadas.
+- Separar organização dos registros de atributos dependentes do treino. Medianas, escalas, codificações aprendidas e outros ajustes usam somente treino; avaliação e aplicação reutilizam as transformações congeladas.
+- IDs e textos permanecem associados para explicação e rastreabilidade. Somente atributos numéricos escolhidos entram nos modelos; muitos campos de origem não significam muitas entradas.
+- Aproveitar leitores, normalização, experimentos, pipeline analítico e artefatos existentes. Registrar o que é reaproveitado, corrigido ou substituído, sem reconstruir tudo desnecessariamente.
+
+### Checklist da trilha ML e critérios de aceitação
+
+Cada item é uma tarefa com branch própria. Entregar instruções de execução/inspeção, testes proporcionais, evidências e status OK/parcial antes de avançar. Branches abaixo são planejadas.
+
+- [ ] **ML-01 — Diagnóstico e contrato analítico** (`docs/ml-01-diagnostico-recorte`). Inventariar arquivos e cobertura temporal; medir preenchimento, chaves, versões, vínculos entre compras/itens/resultados/preços e diversidade. Definir observação de item/fornecedor e de processo, categoria(s), órgão(s), atributos iniciais e requisitos mínimos. **Aceitação:** relatório com contagens verificáveis, lacunas, recorte justificado e lista exata de downloads faltantes. Não escolher o recorte apenas para obter scores altos.
+- [ ] **ML-02 — Base organizada reproduzível** (`feat/ml-02-base-organizada`). Gerar Parquet e exportação CSV inspecionável, dicionário, manifesto/hashes, contagens e rejeições. Preservar resultados de fornecedores distintos e evitar multiplicação de valores em joins. **Aceitação:** mesmas entradas geram conteúdo equivalente; preços, quantidades, unidades e vínculos reconciliados em amostra e checagens agregadas; originais intactos.
+- [ ] **ML-03 — Divisão temporal e atributos** (`feat/ml-03-atributos-temporais`). Fixar treino, avaliação e aplicação com base no diagnóstico; separar compras entre conjuntos. Investigar 2023–2025 como histórico e 2026 como aplicação, sem tratar esse exemplo como disponibilidade confirmada. Possível desenho: treino 2023–2024, avaliação 2025 e eventual modelo final até dezembro/2025, preservando a avaliação e identificando o retreino como outra versão. Referências históricas por especificação/unidade; contextos de órgão/fornecedor calculados sem futuro nem a própria compra. **Aceitação:** matrizes numéricas finitas, ausências/inelegibilidade explícitas, referências e transformações restritas ao passado e proveniência até a fonte.
+- [ ] **ML-04 — Treino, comparação e avaliação** (`feat/ml-04-treino-avaliacao`). Treinar IF e AE sob o mesmo protocolo; comparar com regra simples de preço relativo à mediana; medir estabilidade, convergência, sensibilidade, recursos e exemplos sinalizados. Manter a avaliação separada do ajuste de parâmetros. **Aceitação:** recarga reproduz resultados, relatório comparativo e revisão qualitativa documentada; sem rótulos não publicar acurácia de fraude. Parecer interno deve ser identificado como interno; revisão independente permanece pendência se indisponível.
+- [ ] **ML-05 — Inferência real posterior** (`feat/ml-05-inferencia-real`). Aplicar modelos congelados em compras reais posteriores e compatíveis, com valores observados fora do treino. Reutilizar registro/versionamento e publicação experimental existentes, adaptando contratos se necessário. **Aceitação:** casos reais com scores, explicações/contexto, hashes e cobertura reconciliados; também casos não elegíveis com motivos. Nenhuma fabricação ou seleção apenas de casos convenientes.
+- [ ] **ML-06 — Score explicável por processo** (`feat/ml-06-score-processo`). Definir atributos de processo e avaliar estratégia de modelagem/agregação com sinais por item; justificar a escolha em vez de média/máximo/pesos implícitos. Considerar quantidade de itens e cobertura parcial, modalidade, concorrência e histórico de fornecedor somente quando os dados sustentarem. **Aceitação:** resultado por licitação rastreável aos sinais e dados, limitações e cobertura explícitas, comparação de casos e ausência de score quando insuficiente; atualizar contratos, política e testes afetados antes de publicar.
+- [ ] **ML-07 — Fechamento do núcleo** (`docs/ml-07-validacao-nucleo`). Registrar comandos, artefatos, recursos, exemplos reais, limitações e protocolo de reprodução; verificar fluxo fonte → base organizada → atributos → modelo salvo → inferência → resultado persistido. **Aceitação:** outra execução reproduz o resultado e o usuário consegue inspecionar os CSVs e conferir exemplos. Declarar separadamente funcionamento técnico e validação de utilidade.
+
+Não declarar a ML concluída apenas porque treinou ou gerou um número. O objetivo inclui avaliação honesta, inferência real e score por processo. A evidência antiga continua histórica; novos testes/métricas são registrados na respectiva entrega.
+
+### Aquisição de novos dados — participação do usuário
+
+O usuário se dispôs a baixar arquivos do Compras.gov quando necessário. Primeiro conferir o material já existente. **Antes de depender de novos dados, avisar quais arquivos baixar, período, módulos, origem oficial e local para colocá-los**, explicando a finalidade. Não baixar grandes históricos nem executar coleta online por iniciativa desta mudança documental.
+
+Fontes candidatas: compras, itens, resultados e pesquisa de preços; propostas para concorrência e contratos/PNCP para assinatura quando o atributo for necessário e a cobertura permitir. Um CSV isolado pode não conter todos os campos. Não exigir todos os módulos para iniciar nem prometer três anos completos sem conferir disponibilidade. Dados ausentes não impedem diagnosticar os arquivos locais.
+
+### Fluxo de uso posterior à ML
+
+- O fluxo esperado pelo usuário é **selecionar licitação → solicitar análise com modelo treinado → persistir → apresentar score e explicações**. Importar primeiro no banco; ML não é pré-requisito para armazenar/consultar a compra.
+- O seletor atual apenas consulta execuções já publicadas; não executa ML. Preservar como histórico ou opção avançada, com rótulos claros.
+- Após fechar a trilha ML, planejar tarefa própria para ação de análise na API/interface, processamento e estados de progresso/erro/inelegibilidade, autorização e reaproveitamento de resultados. Não implementar endpoint de escrita ou botão neste replanejamento.
+- Depois retomar 09–13, atualizando dependências e testes com o contrato analítico final. Esta mudança não apaga entregas anteriores nem autoriza merge/push.
 
 ## Entregas, branches e aceitação
 
