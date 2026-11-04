@@ -1,6 +1,6 @@
 # Preparação e modelagem
 
-O pacote `licita-ml` implementa preparação/importação de dados, avaliação versionada do Isolation Forest e comparação com Autoencoder sobre os atributos analíticos. Os ensaios históricos separados permanecem preservados. A inferência experimental em lote está implementada com registro de treino e publicação versionada; a utilidade do ranking continua inconclusiva por ausência de revisão independente. Veja a [avaliação versionada](../docs/AVALIACAO_ISOLATION_FOREST.md) e o [histórico dos ensaios](../docs/validacao_nucleo/RESULTADO.md).
+O pacote `licita-ml` implementa preparação/importação de dados, avaliação versionada do Isolation Forest e comparação com Autoencoder sobre os atributos analíticos. Os ensaios históricos separados permanecem preservados. A inferência experimental em lote está implementada com registro de treino e publicação versionada; a utilidade do ranking continua inconclusiva por ausência de revisão independente. Veja a avaliação versionada (documentação local) e o histórico dos ensaios (documentação local).
 
 Na raiz do repositório, com PostgreSQL migrado e `PROCESSING_DATABASE_URL` restrita já configurada:
 
@@ -19,7 +19,7 @@ O exemplo representa quatro ou mais IDs reais; se houve aquisição complementar
 
 Repetir período, catálogo, seleção e código reutiliza a base, conferindo os hashes do manifesto, dos Parquets e das rejeições. Uma alteração na origem ou no código gera outra base e mantém o histórico. O status `validada` confirma integridade técnica e reconciliação; não afirma que a base está pronta para treinamento.
 
-Veja [regras, comandos e evidências da etapa 05](../docs/PREPARACAO_E_IMPORTACAO.md).
+Veja regras, comandos e evidências da etapa 05 (documentação local).
 
 ## Configuração
 
@@ -41,11 +41,11 @@ uv sync --locked --all-packages --extra validation
 uv run --locked --all-packages --extra validation python -m licita_ml.experiments.core --offline
 ```
 
-O cache histórico fica em `data/validacao_nucleo/`. Sem `--offline`, consultas ausentes podem ser adquiridas na API oficial; caches existentes são conferidos por URL/hash. Os artefatos e planilhas de revisão ficam fora do Git. O ensaio não escreve no PostgreSQL nem publica scores; a categoria original insuficiente continua separada da coorte alternativa. Consulte o [protocolo](../docs/validacao_nucleo/PROTOCOLO.md) antes de interpretar as métricas. Usar outro `--saida` preserva execuções anteriores; planilhas com pareceres preenchidos não são sobrescritas.
+O cache histórico fica em `data/validacao_nucleo/`. Sem `--offline`, consultas ausentes podem ser adquiridas na API oficial; caches existentes são conferidos por URL/hash. Os artefatos e planilhas de revisão ficam fora do Git. O ensaio não escreve no PostgreSQL nem publica scores; a categoria original insuficiente continua separada da coorte alternativa. Consulte o protocolo (documentação local) antes de interpretar as métricas. Usar outro `--saida` preserva execuções anteriores; planilhas com pareceres preenchidos não são sobrescritas.
 
 ## Revisão documental e confirmação
 
-A [revisão aprofundada](../docs/validacao_nucleo/REVISAO_E_CONFIRMACAO.md) encontrou divergências de especificação apesar de valores corroborados. O ranking não está aprovado para publicação como prioridade de auditoria. O ensaio corrigido exige resultado até o corte; a replicação histórica e a consulta de outubro são reportadas separadamente.
+A revisão aprofundada (documentação local) encontrou divergências de especificação apesar de valores corroborados. O ranking não está aprovado para publicação como prioridade de auditoria. O ensaio corrigido exige resultado até o corte; a replicação histórica e a consulta de outubro são reportadas separadamente.
 
 Com o extra `validation` instalado, na raiz do repositório:
 
@@ -60,12 +60,23 @@ uv run --locked --all-packages --extra validation python -m licita_ml.review_val
 
 Esses comandos usam snapshots existentes conferidos por hash; consultas ausentes acessam as fontes oficiais. Não sobrescrever os caches para simular dados novos. O módulo `documents` requer `pdftotext` (Poppler) no sistema. Downloads têm limite de 16 MiB por documento, transferências por partes, prazo global de 45 segundos e quatro tarefas concorrentes. ZIPs são lidos em memória, com até 100 membros, 64 MiB de expansão total e até seis PDFs por documento; nomes internos não viram caminhos locais. Formatos não suportados e falhas permanecem registrados. Nem todos os anexos puderam ser obtidos.
 
-Os quatro modelos originais não são alterados pelos novos ensaios; os novos artefatos têm diretórios próprios. O dossiê independente não contém flags de algoritmo nem achados do assistente e se recusa a sobrescrever pareceres preenchidos. Nenhum desses comandos publica resultados no PostgreSQL.
+Os quatro modelos originais não são alterados pelos novos ensaios; os novos artefatos têm diretórios próprios. O dossiê independente não contém flags de algoritmo nem achados da conferência automatizada e se recusa a sobrescrever pareceres preenchidos. Nenhum desses comandos publica resultados no PostgreSQL.
 
-Consulte a [base e atributos analíticos](../docs/ATRIBUTOS_ANALITICOS.md) para aquisição histórica registrada, preparo versionado, critérios e testes da etapa 04.
+Consulte a base e atributos analíticos (documentação local) para aquisição histórica registrada, preparo versionado, critérios e testes da etapa 04.
 
-A [avaliação versionada do Isolation Forest](../docs/AVALIACAO_ISOLATION_FOREST.md) consome o dataset analítico, compara regras e prepara revisão documental; utilidade ainda inconclusiva.
+A avaliação versionada do Isolation Forest (documentação local) consome o dataset analítico, compara regras e prepara revisão documental; utilidade ainda inconclusiva.
 
-A [comparação Autoencoder/Isolation Forest](../docs/COMPARACAO_AUTOENCODER.md) usa a mesma coorte e regras de referência, sem vencedor validado ou publicação de scores.
+A comparação Autoencoder/Isolation Forest (documentação local) usa a mesma coorte e regras de referência, sem vencedor validado ou publicação de scores.
 
-A [inferência/publicação versionada](../docs/INFERENCIA_PUBLICACAO.md) registra treino/modelos, cobertura por resultado e canal experimental explícito; o piloto atual tem zero scores elegíveis.
+A inferência/publicação versionada (documentação local) registra treino/modelos, cobertura por resultado e canal experimental explícito; o piloto atual tem zero scores elegíveis.
+
+## Recursos e relatórios
+
+Os protocolos e as regras necessários à execução são distribuídos em
+`src/licita_ml/resources/`, incluindo `exclusoes_v1.json` para o argumento
+`licita-ml atributos --exclusoes ml/src/licita_ml/resources/exclusoes_v1.json`.
+A pasta local `docs/` não é necessária à execução e não é versionada.
+Os relatórios dos experimentos históricos são escritos em
+`data/validacao_nucleo/relatorios/`; executar o experimento original antes
+de comandos de revisão que dependam de seus resultados. Artefatos, dados
+e modelos continuam fora do Git.

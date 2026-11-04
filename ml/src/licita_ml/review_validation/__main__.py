@@ -10,6 +10,7 @@ from pathlib import Path
 
 from licita_ml.experiments.core import write_json
 from licita_ml.experiments.data import clean, history
+from licita_ml.resources import RESOURCE_DIR
 from licita_ml.review_validation.acquisition import ROOT
 from licita_ml.review_validation.documentary import review_case
 
@@ -29,7 +30,7 @@ def main():
     with ThreadPoolExecutor(max_workers=4) as pool:
         reviews = list(pool.map(work, cases))
     assert original_hash == hashlib.sha256(source.read_bytes()).hexdigest()
-    protocol = Path("docs/validacao_nucleo/PROTOCOLO_REVISAO_E_CONFIRMACAO.md")
+    protocol = RESOURCE_DIR / "PROTOCOLO_REVISAO_E_CONFIRMACAO.md"
     report = {
         "executado_em_utc": datetime.now(timezone.utc).isoformat(),
         "sha256_protocolo": hashlib.sha256(protocol.read_bytes()).hexdigest(),

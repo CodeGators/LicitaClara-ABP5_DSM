@@ -13,6 +13,7 @@ import numpy as np
 from licita_ml.experiments.core import write_json
 from licita_ml.experiments.data import clean, history
 from licita_ml.experiments.evaluate import features, top_indices
+from licita_ml.resources import REPORT_DIR
 from licita_ml.review_validation.acquisition import ROOT, pages
 
 START, END = date(2026, 10, 1), date(2026, 10, 19)
@@ -37,7 +38,7 @@ def eligible_new(rows, original_rows, group):
 
 
 def main():
-    old_path = Path("docs/validacao_nucleo/resultado_agregado.json")
+    old_path = REPORT_DIR / "resultado_agregado.json"
     old_report = json.loads(old_path.read_text())
     principal = next(
         m for m in old_report["modelos"] if m["catalogo"] == "486374" and m["modo"] == "principal"

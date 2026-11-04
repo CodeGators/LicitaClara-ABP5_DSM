@@ -18,9 +18,10 @@ from licita_ml.experiments.data import (
     history,
     split_groups,
 )
+from licita_ml.resources import REPORT_DIR, RESOURCE_DIR
 
 DATA = Path("data/validacao_nucleo")
-DOCS = Path("docs/validacao_nucleo")
+DOCS = REPORT_DIR
 
 
 def write_json(path, value):
@@ -152,7 +153,7 @@ def main():
     # Importar dependências opcionais somente quando este ensaio for executado.
     from licita_ml.experiments.evaluate import evaluate
 
-    protocol = DOCS / "PROTOCOLO.md"
+    protocol = RESOURCE_DIR / "PROTOCOLO.md"
     code_files = sorted(Path(__file__).parent.glob("*.py"))
     code_sha = hashlib.sha256(
         b"".join(p.name.encode() + p.read_bytes() for p in code_files)

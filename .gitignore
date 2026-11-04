@@ -171,3 +171,15 @@ venv/
 # Browser test output
 /Frontend-licita-clara/test-results/
 /Frontend-licita-clara/playwright-report/
+
+# Local project notes and assistant context
+/docs/
+AGENTS.md
+CLAUDE.md
+/.codex/
+/.claude/
+/.cursor/
+/.github/copilot-instructions.md
+
+# Python package build output
+/ml/build/

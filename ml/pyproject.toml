@@ -19,3 +19,6 @@ where = ["src"]
 
 [tool.uv.sources]
 licita-shared = { workspace = true }
+
+[tool.setuptools.package-data]
+licita_ml = ["resources/*.md", "resources/*.json"]

@@ -1,10 +1,10 @@
 # Backend — FastAPI
 
-Ambiente local, endpoints operacionais, consultas versionadas de processos/itens/documentos e esquema PostgreSQL com quatro migrações implementados. O coletor e a preparação/importação estão operacionais. Os ensaios de ML permanecem sem publicação de scores. Veja os [contratos, filtros e comandos da etapa 06](../docs/API_CONSULTAS.md).
+Ambiente local, endpoints operacionais, consultas versionadas de processos/itens/documentos e esquema PostgreSQL com quatro migrações implementados. O coletor e a preparação/importação estão operacionais. Os ensaios de ML permanecem sem publicação de scores. Veja os contratos, filtros e comandos da etapa 06 (documentação local).
 
-A etapa 02 do plano de conclusão acrescenta `GET /api/v1/itens` e `GET /api/v1/itens/{item_id}`. Esses endpoints retornam uma linha por item, contexto do processo e resultados por fornecedor, sem modificar as sete rotas originais. Ver [contratos de itens/processos e testes manuais](../docs/CONTRATOS_ITENS_PROCESSOS.md).
+A etapa 02 do plano de conclusão acrescenta `GET /api/v1/itens` e `GET /api/v1/itens/{item_id}`. Esses endpoints retornam uma linha por item, contexto do processo e resultados por fornecedor, sem modificar as sete rotas originais. Ver contratos de itens/processos e testes manuais (documentação local).
 
-A etapa 03 integra a interface e acrescenta `GET /api/v1/fornecedores/opcoes` para o filtro, com busca/paginação e nome histórico da base. [Configuração e testes do frontend integrado](../docs/FRONTEND_CONSULTAS_REAIS.md).
+A etapa 03 integra a interface e acrescenta `GET /api/v1/fornecedores/opcoes` para o filtro, com busca/paginação e nome histórico da base. Configuração e testes do frontend integrado (documentação local).
 
 ## Instalar e executar
 
@@ -53,11 +53,11 @@ uv run --locked --all-packages --extra validation pytest
 
 `TEST_DATABASE_URL` deve apontar para banco descartável com nome terminado em `_test`. Se ausente, os testes de integração são pulados; para validar a etapa completa, eles devem executar. As tabelas temporárias de teste têm nomes exclusivos e são removidas ao terminar. Nunca apontar os testes para o banco da aplicação.
 
-Configuração, propriedade do esquema, sessões e contratos: [CONTRATOS_BACKEND_E_DADOS.md](../docs/CONTRATOS_BACKEND_E_DADOS.md).
+Configuração, propriedade do esquema, sessões e contratos: CONTRATOS_BACKEND_E_DADOS.md (documentação local).
 
 ## Migrações e papéis
 
-Revisão atual: `0004_complementos` (após `0001_coleta`, `0002_dominio` e `0003_proveniencia`). São 34 tabelas; propostas, contratos e anexos estão descritos no [diagnóstico complementar](../docs/DIAGNOSTICO_PARTICIPACOES_CONTRATOS_DOCUMENTOS.md).
+Revisão atual: `0004_complementos` (após `0001_coleta`, `0002_dominio` e `0003_proveniencia`). São 34 tabelas; propostas, contratos e anexos estão descritos no diagnóstico complementar (documentação local).
 
 `MIGRATION_DATABASE_URL` é uma conexão administrativa separada de `DATABASE_URL`. Não é usada pela aplicação HTTP. Os comandos de instalação acima criam os grupos NOLOGIN, aplicam migrações sob o papel proprietário, concedem permissões e geram logins locais de API/coleta/processamento.
 
@@ -73,11 +73,11 @@ uv run --locked --package licita-backend alembic history
 
 Após mudar as credenciais, reiniciar a API para que ela leia o `.env`. `upgrade head` aplica apenas revisões pendentes. Não editar revisões já compartilhadas: criar uma nova migração para alterações posteriores. Downgrades removem estruturas e devem ficar restritos a bancos descartáveis ou a recuperação planejada; os testes exercitam downgrade em schemas próprios no banco `_test`, sem tocar no banco da aplicação.
 
-O dicionário implementado, chaves, snapshots e permissões estão em [BANCO_DE_DADOS.md](../docs/BANCO_DE_DADOS.md). Propostas, contratos e documentos já possuem diagnóstico e esquema na revisão `0004_complementos`; cobertura real e vínculos dependem do recorte importado. O piloto atual não tem propostas ou contratos vinculáveis.
+O dicionário implementado, chaves, snapshots e permissões estão em BANCO_DE_DADOS.md (documentação local). Propostas, contratos e documentos já possuem diagnóstico e esquema na revisão `0004_complementos`; cobertura real e vínculos dependem do recorte importado. O piloto atual não tem propostas ou contratos vinculáveis.
 
 ## Consultas de dados reais
 
-As consultas de leitura estão disponíveis no [Swagger e contrato da API](../docs/API_CONSULTAS.md). Aceitam seleção de base por UUID; sem seleção explícita, usam a base validada mais recente. A interface real fixa essa base na URL para as requisições relacionadas. Para preservar as dependências do ensaio ML no mesmo ambiente, executar:
+As consultas de leitura estão disponíveis no Swagger e contrato da API (documentação local). Aceitam seleção de base por UUID; sem seleção explícita, usam a base validada mais recente. A interface real fixa essa base na URL para as requisições relacionadas. Para preservar as dependências do ensaio ML no mesmo ambiente, executar:
 
 ```bash
 uv run --locked --all-packages --extra validation uvicorn licita_backend.main:create_app --factory --reload --host 127.0.0.1 --port 8000 --no-access-log
@@ -85,6 +85,6 @@ uv run --locked --all-packages --extra validation uvicorn licita_backend.main:cr
 
 Os scores continuam nulos com análise `nao_publicada`. Valores globais do processo e dos itens do recorte são campos distintos; consultar a documentação antes de usá-los em totais ou filtros.
 
-A [inferência/publicação versionada](../docs/INFERENCIA_PUBLICACAO.md) registra treino/modelos, cobertura por resultado e canal experimental explícito; o piloto atual tem zero scores elegíveis.
+A inferência/publicação versionada (documentação local) registra treino/modelos, cobertura por resultado e canal experimental explícito; o piloto atual tem zero scores elegíveis.
 
-O [painel, ranking e fornecedores reais](../docs/PAINEL_RANKING_FORNECEDORES.md) compartilha base/execução/modelo e filtros; leia as definições de universo, valores, HHI e indisponibilidade antes de interpretar os indicadores.
+O painel, ranking e fornecedores reais (documentação local) compartilha base/execução/modelo e filtros; leia as definições de universo, valores, HHI e indisponibilidade antes de interpretar os indicadores.

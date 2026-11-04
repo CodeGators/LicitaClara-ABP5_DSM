@@ -21,6 +21,7 @@ from licita_ml.comparison.pipeline import code_hash as comparison_code_hash
 from licita_ml.comparison.pipeline import convert
 from licita_ml.experiments.evaluate import features, train_reference
 from licita_ml.repository import identifier
+from licita_ml.resources import RESOURCE_DIR
 from licita_ml.validation.pipeline import load_groups, read_manifest
 
 EXTRA = [
@@ -32,7 +33,7 @@ EXTRA = [
     "fatores_sinalizacao",
     "publicacoes_analise",
 ]
-POLICY = Path(__file__).resolve().parents[4] / "docs/POLITICA_INFERENCIA_EXPERIMENTAL_V1.md"
+POLICY = RESOURCE_DIR / "POLITICA_INFERENCIA_EXPERIMENTAL_V1.md"
 
 
 def tables(repo):

@@ -25,10 +25,11 @@ from licita_ml.experiments.evaluate import (
     top_indices,
     train_reference,
 )
+from licita_ml.resources import RESOURCE_DIR
 from licita_ml.validation.pipeline import load_groups, read_manifest
 from licita_ml.validation.review import blind_csv, sample, summarize
 
-PROTOCOL = Path(__file__).resolve().parents[4] / "docs/validacao_nucleo/PROTOCOLO_AUTOENCODER_V1.md"
+PROTOCOL = RESOURCE_DIR / "PROTOCOLO_AUTOENCODER_V1.md"
 
 
 def code_hash():

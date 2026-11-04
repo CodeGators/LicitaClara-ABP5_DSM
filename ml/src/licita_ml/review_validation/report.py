@@ -9,9 +9,10 @@ from decimal import Decimal
 from pathlib import Path
 
 from licita_ml.experiments.core import write_json
+from licita_ml.resources import REPORT_DIR, RESOURCE_DIR
 from licita_ml.review_validation.acquisition import ROOT
 
-DOCS = Path("docs/validacao_nucleo")
+DOCS = REPORT_DIR
 
 
 def load(name):
@@ -134,7 +135,7 @@ def main():
     summary = {
         "executado_em_utc": datetime.now(timezone.utc).isoformat(),
         "sha256_protocolo": hashlib.sha256(
-            (DOCS / "PROTOCOLO_REVISAO_E_CONFIRMACAO.md").read_bytes()
+            (RESOURCE_DIR / "PROTOCOLO_REVISAO_E_CONFIRMACAO.md").read_bytes()
         ).hexdigest(),
         "sha256_codigo": hashlib.sha256(
             b"".join(

@@ -18,9 +18,10 @@ import pyarrow.parquet as pq
 from licita_ml.analytical.pipeline import existing, put_immutable
 from licita_ml.analytical.rules import Policy, canonical, digest, prepare_references
 from licita_ml.experiments.evaluate import evaluate
+from licita_ml.resources import RESOURCE_DIR
 from licita_ml.validation.review import blind_csv, sample, summarize
 
-PROTOCOL = Path(__file__).resolve().parents[4] / "docs/validacao_nucleo/PROTOCOLO_OPERACIONAL_V1.md"
+PROTOCOL = RESOURCE_DIR / "PROTOCOLO_OPERACIONAL_V1.md"
 MAX_BYTES = 32 * 1024**2
 
 

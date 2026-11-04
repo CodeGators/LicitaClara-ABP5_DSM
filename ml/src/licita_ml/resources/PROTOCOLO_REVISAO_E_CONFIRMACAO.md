@@ -4,7 +4,7 @@ Registrado em 20/10/2026, antes de adquirir os documentos complementares e o nov
 
 ## Objetivo e limites
 
-Verificar a rastreabilidade e comparabilidade dos 18 casos principais já selecionados e avaliar os modelos congelados em outubro/2026. Não há rótulos de fraude. A análise realizada pelo assistente é **revisão documental assistida**, não parecer humano independente nem avaliação cega: o assistente conhece os rankings. Preservar as planilhas cegas originais e não preencher pareceres humanos em nome de pessoas.
+Verificar a rastreabilidade e comparabilidade dos 18 casos principais já selecionados e avaliar os modelos congelados em outubro/2026. Não há rótulos de fraude. A conferência automatizada não constitui parecer humano independente nem avaliação cega, pois utiliza informações dos rankings. Preservar as planilhas cegas originais e não preencher pareceres humanos em nome de pessoas.
 
 ## Critérios anteriores à consulta complementar
 

@@ -17,6 +17,6 @@ O frontend incorporou a entrega de 01/11/2026 da equipe e a integração da etap
 
 Testes: `npm test` (cliente HTTP/decimais), `npm run test:e2e` (browser com fixtures) e `npm run test:live` (API real com dados importados). Instalar o browser com `npx playwright install chromium` ou usar `PLAYWRIGHT_CHANNEL=chrome` se Chrome já estiver instalado. Relatórios e screenshots de teste são ignorados pelo Git.
 
-Instruções completas e resultados em [FRONTEND_CONSULTAS_REAIS.md](../docs/FRONTEND_CONSULTAS_REAIS.md). Revisão persistente, ranking e exportação real continuam no [plano de conclusão](../docs/PLANO_CONCLUSAO.md). O botão de exportação da demonstração abre a impressão do navegador; a opção CSV demonstrativa ainda não gera CSV.
+Instruções completas e resultados em FRONTEND_CONSULTAS_REAIS.md (documentação local). Revisão persistente, ranking e exportação real continuam no plano de conclusão (documentação local). O botão de exportação da demonstração abre a impressão do navegador; a opção CSV demonstrativa ainda não gera CSV.
 
-O [painel, ranking e fornecedores reais](../docs/PAINEL_RANKING_FORNECEDORES.md) compartilha base/execução/modelo e filtros; leia as definições de universo, valores, HHI e indisponibilidade antes de interpretar os indicadores.
+O painel, ranking e fornecedores reais (documentação local) compartilha base/execução/modelo e filtros; leia as definições de universo, valores, HHI e indisponibilidade antes de interpretar os indicadores.

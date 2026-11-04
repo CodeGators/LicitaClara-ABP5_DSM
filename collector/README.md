@@ -67,7 +67,7 @@ uv run --locked --all-packages ruff format --check .
 
 Integração exige `TEST_DATABASE_URL` em banco terminado em `_test`; os testes criam e removem apenas seus schemas. Cobrem aquisição HTTP controlada, retomada, erro transitório, resposta HTML, arquivo incompleto, CRC, extração, repetição, versões e concorrência usando permissões de coletor no PostgreSQL.
 
-Os scripts em `scripts/` continuam sendo diagnósticos exploratórios, separados da CLI. Consulte [diagnóstico da fonte](../docs/DIAGNOSTICO_COMPRASGOV.md). A competência PNCP se refere à publicação; em pesquisa de preços, à compra. O Portal da Transparência não integra o coletor do MVP.
+Os scripts em `scripts/` continuam sendo diagnósticos exploratórios, separados da CLI. Consulte diagnóstico da fonte (documentação local). A competência PNCP se refere à publicação; em pesquisa de preços, à compra. O Portal da Transparência não integra o coletor do MVP.
 
 ## Aquisição complementar implementada
 
@@ -80,6 +80,6 @@ uv run --locked --package licita-collector licita-collector complementar --compe
 
 Substitua UUID_MATERIAL pelo identificador de um arquivo material real. Propostas usam inclusão do item segundo o LEIAME; consultas JSON usam a competência como janela de referência, sem reescrever as datas da origem. Envelopes JSON podem ser retomados/reprocessados pelos mesmos comandos; não requerem extração. Totais incompatíveis ou paginação ignorada/repetida provocam falha, sem confirmação do objeto.
 
-São adquiridos metadados de documentos e detalhe contratual; PDFs não são baixados. A importação desses arquivos cabe ao pacote ML. [Regras e evidências da etapa 05](../docs/PREPARACAO_E_IMPORTACAO.md). Scripts exploratórios permanecem separados da aquisição de produção.
+São adquiridos metadados de documentos e detalhe contratual; PDFs não são baixados. A importação desses arquivos cabe ao pacote ML. Regras e evidências da etapa 05 (documentação local). Scripts exploratórios permanecem separados da aquisição de produção.
 
-Consulte a [base e atributos analíticos](../docs/ATRIBUTOS_ANALITICOS.md) para aquisição histórica registrada, preparo versionado, critérios e testes da etapa 04.
+Consulte a base e atributos analíticos (documentação local) para aquisição histórica registrada, preparo versionado, critérios e testes da etapa 04.
