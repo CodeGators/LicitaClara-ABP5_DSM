@@ -374,3 +374,73 @@ uv run --locked --all-packages --extra validation pytest \
   ml/tests/test_process_scores.py ml/tests/test_process_universe.py \
   ml/tests/test_process_inference.py -q
 ```
+
+## Catálogo integral e revisão do agrupamento dos itens
+
+```bash
+uv run --locked --all-packages python -m licita_ml.catalog \
+  --base CAMINHO_DA_BASE_ORGANIZADA --saida data/catalogo_itens
+uv run --locked --all-packages --extra validation pytest \
+  ml/tests/test_catalog_rules.py ml/tests/test_catalog_pipeline.py -q
+```
+
+Percorre todas as referências, itens e resultados consolidados da base, sem o
+filtro anterior de materiais de escritório. Usa as fontes já organizadas, com
+hashes conferidos, sem baixar dados, importar no SQL ou modificar modelos.
+Novos CSVs devem ser incorporados primeiro com `licita_ml.organized`; cópias de
+arquivos e versões repetidas não devem virar novos exemplos de treino.
+
+Agrupa por CATMAT, especificações do catálogo **e** detalhada, unidade de
+fornecimento, capacidade e medida. Normaliza acentos/caixa, espaçamento entre
+número e unidade e ordem dos atributos nomeados. Uma cópia exata dos atributos
+do catálogo também pode omitir dois-pontos ou espaços no nome do atributo;
+todos os valores devem coincidir, sem sobras ou atributos ausentes. Preserva texto livre, cores,
+números, dimensões, qualificadores, atributos repetidos e símbolos significativos
+como µ e ≥. Não usa busca por palavra-chave ou similaridade de texto para unir
+produtos automaticamente. UN/UNIDADE e CX/CAIXA são aliases explícitos; preços
+e quantidades por caixa continuam por caixa. Não converte CX em UN. Unidades
+simples KG/G/L/ML/M/M2/M3 também não exigem capacidade de embalagem; KG e G,
+por exemplo, permanecem grupos distintos e nenhum preço é convertido.
+
+Saída versionada/imutável em `data/catalogo_itens/catalogo=FINGERPRINT/`, CSV e
+Parquet, manifesto de hashes e protocolo:
+
+- `produtos`: inventário dos códigos de catálogo. Não calcula média global que
+  misture especificações ou embalagens do mesmo CATMAT.
+- `grupos`: especificação canônica, contagens, média, mediana e faixa de preços
+  por grupo, com estatísticas de treino separadas e diagnóstico de fragmentação.
+- `candidatos_estudo`: grupos com pelo menos 100 referências de treino e 30 de
+  avaliação válidas quanto a datas, ordenados por contagens. É triagem; não
+  comprova diversidade, estabilidade, comparabilidade comercial ou aptidão de ML.
+- `variantes`: descrições originais e contagens para conferir cada reunião.
+- `observacoes`: cada referência individual, com preço, quantidade, datas,
+  fornecedor, compra/item, grupo novo/anterior e fonte/ordinal. Não substituir
+  essas observações por uma única média para treinar o Forest.
+- `itens_catalogados` e `resultados_catalogados`: todos os registros nativos,
+  incluindo serviços, ausências e vínculos candidatos por chave. Preço estimado
+  e homologado são campos distintos; resultados não são somados às referências
+  que podem representar a mesma compra. Código ausente não é inventado.
+
+Médias são aritméticas por observação e medianas são descritivas, com Decimal e
+sem remoção automática de outliers. Preços não positivos e suspensões documentais
+não entram nessas estatísticas. A estatística do período inteiro **não pode ser
+usada como baseline do treino**. Médias/medianas da janela de treino são apenas
+diagnósticas: a próxima preparação deve validar suficiência/diversidade e manter
+a separação temporal. Os snapshots não constituem backtest ponto no tempo.
+
+Os modelos atuais continuam com duas entradas numéricas: log(preço/mediana de
+treino) e log(1+quantidade). Catálogo, descrição, cor e embalagem organizam os
+grupos e a rastreabilidade; não são novas colunas contínuas no Forest. Corrigir
+os grupos melhora comparabilidade/aproveitamento, não reduz automaticamente o
+número de atributos nem o número de árvores. O catálogo não treina/publica modelos
+ou aprova automaticamente comparabilidade comercial. Repetição confere e reutiliza;
+saída corrompida ou incompleta é rejeitada, sem sobrescrever evidências anteriores.
+
+
+Para refinar um catálogo previamente gerado pela mesma base e protocolo,
+`--catalogo-anterior CAMINHO_DO_CATALOGO` reaproveita as observações verificadas
+por hash e recalcula os grupos/estatísticas. O manifesto registra o catálogo
+anterior; base, janelas temporais ou regras documentais diferentes são rejeitadas.
+Essa opção só reconhece a cópia literal dos atributos do catálogo com formatação
+diferente. A geração completa e o refinamento produzem as mesmas tabelas; suas
+identidades de execução diferem por registrarem o caminho de preparação.
