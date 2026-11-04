@@ -80,3 +80,20 @@ Os relatórios dos experimentos históricos são escritos em
 `data/validacao_nucleo/relatorios/`; executar o experimento original antes
 de comandos de revisão que dependam de seus resultados. Artefatos, dados
 e modelos continuam fora do Git.
+
+## Diagnóstico offline dos arquivos
+
+Para medir preenchimento, identidades, datas, números, vínculos e categorias dos
+quatro ZIPs mensais antes de preparar a base analítica:
+
+```bash
+uv run --locked --all-packages --extra validation python -m licita_ml.diagnostics \
+  --entrada data/diagnostico/compras/2026-09 \
+  --inventario-raiz data \
+  --saida data/diagnostico/ml01/conferencia.json
+```
+
+A saída deve ser um caminho novo. O comando preserva as fontes, usa SQLite
+temporário em disco e não acessa rede, banco operacional ou modelos.
+Correspondência de IDs/campos e grupos exploratórios não comprovam
+elegibilidade analítica. O relatório é local, em `data/`, fora do Git.
