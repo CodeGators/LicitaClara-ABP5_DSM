@@ -22,6 +22,7 @@ export default function Itens() {
   const apply = event => {
     event.preventDefault()
     const next = new URLSearchParams({ base_id: baseId })
+    for (const key of ['execucao_id', 'modelo_id']) if (params.has(key)) next.set(key, params.get(key))
     for (const key of names) if (draft[key]) next.set(key, draft[key])
     setParams(next)
   }
@@ -30,7 +31,7 @@ export default function Itens() {
   })
   return <>
     <Head kicker="Consulta / Itens de compras públicas" title="Consultar itens" sub="Dados oficiais do recorte importado. Cada linha representa um item; abra o detalhe para consultar seus resultados e o processo da compra." />
-    <form className="card" onSubmit={apply}>
+    <form className="card" aria-label="Filtros dos itens" onSubmit={apply}>
       <h2>Refine o recorte</h2>
       <div className="filters real-filters">
         <Field label="Buscar item, compra ou fornecedor"><input className="input" type="search" maxLength={200} value={draft.busca} onChange={e => change('busca', e.target.value)} /></Field>
@@ -45,7 +46,11 @@ export default function Itens() {
         <Field label="Itens por página"><select className="select" value={draft.tamanho_pagina} onChange={e => change('tamanho_pagina', e.target.value)}>{[5, 10, 20, 50, 100].map(value => <option key={value} value={value}>{value}</option>)}</select></Field>
       </div>
       {filters.processo_id && <p className="sub">Consulta restrita ao processo selecionado. Use “Limpar filtros” para consultar toda a base.</p>}
-      <div className="filter-actions"><button className="btn primary" type="submit">Aplicar filtros</button><button className="btn ghost" type="button" onClick={() => { setDraft(readFilters(new URLSearchParams())); setParams({ base_id: baseId }); setLookupReset(value => value + 1) }}>Limpar filtros</button></div>
+      <div className="filter-actions"><button className="btn primary" type="submit">Aplicar filtros</button><button className="btn ghost" type="button" onClick={() => { setDraft(readFilters(new URLSearchParams())); setParams(previous => {
+          const next = new URLSearchParams({ base_id: baseId })
+          for (const key of ['execucao_id', 'modelo_id']) if (previous.has(key)) next.set(key, previous.get(key))
+          return next
+        }); setLookupReset(value => value + 1) }}>Limpar filtros</button></div>
       <p className="hint">O período considera resultados não cancelados. Valores são totais do item, não da compra inteira.</p>
     </form>
     <NoAnalysis />

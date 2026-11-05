@@ -49,20 +49,20 @@ export const desenvolvedores = [
   { nome: 'Rodrigo Augusto', papel: 'Desenvolvedor', user: 'rodrigoaslima' },
 ]
 export const passos = [
-  { t: 'Comece pelo Painel geral', to: '/demonstracao/painel', d: 'Veja a visão do semestre: quantos itens há no recorte, a distribuição dos scores e a evolução da alta prioridade. Clique nos cards do topo para abrir a lista correspondente.' },
-  { t: 'Explore os itens demonstrativos', to: '/demonstracao/itens', d: 'Filtre por item ou fornecedor, use a busca e as abas (Alta, Média, Todos) para achar os itens de maior score. Clique em uma linha para selecioná-la e em "Ver detalhe do item" para abrir.' },
-  { t: 'Leia o Detalhe do item', to: '/demonstracao/itens/LC-2026-0142', d: 'Compare o preço com itens similares e veja quais atributos mais pesaram para o sinal. Passe o mouse nos ícones ? para ver o significado dos termos.' },
-  { t: 'Explore os Fornecedores', to: '/fornecedores', d: 'Veja contratos, valores e a participação de cada fornecedor no gasto dos órgãos. Clique em um fornecedor da lista para ver os detalhes dele.' },
-  { t: 'Conheça a revisão demonstrativa', to: '/demonstracao/itens/LC-2026-0142', d: 'No fim do detalhe, escolha o status da análise e clique em "Registrar revisão". O histórico fica na aba "Registro da revisão".' },
-  { t: 'Prepare o Relatório', to: '/relatorios', d: 'Escolha título, formato e seções, confira a prévia ao lado e exporte. O relatório já inclui síntese, sinais e limitações, e o aviso de revisão humana sempre permanece.' },
+  { t: 'Consulte os itens', to: '/itens', d: 'Explore os dados oficiais importados. Filtre por descrição, órgão, fornecedor, período e valor; abra um item para consultar os resultados e documentos da compra.' },
+  { t: 'Veja o Painel', to: '/painel', d: 'Confira a cobertura da análise, a distribuição dos índices e a evolução dos itens no recorte selecionado. Ausência de análise permanece identificada.' },
+  { t: 'Explore o Ranking experimental', to: '/ranking', d: 'Consulte os itens ordenados pelos índices disponíveis e abra o detalhe. Cada item é comparado com seu próprio grupo; o índice não é um score da licitação inteira.' },
+  { t: 'Confira os resultados do item', to: '/itens', d: 'No detalhe do item, compare preços e veja os resultados de cada fornecedor e modelo separadamente. Abra o processo para consultar sua cobertura e os documentos conhecidos.' },
+  { t: 'Explore os Fornecedores', to: '/fornecedores', d: 'Consulte compras com resultado, contratos vinculados e participação no gasto dos itens filtrados. Abra um fornecedor para ver suas relações por órgão.' },
+  { t: 'Prepare o Relatório', to: '/relatorios', d: 'Selecione uma compra, confira a prévia, escolha PDF ou CSV e exporte. Os arquivos reais incluem valores, análises disponíveis, fontes e limitações; não exigem login.' },
 ]
 export const glossario = [
-  ['Score', 'Nota de 0 a 100 que indica a prioridade de análise de um item comprado. Não é probabilidade de fraude.'],
-  ['Prioridade', 'Baixa (0–49), média (50–79) ou alta (80–100), conforme o score.'],
-  ['Mediana', 'Valor do meio entre itens parecidos. Serve de referência para comparar preços.'],
+  ['Score', 'Índice de anomalia relativo ao treino do modelo e ao grupo do item. Não mede probabilidade de irregularidade; não some índices de grupos diferentes.'],
+  ['Prioridade', 'As faixas baixa, média e alta aparecem apenas nas demonstrações. A consulta real não atribui prioridade validada de auditoria.'],
+  ['Mediana', 'Valor central do grupo usado no treino. Exige especificação, unidade e embalagem comparáveis; não é uma cotação atual.'],
   ['Preço / mediana', 'Quantas vezes o preço do item é maior que a mediana dos similares. 1,60× significa 60% acima.'],
-  ['HHI', 'Índice de concentração de 0 a 1: quanto maior, mais o gasto do órgão está concentrado em poucos fornecedores.'],
-  ['Homologado', 'Valor final aprovado da contratação.'],
-  ['Isolation Forest e Autoencoder', 'Modelos de aprendizado não supervisionado que apontam itens diferentes do padrão. Neste protótipo os valores são simulados.'],
+  ['HHI', 'Índice de concentração de 0 a 1 no universo filtrado. Valores maiores indicam concentração entre os fornecedores observados, sem representar todo o órgão.'],
+  ['Homologado', 'Valor aprovado na contratação; não comprova pagamento ou entrega.'],
+  ['Isolation Forest e Autoencoder', 'Modelos não supervisionados que identificam comportamentos atípicos. Nas telas reais, os modelos treinados analisam os grupos compatíveis e seus resultados ficam disponíveis por versão.'],
   ['Falso positivo', 'Item sinalizado que, após revisão, está correto. Por isso toda conclusão exige revisão humana.'],
 ]

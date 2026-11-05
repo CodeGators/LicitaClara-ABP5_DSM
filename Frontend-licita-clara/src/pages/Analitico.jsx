@@ -25,7 +25,7 @@ function Filters() {
       return next
     })
   }
-  return <form className="card" onSubmit={apply}><h2>Filtros do recorte</h2><div className="filters real-filters">
+  return <form className="card" aria-label="Filtros do recorte" onSubmit={apply}><h2>Filtros do recorte</h2><div className="filters real-filters">
     <Field label="Buscar item, compra ou fornecedor"><input className="input" type="search" maxLength={200} value={draft.busca} onChange={e => change('busca', e.target.value)} /></Field>
     <LookupFilter kind="/orgaos" title="Órgão" baseId={baseId} value={draft.orgao_id} onChange={v => change('orgao_id', v)} />
     <LookupFilter kind="/fornecedores/opcoes" title="Fornecedor" baseId={baseId} value={draft.fornecedor_id} onChange={v => change('fornecedor_id', v)} />
@@ -52,7 +52,7 @@ function Cards({ summary }) {
       ['Itens no recorte', summary.itens, `${summary.processos} compras · ${summary.contratos_vinculados} contratos vinculados`],
       ['Total homologado no recorte', money(summary.valor_homologado), summary.resultados_sem_total ? `${summary.resultados_sem_total} resultado(s) sem total; soma conhecida: ${money(summary.soma_valores_conhecidos)}` : `${summary.resultados} resultados não cancelados; não é valor pago`],
       ['Fornecedores exibidos', summary.fornecedores, `${summary.orgaos} órgãos · ${summary.fornecedores_no_denominador} fornecedores no universo de concentração`],
-      ['Analisados integralmente', summary.analisados, 'Todos os resultados selecionados têm índice neste modelo'],
+      ['Analisados integralmente', summary.analisados, 'Todos os resultados selecionados do item têm índice'],
       ['Parcialmente analisados', summary.parcial, 'Há resultados sem score; cobertura não é completada com zero'],
       ['Não analisados', summary.nao_analisados, 'Motivo disponível na consulta; sem conclusão de auditoria'],
     ].map(([label, value, text]) => <div className="card kpi" key={label}><span>{label}</span><strong>{value}</strong><small>{text}</small></div>)}
@@ -70,27 +70,27 @@ function useView(path) {
 
 function ItemRows({ rows, params }) {
   const location = useLocation()
-  return <div className="table-scroll"><table className="tbl"><thead><tr><th>Item / compra</th><th>Órgão / fornecedores</th><th>Total homologado no recorte</th><th>Índice experimental</th><th>Cobertura</th></tr></thead><tbody>{rows.map(r => <tr key={r.id}>
+  return <div className="table-scroll" role="region" aria-label="Itens e resultados do recorte; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Item / compra</th><th scope="col">Órgão / fornecedores</th><th scope="col">Total homologado no recorte</th><th scope="col">Índice experimental</th><th scope="col">Cobertura</th></tr></thead><tbody>{rows.map(r => <tr key={r.id}>
     <td><Link className="link-a" to={selectionLink(`/itens/${r.id}`, params)} state={{ from: location.pathname + location.search }}>{r.descricao}</Link><small>Item {r.numero_item} · Compra {r.processo.numero_compra}</small></td>
     <td>{r.processo.orgao_nome}<small>{[...new Set(r.resultados.map(e => e.fornecedor_nome))].join('; ') || 'Nenhum resultado conhecido'}</small></td>
     <td>{money(r.valor_homologado)}{r.resultados_sem_total > 0 && <small>Total incompleto na fonte</small>}</td>
-    <td>{indexText(r.indice_experimental)}{r.indice_experimental != null && <small>Máximo dos resultados neste modelo</small>}</td>
+    <td>{indexText(r.indice_experimental)}{r.indice_experimental != null && <small>Máximo dos resultados analisados do item</small>}</td>
     <td>{r.status_analise === 'analisados' ? 'Integral' : r.status_analise === 'parcial' ? 'Parcial' : 'Não analisado'}<small>{r.resultados_analisados}/{r.resultados_ativos} resultados</small>{Object.keys(r.motivos).map(reason => <small key={reason}>{reason.replaceAll('_', ' ').toLocaleLowerCase('pt-BR')}</small>)}</td>
   </tr>)}</tbody></table></div>
 }
 
-function Shell({ title, children }) {
-  return <><Head kicker="Dados oficiais / Recorte selecionado" title={title} sub="Consultas reais, com base e análise versionadas. Filtros compartilhados entre painel, ranking e fornecedores." /><AnalysisSelector /><Notice /><Filters />{children}</>
+function Shell({ title, summary, children }) {
+  return <><Head kicker="Dados oficiais / Recorte selecionado" title={title} sub="Consultas reais, com base e análise versionadas. Filtros compartilhados entre painel, ranking e fornecedores." />{summary && <Cards summary={summary} />}<AnalysisSelector /><Notice /><Filters />{children}</>
 }
 
 function DashboardContent() {
   const { query } = useView('/visao/painel')
   const data = query.data
-  return <Shell title="Painel do recorte"><QueryState query={query} />{data && <><Cards summary={data.resumo} />
-    <div className="grid g-1-1"><section className="card"><h2>Distribuição dos índices experimentais</h2><p className="sub">Um índice máximo por item no modelo escolhido. Parcialmente analisados são identificados nos contadores.</p>
-      {!data.distribuicao.some(b => b.itens) ? <p className="empty-chart">Nenhum índice disponível neste recorte.</p> : <><div className="distribution" role="img" aria-label="Distribuição de itens por faixa do índice experimental">{data.distribuicao.map((b,i) => <div key={b.inicio}><span>{b.itens}</span><div style={{ height: `${120*b.itens/Math.max(...data.distribuicao.map(x => x.itens))}px` }} /><small>{i === 9 ? '90–100' : `${b.inicio}–<${b.fim}`}</small></div>)}</div><table className="tbl"><caption>Contagem por intervalo</caption><tbody>{data.distribuicao.map((b,i) => <tr key={b.inicio}><th>{i === 9 ? '90–100' : `${b.inicio}–<${b.fim}`}</th><td>{b.itens}</td></tr>)}</tbody></table></>}
+  return <Shell title="Painel do recorte" summary={data?.resumo}><QueryState query={query} />{data && <>
+    <div className="grid g-1-1"><section className="card"><h2>Distribuição dos índices experimentais</h2><p className="sub">Um índice máximo por item, conforme a seleção da análise. Parcialmente analisados são identificados nos contadores.</p>
+      {!data.distribuicao.some(b => b.itens) ? <p className="empty-chart">Nenhum índice disponível neste recorte.</p> : <><div className="distribution" role="region" aria-label="Distribuição de itens por faixa do índice experimental; use as setas para rolar" tabIndex={0}>{data.distribuicao.map((b,i) => <div key={b.inicio}><span>{b.itens}</span><div style={{ height: `${120*b.itens/Math.max(...data.distribuicao.map(x => x.itens))}px` }} /><small>{i === 9 ? '90–100' : `${b.inicio}–<${b.fim}`}</small></div>)}</div><table className="tbl"><caption>Contagem por intervalo</caption><tbody>{data.distribuicao.map((b,i) => <tr key={b.inicio}><th scope="row">{i === 9 ? '90–100' : `${b.inicio}–<${b.fim}`}</th><td>{b.itens}</td></tr>)}</tbody></table></>}
     </section><section className="card"><h2>Evolução dos itens por último resultado</h2><p className="sub">Cada item conta uma vez, no mês do último resultado do recorte. Não mede pagamento ou alta prioridade.</p>
-      {!data.evolucao.length ? <p>Nenhum item neste recorte.</p> : <div className="table-scroll compact-table" role="region" aria-label="Evolução dos itens por mês" tabIndex="0"><table className="tbl"><thead><tr><th>Mês</th><th>Itens</th><th>Integrais</th><th>Parciais</th><th>Sem análise</th></tr></thead><tbody>{data.evolucao.map(m => <tr key={m.mes}><td>{m.mes === 'sem_data' ? 'Sem data conhecida' : m.mes.split('-').reverse().join('/')}</td><td>{m.itens}</td><td>{m.analisados}</td><td>{m.parcial}</td><td>{m.nao_analisados}</td></tr>)}</tbody></table></div>}
+      {!data.evolucao.length ? <p>Nenhum item neste recorte.</p> : <div className="table-scroll compact-table" role="region" aria-label="Evolução dos itens por mês" tabIndex="0"><table className="tbl"><thead><tr><th scope="col">Mês</th><th scope="col">Itens</th><th scope="col">Integrais</th><th scope="col">Parciais</th><th scope="col">Sem análise</th></tr></thead><tbody>{data.evolucao.map(m => <tr key={m.mes}><td>{m.mes === 'sem_data' ? 'Sem data conhecida' : m.mes.split('-').reverse().join('/')}</td><td>{m.itens}</td><td>{m.analisados}</td><td>{m.parcial}</td><td>{m.nao_analisados}</td></tr>)}</tbody></table></div>}
     </section></div><section className="card"><h2>Motivos de indisponibilidade</h2>{Object.keys(data.motivos_indisponibilidade).length ? <ul>{Object.entries(data.motivos_indisponibilidade).map(([reason,n]) => <li key={reason}>{reason.replaceAll('_', ' ').toLocaleLowerCase('pt-BR')}: {n} ocorrência(s)</li>)}</ul> : <p>Nenhum motivo registrado neste recorte.</p>}</section></>}
   </Shell>
 }
@@ -98,18 +98,18 @@ function DashboardContent() {
 function RankingContent() {
   const { query, params, changePage } = useView('/visao/ranking')
   const data = query.data
-  return <Shell title="Ranking experimental"><QueryState query={query} />{data && <><Cards summary={data.resumo} /><section className="card"><h2>{data.total} item(ns) no ranking</h2><p className="sub">Índices disponíveis primeiro; ausências ficam ao final, sem receber zero. Não é uma fila de risco validado.</p>{data.dados.length ? <ItemRows rows={data.dados} params={params} /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section></>}</Shell>
+  return <Shell title="Ranking experimental" summary={data?.resumo}><QueryState query={query} />{data && <><section className="card"><h2>{data.total} item(ns) no ranking</h2><p className="sub">Índices disponíveis primeiro; ausências ficam ao final, sem receber zero. Não é uma fila de risco validado.</p>{data.dados.length ? <ItemRows rows={data.dados} params={params} /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section></>}</Shell>
 }
 
 function SuppliersContent() {
   const { id } = useParams()
   const { query, params, changePage } = useView(id ? `/visao/fornecedores/${encodeURIComponent(id)}` : '/visao/fornecedores')
   const data = query.data
-  return <Shell title={id ? 'Relações do fornecedor' : 'Fornecedores do recorte'}><QueryState query={query} />{data && <><Cards summary={data.resumo} />
+  return <Shell title={id ? 'Relações do fornecedor' : 'Fornecedores do recorte'} summary={data?.resumo}><QueryState query={query} />{data && <>
     {id ? <><Link className="link-a" to={selectionLink('/fornecedores', params)}>← Todos os fornecedores</Link><section className="card"><h2>{data.fornecedor.nome}</h2><p>{data.fornecedor.compras_com_resultado} compras com resultado · {data.fornecedor.contratos_vinculados} contratos vinculados conhecidos · {data.fornecedor.orgaos} órgãos</p><p>Total homologado deste fornecedor: {money(data.fornecedor.valor_homologado)} · Maior índice disponível: {indexText(data.fornecedor.indice_experimental)}</p></section>
-      <section className="card"><h2>Participação e concentração por órgão</h2><p className="sub">HHI de todos os fornecedores dos itens filtrados, no período selecionado. Não representa o universo completo do órgão. Concentração não comprova irregularidade.</p><div className="table-scroll"><table className="tbl"><thead><tr><th>Órgão</th><th>Compras com resultado</th><th>Homologado ao fornecedor</th><th>Total do universo</th><th>Participação</th><th>HHI</th></tr></thead><tbody>{data.relacoes.map(r => <tr key={r.orgao_id}><td>{r.orgao_nome}</td><td>{r.compras_com_resultado}</td><td>{money(r.valor_fornecedor)}</td><td>{money(r.valor_homologado)}</td><td>{r.participacao == null ? 'Indisponível' : `${decimal((Number(r.participacao)*100).toFixed(2))}%`}</td><td>{r.hhi == null ? 'Indisponível' : decimal(Number(r.hhi).toFixed(4))}{r.motivo && <small>{r.motivo.replaceAll('_',' ').toLowerCase()}</small>}</td></tr>)}</tbody></table></div></section>
+      <section className="card"><h2>Participação e concentração por órgão</h2><p className="sub">HHI de todos os fornecedores dos itens filtrados, no período selecionado. Não representa o universo completo do órgão. Concentração não comprova irregularidade.</p><div className="table-scroll" role="region" aria-label="Participação e concentração por órgão; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Órgão</th><th scope="col">Compras com resultado</th><th scope="col">Homologado ao fornecedor</th><th scope="col">Total do universo</th><th scope="col">Participação</th><th scope="col">HHI</th></tr></thead><tbody>{data.relacoes.map(r => <tr key={r.orgao_id}><td>{r.orgao_nome}</td><td>{r.compras_com_resultado}</td><td>{money(r.valor_fornecedor)}</td><td>{money(r.valor_homologado)}</td><td>{r.participacao == null ? 'Indisponível' : `${decimal((Number(r.participacao)*100).toFixed(2))}%`}</td><td>{r.hhi == null ? 'Indisponível' : decimal(Number(r.hhi).toFixed(4))}{r.motivo && <small>{r.motivo.replaceAll('_',' ').toLowerCase()}</small>}</td></tr>)}</tbody></table></div></section>
       <section className="card"><h2>Itens com resultado deste fornecedor</h2><p className="sub">Valores e índices abaixo consideram somente seus resultados; o detalhe do item apresenta todos os vencedores.</p><ItemRows rows={data.itens.dados} params={params} /><Pager meta={data.itens} onChange={changePage} /></section></>
-      : <section className="card"><h2>{data.total} fornecedor(es) encontrado(s)</h2>{data.dados.length ? <div className="table-scroll"><table className="tbl"><thead><tr><th>Fornecedor</th><th>Compras com resultado</th><th>Contratos vinculados</th><th>Homologado</th><th>Maior índice disponível</th></tr></thead><tbody>{data.dados.map(r => <tr key={r.id}><td><Link className="link-a" to={selectionLink(`/fornecedores/${r.id}`, params)}>{r.nome}</Link><small>{r.itens} itens · {r.orgaos} órgãos</small></td><td>{r.compras_com_resultado}</td><td>{r.contratos_vinculados}</td><td>{money(r.valor_homologado)}{r.resultados_sem_total > 0 && <small>Total incompleto</small>}</td><td>{indexText(r.indice_experimental)}</td></tr>)}</tbody></table></div> : <p>Nenhum fornecedor encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section>}
+      : <section className="card"><h2>{data.total} fornecedor(es) encontrado(s)</h2>{data.dados.length ? <div className="table-scroll" role="region" aria-label="Ranking de fornecedores; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Compras com resultado</th><th scope="col">Contratos vinculados</th><th scope="col">Homologado</th><th scope="col">Maior índice disponível</th></tr></thead><tbody>{data.dados.map(r => <tr key={r.id}><td><Link className="link-a" to={selectionLink(`/fornecedores/${r.id}`, params)}>{r.nome}</Link><small>{r.itens} itens · {r.orgaos} órgãos</small></td><td>{r.compras_com_resultado}</td><td>{r.contratos_vinculados}</td><td>{money(r.valor_homologado)}{r.resultados_sem_total > 0 && <small>Total incompleto</small>}</td><td>{indexText(r.indice_experimental)}</td></tr>)}</tbody></table></div> : <p>Nenhum fornecedor encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section>}
     </>}</Shell>
 }
 

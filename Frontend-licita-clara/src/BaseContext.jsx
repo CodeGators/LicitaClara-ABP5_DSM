@@ -23,7 +23,7 @@ export function BaseProvider({ enabled, children }) {
 
 export function BaseGate({ children }) {
   const base = useBase()
-  if (base.loading || base.error) return <QueryState query={base} loading="Consultando a base de dados…" />
-  if (!base.data?.base) return <div className="card" role="status"><h2>Nenhuma base disponível</h2><p className="sub">Ainda não há dados importados disponíveis para consulta.</p><button className="btn ghost sm" onClick={base.retry}>Consultar novamente</button></div>
+  if (base.loading || base.error) return <section><h1 className="sr-only">Consulta de dados</h1><QueryState query={base} loading="Consultando a base de dados…" /></section>
+  if (!base.data?.base) return <div className="card" role="status"><h1>Nenhuma base disponível</h1><p className="sub">Ainda não há dados importados disponíveis para consulta.</p><button className="btn ghost sm" onClick={base.retry}>Consultar novamente</button></div>
   return children
 }

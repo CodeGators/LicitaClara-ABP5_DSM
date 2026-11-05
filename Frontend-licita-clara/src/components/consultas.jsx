@@ -7,15 +7,21 @@ export function QueryState({ query, loading = 'Carregando…' }) {
   if (query.loading) return <div className="card" role="status" aria-live="polite">{loading}</div>
   if (!query.error) return null
   const { error } = query
-  return <div className="card query-error" role="alert"><h2>{error.status === 404 ? 'Registro não encontrado' : error.status === 422 ? 'Consulta inválida' : 'Consulta indisponível'}</h2><p className="sub">{error.message}</p>{error.requestId && <p className="hint">Referência do atendimento: {error.requestId}</p>}<button className="btn ghost sm" onClick={query.retry}>Tentar novamente</button></div>
+  return <div className="card query-error" role="alert"><h2>{error.status === 404 ? 'Registro não encontrado' : error.status === 422 ? 'Consulta inválida' : 'Consulta indisponível'}</h2><p className="sub">{error.message}</p>{error.status === 422 && <p className="sub">Confira o intervalo de datas, os valores mínimo e máximo e as opções selecionadas.</p>}{error.requestId && <p className="hint">Referência do atendimento: {error.requestId}</p>}<button className="btn ghost sm" onClick={query.retry}>Tentar novamente</button></div>
 }
 
 export function Field({ label, children }) {
   const id = useId()
-  return <div className="field"><label htmlFor={id}>{label}</label>{cloneElement(children, { id })}</div>
+  const control = ['input', 'select', 'textarea'].includes(children.type)
+  return <div className="field">{control ? <label htmlFor={id}>{label}</label> : <span id={id} className="field-label">{label}</span>}{cloneElement(children, control ? { id } : { role: 'group', 'aria-labelledby': id })}</div>
 }
 export const Info = ({ label, children }) => <div><small>{label}</small><strong>{children}</strong></div>
-export const NoAnalysis = () => <div className="note"><b>Análise não publicada</b>Não há prioridade de auditoria validada. O canal experimental, quando selecionado, pode ser consultado no detalhe e no ranking. Ausência de score não representa conclusão sobre regularidade.</div>
+export function NoAnalysis() {
+  const { search } = useLocation()
+  const execution = new URLSearchParams(search).get('execucao_id')
+  const selected = execution && execution !== 'nenhuma'
+  return <div className="note"><b>{selected ? 'Análise selecionada' : 'Sem análise selecionada'}</b>{selected ? 'Abra o detalhe de um item para consultar os índices ou os motivos de ausência na execução escolhida.' : 'Esta consulta mostra os dados importados. No painel ou ranking, selecione uma execução para consultar os índices disponíveis.'} Ausência de índice não representa conclusão sobre regularidade.</div>
+}
 
 export function LookupFilter({ kind, title, value, onChange, baseId }) {
   const [search, setSearch] = useState('')
@@ -32,14 +38,14 @@ export function LookupFilter({ kind, title, value, onChange, baseId }) {
     </select></Field>
     {query.loading && <small role="status">Carregando opções…</small>}
     {query.error && <div role="alert">Não foi possível carregar as opções. <button type="button" className="link-a" onClick={query.retry}>Tentar novamente</button></div>}
-    {query.data?.meta.total_paginas > 1 && <div className="pager"><button type="button" disabled={page === 1 || query.loading} onClick={() => setPage(p => p - 1)}>Opções anteriores</button><small>{page}/{query.data.meta.total_paginas}</small><button type="button" disabled={page >= query.data.meta.total_paginas || query.loading} onClick={() => setPage(p => p + 1)}>Mais opções</button></div>}
+    {query.data?.meta.total_paginas > 1 && <div className="pager"><button className="btn ghost sm" type="button" disabled={page === 1 || query.loading} onClick={() => setPage(p => p - 1)}>Opções anteriores</button><small>{page}/{query.data.meta.total_paginas}</small><button className="btn ghost sm" type="button" disabled={page >= query.data.meta.total_paginas || query.loading} onClick={() => setPage(p => p + 1)}>Mais opções</button></div>}
   </div>
 }
 
 // Mantido fora das telas para reutilizar o contrato de resultados por fornecedor.
 export function Results({ results }) {
   return <div className="card"><h2>Resultados do item</h2><p className="sub">Preços e quantidades por fornecedor. Resultados cancelados não entram no total homologado do item.</p>
-    {!results.length ? <p className="sub">Nenhum resultado conhecido nesta base.</p> : <div className="table-scroll"><table className="tbl"><thead><tr><th>Fornecedor</th><th>Quantidade homologada</th><th>Preço unitário</th><th>Total homologado</th><th>Data do resultado</th><th>Situação</th></tr></thead><tbody>{results.map(r => <tr key={r.id}><td>{r.fornecedor_nome}</td><td>{decimal(r.quantidade_homologada)}</td><td>{money(r.valor_unitario_homologado)}</td><td>{money(r.valor_total_homologado)}</td><td>{date(r.data_resultado)}</td><td>{r.cancelado ? 'Cancelado' : 'Não cancelado'}<small>{r.situacao}</small></td></tr>)}</tbody></table></div>}
+    {!results.length ? <p className="sub">Nenhum resultado conhecido nesta base.</p> : <div className="table-scroll" role="region" aria-label="Resultados do item; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Quantidade homologada</th><th scope="col">Preço unitário</th><th scope="col">Total homologado</th><th scope="col">Data do resultado</th><th scope="col">Situação</th></tr></thead><tbody>{results.map(r => <tr key={r.id}><td>{r.fornecedor_nome}</td><td>{decimal(r.quantidade_homologada)}</td><td>{money(r.valor_unitario_homologado)}</td><td>{money(r.valor_total_homologado)}</td><td>{date(r.data_resultado)}</td><td>{r.cancelado ? 'Cancelado' : 'Não cancelado'}<small>{r.situacao}</small></td></tr>)}</tbody></table></div>}
   </div>
 }
 
@@ -65,7 +71,7 @@ export function Pager({ meta, onChange }) {
 export function ItemTable({ items, baseId, from }) {
   const location = useLocation()
   const selected = new URLSearchParams(location.search).get('execucao_id')
-  return <div className="table-scroll"><table className="tbl"><thead><tr><th>Item</th><th>Órgão / compra</th><th>Fornecedores com resultados não cancelados</th><th>Total homologado do item</th><th>Análise</th></tr></thead><tbody>{items.map(item => {
+  return <div className="table-scroll" role="region" aria-label="Itens encontrados; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Item</th><th scope="col">Órgão / compra</th><th scope="col">Fornecedores com resultados não cancelados</th><th scope="col">Total homologado do item</th><th scope="col">Análise</th></tr></thead><tbody>{items.map(item => {
     const suppliers = [...new Set(item.resultados.filter(r => !r.cancelado).map(r => r.fornecedor_nome))]
     return <tr key={item.id}><td><Link className="link-a" to={selected ? selectionLink(`/itens/${item.id}`, location.search) : baseLink(`/itens/${item.id}`, baseId)} state={{ from }}>{item.descricao}</Link><small>Item {item.numero_item} · {item.catalogo ? `${item.catalogo} ${item.codigo_catalogo}` : 'Catálogo não informado'}</small></td><td>{item.processo.orgao_nome}<small>Compra {item.processo.numero_compra}</small></td><td>{suppliers.length ? suppliers.join('; ') : 'Não informado'}</td><td>{money(item.valor_homologado_item)}{item.resultados_sem_valor_total > 0 && <small>Total incompleto na fonte</small>}</td><td><span className="pill rev">{selected && selected !== 'nenhuma' ? 'Consultar análise no detalhe' : 'Não publicada'}</span></td></tr>
   })}</tbody></table></div>

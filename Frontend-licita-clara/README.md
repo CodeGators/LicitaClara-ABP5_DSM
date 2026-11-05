@@ -48,3 +48,33 @@ PLAYWRIGHT_CHANNEL=chrome API_PROXY_TARGET=http://127.0.0.1:8000 LICITA_REPORT_T
 
 O fluxo verifica o snapshot, arquivos baixados, exceções JavaScript e largura em
 celular. Os testes controlados de relatório fazem parte de `npm run test:e2e`.
+
+## Interface e navegação acessível
+
+As telas reais incluem atalho “Pular para o conteúdo”, identificação de conteúdo
+principal, foco após troca de página e regiões de tabela roláveis com teclado.
+No celular, o menu fechado fica fora da navegação por teclado. Menu aberto e
+ajuda mantêm o foco, permitem fechar com Escape e devolvem o foco ao controle que
+os abriu. As abas da ajuda aceitam setas, Home e End. A preferência por movimento
+reduzido do sistema é respeitada. Contraste, foco e largura dos cartões foram
+ajustados para os dois temas.
+
+A lista de itens preserva base, execução e modelo ao aplicar/limpar filtros.
+“Sem análise selecionada” descreve a consulta atual; não afirma que não existam
+análises publicadas. Ajuda e glossário descrevem as funcionalidades reais.
+
+`npm run test:e2e` inclui teclado, menu, ajuda, estados de carregamento/erro/vazio,
+rolagem em 320 px e persistência de tema. A auditoria de dados reais usa o projeto
+`interface-live` e [axe com Playwright](https://playwright.dev/docs/accessibility-testing):
+
+```bash
+PLAYWRIGHT_CHANNEL=chrome API_PROXY_TARGET=http://127.0.0.1:8000 LICITA_INTERFACE_CONFIG=../data/diagnostico/11/config.json npx playwright test --project=interface-live
+```
+
+O JSON local contém `routes`, lista de pares `[nome, caminho_com_base_e_execucao]`.
+São verificadas oito telas em 1280/390 px e temas claro/escuro, com registro de
+violações, exceções JavaScript, overflow da página/cartões e screenshots locais.
+`LICITA_INTERFACE_OUTPUT` pode selecionar outra pasta de evidências.
+As regras automatizadas WCAG 2/2.1 A/AA e best practices não substituem uma
+avaliação completa com tecnologias assistivas.
+O comportamento dos diálogos segue a [referência WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/).

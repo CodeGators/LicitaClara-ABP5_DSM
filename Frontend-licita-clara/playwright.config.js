@@ -14,9 +14,10 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
-    { name: 'mock', testMatch: ['consultas.spec.js', 'visao.spec.js', 'relatorios.spec.js'] },
+    { name: 'mock', testMatch: ['consultas.spec.js', 'visao.spec.js', 'relatorios.spec.js', 'interface.spec.js'] },
     { name: 'live', testMatch: 'live.spec.js' },
     { name: 'reports-live', testMatch: 'relatorios-live.spec.js' },
+    { name: 'interface-live', testMatch: 'interface-live.spec.js' },
   ],
   webServer: {
     command: `npm run dev -- --host 127.0.0.1 --port ${port} --strictPort`,

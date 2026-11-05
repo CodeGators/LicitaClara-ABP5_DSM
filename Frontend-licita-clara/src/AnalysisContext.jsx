@@ -49,9 +49,9 @@ export function AnalysisProvider({ enabled, children }) {
 
 export function AnalysisGate({ children }) {
   const selection = useAnalysis()
-  if (selection.executionId && selection.run.error) return <><AnalysisSelector /><QueryState query={selection.run} /></>
-  if (selection.publication.error && !selection.params.has('execucao_id')) return <QueryState query={selection.publication} />
-  if (!selection.ready) return <div className="card" role="status">Selecionando a versão da análise…</div>
+  if (selection.executionId && selection.run.error) return <><h1>Não foi possível abrir a análise</h1><AnalysisSelector /><QueryState query={selection.run} /></>
+  if (selection.publication.error && !selection.params.has('execucao_id')) return <section><h1>Consulta da análise</h1><QueryState query={selection.publication} /></section>
+  if (!selection.ready) return <section><h1 className="sr-only">Consulta da análise</h1><div className="card" role="status">Selecionando a versão da análise…</div></section>
   return children
 }
 
