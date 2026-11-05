@@ -539,3 +539,8 @@ Conferir especificação, unidade/embalagem, quantidade, preço, referência e d
 registrar parecer, justificativa, fonte verificável, revisor e data. Todos os
 pareceres começam pendentes. O exportador preserva arquivos existentes divergentes
 em vez de sobrescrevê-los. Exportações e revisões permanecem fora do Git.
+
+O objetivo da aplicação é identificar e explorar **anomalias estatísticas por
+item**, com referências, cobertura e rastreabilidade. Os índices não identificam
+fraude nem determinam irregularidade. A revisão registra a investigação dos
+sinais. Não há score integral validado que combine grupos de uma licitação.
