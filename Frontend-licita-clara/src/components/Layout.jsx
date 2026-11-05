@@ -10,10 +10,8 @@ import { date } from '../api.mjs'
 import { selectionLink } from '../AnalysisContext.jsx'
 
 const nav = [
-  { to: '/itens', label: 'Consultar itens', icon: ListFilter },
-  { to: '/painel', label: 'Painel', icon: LayoutGrid },
-  { to: '/ranking', label: 'Ranking experimental', icon: ListFilter },
-  { to: '/demonstracao/painel', label: 'Painel · demonstração', icon: LayoutGrid },
+  { to: '/painel', label: 'Painel Geral', icon: LayoutGrid },
+  { to: '/ranking', label: 'Processos sinalizados', icon: ListFilter },
   { to: '/fornecedores', label: 'Fornecedores', icon: Building2 },
   { to: '/relatorios', label: 'Relatórios', icon: FileText },
 ]
@@ -61,7 +59,7 @@ export default function Layout() {
           <div className="eyebrow">Espaço de análise</div>
           <nav className="nav" aria-label="Navegação principal">
             {nav.map(({ to, label, icon: I, end }) => (
-              <NavLink key={to} to={real && base.baseId && !to.startsWith('/demonstracao') ? selectionLink(to, search) : to} end={end} className={({ isActive }) => (isActive || (to === '/itens' && /^\/(itens|processos)(\/|$)/.test(pathname)) ? 'active' : '')}>
+              <NavLink key={to} to={real && base.baseId && !to.startsWith('/demonstracao') ? selectionLink(to, search) : to} end={end} className={({ isActive }) => (isActive || (to === '/ranking' && /^\/(itens|processos)(\/|$)/.test(pathname)) ? 'active' : '')}>
                 <I size={18} /> {label}
               </NavLink>
             ))}
