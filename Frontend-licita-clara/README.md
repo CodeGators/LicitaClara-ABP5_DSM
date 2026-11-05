@@ -78,3 +78,29 @@ violações, exceções JavaScript, overflow da página/cartões e screenshots l
 As regras automatizadas WCAG 2/2.1 A/AA e best practices não substituem uma
 avaliação completa com tecnologias assistivas.
 O comportamento dos diálogos segue a [referência WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/).
+
+## Painel Geral
+
+O painel tem quatro indicadores, distribuição em barras, evolução temporal e uma
+seleção de itens para comparar resultados dos modelos. “Filtros e versão da
+análise” fica recolhido; o botão do período abre essa configuração. Ordenação e
+paginação permanecem nas listas, sem controles sem efeito na visão consolidada.
+
+Os cards mostram processos, homologado, itens com índice e itens sem análise.
+Valores grandes são abreviados no card; o valor exato fica no título do valor.
+As cores do histograma indicam intervalos numéricos, sem criar classes de risco.
+A evolução usa o mês real do último resultado; itens sem data são informados
+separadamente, e as tabelas dos gráficos podem ser abertas abaixo deles.
+
+Selecionar uma linha em “Por onde começar” consulta os resultados já persistidos.
+IF/AE são comparados para o mesmo resultado/fornecedor; quando há vários
+resultados, o seletor permite escolher o fornecedor. Não executa treino/inferência.
+Nomes longos têm visual compacto e texto completo no título/detalhe do item.
+
+O teste real do painel (`painel-live`) usa o mesmo `LICITA_INTERFACE_CONFIG` da
+auditoria de interface. Confere dados e composição em 1280, 1062 e 390 px, temas
+claro/escuro e regras automatizadas de acessibilidade:
+
+```bash
+PLAYWRIGHT_CHANNEL=chrome API_PROXY_TARGET=http://127.0.0.1:8000 LICITA_INTERFACE_CONFIG=../data/diagnostico/11/config.json npx playwright test --project=painel-live
+```

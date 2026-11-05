@@ -247,3 +247,76 @@ h1{font-size:30px;font-weight:500;letter-spacing:-.01em}
 .kpi strong { font-size: clamp(22px, 9cqi, 32px); overflow-wrap: anywhere; line-height: 1.2; }
 
 .table-scroll .tbl td.numeric { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* Painel Geral: composição da referência visual, com dados do recorte real. */
+.dashboard { display: grid; gap: 18px; }
+.dashboard .head { align-items: center; }
+.dashboard .head .sub { font-size: 12px; }
+.dashboard-period { min-height: 36px; font-size: 12px; white-space: nowrap; }
+.dashboard-settings { font-size: 12px; color: var(--secundario); }
+.dashboard-settings > summary { cursor: pointer; padding: 4px 0; width: fit-content; }
+.dashboard-settings[open] { display: grid; gap: 16px; }
+.dashboard-kpis { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; }
+.dashboard-kpis .card { padding: 16px; gap: 12px; }
+.dashboard-kpi-label { display: flex; justify-content: space-between; gap: 8px; color: var(--secundario); font-size: 11px; }
+.dashboard-kpi-label svg { flex: none; color: var(--petroleo); }
+.dashboard-kpis .kpi strong { font-weight: 500; font-size: clamp(22px,12cqi,30px); line-height: 1.1; }
+.dashboard-kpis .kpi small { font-size: 10px; }
+.dashboard-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.dashboard-chart { min-width: 0; padding: 18px; }
+.dashboard h2 { font-size: 15px; }
+.dashboard-chart .sub, .dashboard-start .sub, .dashboard-reading .sub { font-size: 11px; }
+.dashboard-chart-scroll { overflow-x: auto; padding-top: 18px; }
+.dashboard-chart-scroll:focus-visible { outline: 3px solid var(--petroleo); outline-offset: 3px; }
+.dashboard-bins { display: flex; min-width: 300px; gap: 8px; padding: 0 4px 0; background: repeating-linear-gradient(to top,transparent 0,transparent 45px,var(--divisoria) 45px,var(--divisoria) 46px); }
+.dashboard-bin { flex: 1; min-width: 0; text-align: center; }
+.dashboard-bar-track { height: 115px; display: flex; align-items: end; justify-content: center; }
+.dashboard-bar { width: 76%; position: relative; background: var(--petroleo); border-radius: 3px 3px 0 0; }
+.dashboard-bar span { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); font-size: 10px; }
+.dashboard-bin > small { display: block; padding-top: 8px; font-size: 9px; white-space: nowrap; color: var(--secundario); background: var(--superficie); }
+.dashboard-chart-caption { font-size: 10px; color: var(--secundario); margin-top: 12px; }
+.dashboard-chart-data { font-size: 11px; color: var(--secundario); margin-top: 10px; }
+.dashboard-chart-data > summary { cursor: pointer; width: fit-content; }
+.dashboard-chart-empty { min-height: 172px; display: grid; place-items: center; text-align: center; color: var(--secundario); padding: 20px; }
+.dashboard-line { display: block; width: 100%; height: 185px; margin-top: 7px; overflow: visible; }
+.dashboard-line text { fill: var(--secundario); font-size: 13px; }
+.dashboard-grid-line { stroke: var(--divisoria); stroke-width: 1; }
+.dashboard-line-area { fill: var(--sel); }
+.dashboard-line-path { fill: none; stroke: var(--petroleo); stroke-width: 2; }
+.dashboard-point { fill: var(--petroleo); }
+.dashboard-bottom { display: grid; grid-template-columns: minmax(0,1.75fr) minmax(240px,1fr); gap: 18px; align-items: start; }
+.dashboard-bottom > * { min-width: 0; }
+.dashboard-start, .dashboard-reading { padding: 18px; }
+.dashboard-start .mini { align-items: start; gap: 10px; }
+.dashboard-start .mini > a { flex: none; font-size: 11px; }
+.dashboard-start .tbl th { padding: 10px; font-size: 9px; }
+.dashboard-start .tbl td { padding: 12px 10px; font-size: 11px; }
+.dashboard-start .tbl td, .dashboard-start .tbl td:first-child { min-width: 0; max-width: none; }
+.dashboard-start .tbl td:first-child { min-width: 145px; }
+.dashboard-start .tbl td:nth-child(2) { min-width: 130px; }
+.dashboard-start .tbl small { font-size: 10px; }
+.dashboard-row-select { min-height: 24px; color: var(--petroleo); padding: 0; border: 0; background: transparent; font-size: 11px; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+.dashboard-index { color: var(--petroleo); font-weight: 600; }
+.dashboard-selected { margin: 18px 0 10px; color: var(--secundario); font-size: 11px; }
+.dashboard-supplier { color: var(--secundario); font-size: 11px; margin-bottom: 6px; overflow-wrap: anywhere; }
+.dashboard-model { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; padding: 14px 0; border-bottom: 1px solid var(--divisoria); }
+.dashboard-model span small { display: block; font-size: 10px; color: var(--secundario); }
+.dashboard-model strong { font-size: 15px; color: var(--petroleo); white-space: nowrap; }
+.dashboard-model strong small { font-size: 10px; font-weight: 400; }
+.dashboard-model-note { font-size: 10px; color: var(--secundario); padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--divisoria); }
+.dashboard-reading .link-a { margin-top: 16px; font-size: 11px; }
+.dashboard-reading .hint { display: block; margin-top: 6px; }
+.dashboard-muted { color: var(--secundario); padding: 24px 0; font-size: 12px; }
+.dashboard .aviso { padding: 14px 16px; font-size: 11px; }
+.dashboard .aviso small { font-size: 10px; }
+@media (min-width:901px) and (max-width:1000px) { .dashboard-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width:760px) { .dashboard-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); } .dashboard-charts, .dashboard-bottom { grid-template-columns: minmax(0,1fr); } .dashboard .head { align-items: start; } }
+@media (max-width:400px) { .dashboard-kpis { grid-template-columns: minmax(0,1fr); } .dashboard-line text { font-size: 18px; } }
+
+.dashboard-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 10px; color: var(--secundario); }
+.dashboard-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.dashboard-legend i { width: 6px; height: 6px; border-radius: 1px; }
+.dashboard-settings > summary .pill { margin-left: 8px; font-size: 10px; }
+
+.dashboard-start .tbl .dashboard-clamp { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.dashboard-supplier { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

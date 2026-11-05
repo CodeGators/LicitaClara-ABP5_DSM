@@ -6,11 +6,12 @@ import { decimal, money } from '../api.mjs'
 import { Field, LookupFilter, Pager, QueryState } from '../components/consultas.jsx'
 import { Head } from '../components/ui.jsx'
 import useApi from '../useApi.js'
+import PainelGeral from './PainelGeral.jsx'
 
 export const indexText = value => value == null ? 'Indisponível' : decimal(value)
 const read = params => Object.fromEntries(viewFields.map(key => [key, params.get(key) || (key === 'analise' ? 'todos' : key === 'ordenacao' ? 'indice_desc' : key === 'tamanho_pagina' ? '20' : '')]))
 
-function Filters() {
+function Filters({ overview = false }) {
   const { params, setParams } = useAnalysis()
   const { baseId } = useBase()
   const [draft, setDraft] = useState(() => read(params))
@@ -35,12 +36,16 @@ function Filters() {
     <Field label="Total do recorte mínimo (R$)"><input className="input" type="number" min="0" step="0.00000001" value={draft.valor_minimo} onChange={e => change('valor_minimo', e.target.value)} /></Field>
     <Field label="Total do recorte máximo (R$)"><input className="input" type="number" min="0" step="0.00000001" value={draft.valor_maximo} onChange={e => change('valor_maximo', e.target.value)} /></Field>
     <Field label="Estado da análise"><select className="select" value={draft.analise} onChange={e => change('analise', e.target.value)}><option value="todos">Todos</option><option value="analisados">Analisados integralmente</option><option value="parcial">Parcialmente analisados</option><option value="nao_analisados">Não analisados</option></select></Field>
+    {!overview && <>
     <Field label="Ordenação"><select className="select" value={draft.ordenacao} onChange={e => change('ordenacao', e.target.value)}><option value="indice_desc">Maior índice disponível</option><option value="descricao_asc">Nome / descrição</option><option value="valor_desc">Maior total conhecido</option></select></Field>
     <Field label="Registros por página"><select className="select" value={draft.tamanho_pagina} onChange={e => change('tamanho_pagina', e.target.value)}>{[5,10,20,50,100].map(n => <option key={n}>{n}</option>)}</select></Field>
+    </>}
   </div><div className="filter-actions"><button className="btn primary" type="submit">Aplicar filtros</button><button className="btn ghost" type="button" onClick={() => setParams(previous => {
     const next = new URLSearchParams(previous); for (const key of [...viewFields, 'pagina']) next.delete(key); return next
   })}>Limpar filtros</button></div><p className="hint">O fornecedor seleciona itens com resultado dele. Valores e HHI conservam os demais vencedores desses itens no período. Contratos são vínculos conhecidos, não contagem de compras.</p></form>
 }
+
+function DashboardFilters() { return <Filters overview /> }
 
 function Notice() {
   return <div className="note"><b>Análise experimental · utilidade não validada</b>O índice é uma posição em relação ao treino do modelo, não probabilidade de fraude ou prioridade de auditoria. Sem faixas de risco validadas. Ausência de índice não representa regularidade.</div>
@@ -84,15 +89,15 @@ function Shell({ title, summary, children }) {
 }
 
 function DashboardContent() {
-  const { query } = useView('/visao/painel')
-  const data = query.data
-  return <Shell title="Painel do recorte" summary={data?.resumo}><QueryState query={query} />{data && <>
-    <div className="grid g-1-1"><section className="card"><h2>Distribuição dos índices experimentais</h2><p className="sub">Um índice máximo por item, conforme a seleção da análise. Parcialmente analisados são identificados nos contadores.</p>
-      {!data.distribuicao.some(b => b.itens) ? <p className="empty-chart">Nenhum índice disponível neste recorte.</p> : <><div className="distribution" role="region" aria-label="Distribuição de itens por faixa do índice experimental; use as setas para rolar" tabIndex={0}>{data.distribuicao.map((b,i) => <div key={b.inicio}><span>{b.itens}</span><div style={{ height: `${120*b.itens/Math.max(...data.distribuicao.map(x => x.itens))}px` }} /><small>{i === 9 ? '90–100' : `${b.inicio}–<${b.fim}`}</small></div>)}</div><table className="tbl"><caption>Contagem por intervalo</caption><tbody>{data.distribuicao.map((b,i) => <tr key={b.inicio}><th scope="row">{i === 9 ? '90–100' : `${b.inicio}–<${b.fim}`}</th><td>{b.itens}</td></tr>)}</tbody></table></>}
-    </section><section className="card"><h2>Evolução dos itens por último resultado</h2><p className="sub">Cada item conta uma vez, no mês do último resultado do recorte. Não mede pagamento ou alta prioridade.</p>
-      {!data.evolucao.length ? <p>Nenhum item neste recorte.</p> : <div className="table-scroll compact-table" role="region" aria-label="Evolução dos itens por mês" tabIndex="0"><table className="tbl"><thead><tr><th scope="col">Mês</th><th scope="col">Itens</th><th scope="col">Integrais</th><th scope="col">Parciais</th><th scope="col">Sem análise</th></tr></thead><tbody>{data.evolucao.map(m => <tr key={m.mes}><td>{m.mes === 'sem_data' ? 'Sem data conhecida' : m.mes.split('-').reverse().join('/')}</td><td>{m.itens}</td><td>{m.analisados}</td><td>{m.parcial}</td><td>{m.nao_analisados}</td></tr>)}</tbody></table></div>}
-    </section></div><section className="card"><h2>Motivos de indisponibilidade</h2>{Object.keys(data.motivos_indisponibilidade).length ? <ul>{Object.entries(data.motivos_indisponibilidade).map(([reason,n]) => <li key={reason}>{reason.replaceAll('_', ' ').toLocaleLowerCase('pt-BR')}: {n} ocorrência(s)</li>)}</ul> : <p>Nenhum motivo registrado neste recorte.</p>}</section></>}
-  </Shell>
+  const { query, params } = useView('/visao/painel')
+  const { baseId } = useBase()
+  const s = useAnalysis()
+  const filters = read(params)
+  const ranking = useApi('/visao/ranking', {
+    base_id: baseId, execucao_id: s.executionId, modelo_id: s.modelId,
+    ...filters, ordenacao: 'indice_desc', pagina: 1, tamanho_pagina: 3,
+  }, !!s.ready && !!query.data)
+  return <PainelGeral query={query} ranking={ranking} params={params} Filters={DashboardFilters} />
 }
 
 function RankingContent() {
