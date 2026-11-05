@@ -2,7 +2,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import DemoPainel from './pages/DemoPainel.jsx'
 import { PainelReal, RankingReal, FornecedoresReal } from './pages/Analitico.jsx'
-import { AnalysisProvider } from './AnalysisContext.jsx'
+import { AnalysisProvider, AnalysisGate } from './AnalysisContext.jsx'
 import DemoItens from './pages/DemoItens.jsx'
 import Detalhe from './pages/Detalhe.jsx'
 import Itens from './pages/Itens.jsx'
@@ -11,11 +11,12 @@ import Processo from './pages/Processo.jsx'
 import { BaseGate, BaseProvider } from './BaseContext.jsx'
 import DemoFornecedores from './pages/DemoFornecedores.jsx'
 import Relatorios from './pages/Relatorios.jsx'
+import DemoRelatorios from './pages/DemoRelatorios.jsx'
 
 export default function App() {
   const location = useLocation()
-  const real = /^\/(itens|processos|painel|ranking|fornecedores)(\/|$)/.test(location.pathname)
-  const analytic = /^\/(painel|ranking|fornecedores)(\/|$)/.test(location.pathname) || new URLSearchParams(location.search).has('execucao_id')
+  const real = /^\/(itens|processos|painel|ranking|fornecedores|relatorios)(\/|$)/.test(location.pathname)
+  const analytic = /^\/(painel|ranking|fornecedores|relatorios)(\/|$)/.test(location.pathname) || new URLSearchParams(location.search).has('execucao_id')
   const legacyParams = new URLSearchParams(location.search)
   legacyParams.delete('aba')
   return (
@@ -34,7 +35,8 @@ export default function App() {
         <Route path="demonstracao/itens/:id" element={<Detalhe />} />
         <Route path="fornecedores" element={<BaseGate><FornecedoresReal /></BaseGate>} />
         <Route path="fornecedores/:id" element={<BaseGate><FornecedoresReal /></BaseGate>} />
-        <Route path="relatorios" element={<Relatorios />} />
+        <Route path="relatorios" element={<BaseGate><AnalysisGate><Relatorios /></AnalysisGate></BaseGate>} />
+        <Route path="demonstracao/relatorios" element={<DemoRelatorios />} />
         <Route path="*" element={<div className="card" role="alert"><h1>Página não encontrada</h1><a className="link-a" href="/itens">Consultar itens</a></div>} />
       </Route>
     </Routes></AnalysisProvider></BaseProvider>

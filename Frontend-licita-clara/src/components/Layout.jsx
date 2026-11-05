@@ -14,9 +14,9 @@ const nav = [
   { to: '/ranking', label: 'Ranking experimental', icon: ListFilter },
   { to: '/demonstracao/painel', label: 'Painel · demonstração', icon: LayoutGrid },
   { to: '/fornecedores', label: 'Fornecedores', icon: Building2 },
-  { to: '/relatorios', label: 'Relatórios · demonstração', icon: FileText },
+  { to: '/relatorios', label: 'Relatórios', icon: FileText },
 ]
-const names = { itens: 'Consultar itens', processos: 'Processo da compra', demonstracao: 'Demonstração', painel: 'Painel', ranking: 'Ranking experimental', fornecedores: 'Fornecedores', relatorios: 'Relatórios · demonstração' }
+const names = { itens: 'Consultar itens', processos: 'Processo da compra', demonstracao: 'Demonstração', painel: 'Painel', ranking: 'Ranking experimental', fornecedores: 'Fornecedores', relatorios: 'Relatórios' }
 const readSeen = () => { try { return localStorage.getItem('lc_ajuda_vista') } catch { return null } }
 
 export default function Layout() {
@@ -46,7 +46,7 @@ export default function Layout() {
           <div className="eyebrow">Espaço de análise</div>
           <nav className="nav">
             {nav.map(({ to, label, icon: I, end }) => (
-              <NavLink key={to} to={real && base.baseId && !to.startsWith('/demonstracao') && to !== '/relatorios' ? selectionLink(to, search) : to} end={end} className={({ isActive }) => (isActive || (to === '/itens' && /^\/(itens|processos)(\/|$)/.test(pathname)) ? 'active' : '')}>
+              <NavLink key={to} to={real && base.baseId && !to.startsWith('/demonstracao') ? selectionLink(to, search) : to} end={end} className={({ isActive }) => (isActive || (to === '/itens' && /^\/(itens|processos)(\/|$)/.test(pathname)) ? 'active' : '')}>
                 <I size={18} /> {label}
               </NavLink>
             ))}

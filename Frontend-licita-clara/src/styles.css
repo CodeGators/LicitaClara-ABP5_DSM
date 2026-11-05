@@ -203,3 +203,15 @@ h1{font-size:30px;font-weight:500;letter-spacing:-.01em}
 .analysis-selection .pager { margin-top: 12px; }
 .compact-table .tbl td, .compact-table .tbl td:first-child { min-width: 0; max-width: none; white-space: nowrap; }
 .compact-table:focus-visible { outline: 2px solid var(--petroleo); outline-offset: 3px; }
+
+.report-grid { grid-template-columns: 300px minmax(0, 1fr); align-items: start; }
+.report-config { min-width: 0; }
+.report-config .field { margin: 16px 0; }
+.report-config .select { width: 100%; }
+.report-config hr { border: 0; border-top: 1px solid var(--divisoria); margin: 20px 0; }
+.report-preview, .report-preview .paper { min-width: 0; overflow-wrap: anywhere; }
+.report-preview .stats { grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); }
+.report-preview .stats strong { font-size: 16px; }
+.report-item { border-bottom: 1px solid var(--divisoria); padding-bottom: 16px; }
+.report-item .note small { display: block; }
+.report-rule { border: 0; border-top: 2px solid var(--petroleo); width: 100%; }

@@ -26,3 +26,25 @@ O detalhe do processo apresenta a síntese experimental quando a URL fixa
 disponíveis, cobertura oficial e links para os itens. Cobertura parcial mantém
 o score integral indisponível. Os modelos continuam separados, sem botão de
 execução ou faixas de fraude. API e banco devem estar na migração `0006_sinteses`.
+
+## Relatórios reais
+
+`/relatorios` consulta a API e permite selecionar um processo, conferir a prévia,
+alterar título e baixar PDF/CSV sem login. Os links “Preparar relatório” no detalhe
+do item/processo levam à compra selecionada e preservam base/execução; os modelos
+são incluídos separadamente. A página não exporta apenas a página atual de itens.
+A antiga tela ilustrativa fica em `/demonstracao/relatorios`.
+
+Uma alteração de título precisa ser aplicada em “Atualizar prévia” antes do
+exportar. Conflito 409 solicita atualizar os dados. Arquivos de até 200 itens por
+processo podem ter várias páginas; ausências e limites são explícitos.
+
+O projeto Playwright `reports-live` usa API/banco reais, sem escrever dados. Criar
+JSON local ignorado com `base`, `execucao`, `processo` (UUIDs publicados) e executar:
+
+```bash
+PLAYWRIGHT_CHANNEL=chrome API_PROXY_TARGET=http://127.0.0.1:8000 LICITA_REPORT_TEST_CONFIG=../data/diagnostico/10/browser_config.json npx playwright test --project=reports-live
+```
+
+O fluxo verifica o snapshot, arquivos baixados, exceções JavaScript e largura em
+celular. Os testes controlados de relatório fazem parte de `npm run test:e2e`.

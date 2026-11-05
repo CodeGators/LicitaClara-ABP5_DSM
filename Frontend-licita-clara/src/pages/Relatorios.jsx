@@ -1,78 +1,108 @@
 import { useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { Download, Pencil, Calendar, ChevronDown, FileCheck, CircleDot, Circle, Check } from 'lucide-react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { Download, FileCheck, Check } from 'lucide-react'
 import { Head } from '../components/ui.jsx'
 import { Mark } from '../components/Logo.jsx'
-import { itens, derivar, razaoTxt, brl } from '../data.js'
+import { Field, QueryState } from '../components/consultas.jsx'
+import { AnalysisSelector, useAnalysis } from '../AnalysisContext.jsx'
+import { useBase } from '../BaseContext.jsx'
+import { date, decimal, money } from '../api.mjs'
+import useApi from '../useApi.js'
 
-const Sec = ({ children }) => <h4 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{children}</h4>
-
+const apiBase = (import.meta.env.VITE_API_URL || '/api/v1').replace(/\/$/, '')
 export default function Relatorios() {
-  const [params] = useSearchParams()
-  const p = params.get('item') ? itens.find(x => x.id === params.get('item')) : itens[0]
-  const d = p ? derivar(p) : null
-  const [titulo, setTitulo] = useState('Prioridade de análise')
-  const [fmt, setFmt] = useState('PDF')
-  if (!p) return <div className="card" role="alert"><h1>Relatório indisponível</h1><p className="sub">Esta demonstração não gera relatórios dos itens reais. A emissão estará disponível após a integração dos relatórios.</p></div>
-  const marca = p.forn.split(' ')[0]
-  const rows = [
-    ['Preço unitário / mediana', razaoTxt(p.razao), `${brl(d.unitHom)} / ${brl(d.unitMed)}`],
-    ['Participantes', String(p.part), 'Mediana: 6'],
-    ['Participação no gasto do órgão', '42%', 'HHI do órgão: 0,31'],
-    ['Publicação–contrato', '12 dias', 'Mediana: 28 dias'],
-  ]
-  return (
-    <>
-      <Head kicker="Exportação / Auditoria e compliance" title="Relatórios" sub="Defina o item, revise a prévia e documente os sinais com responsabilidade."
-        action={<button className="btn primary no-print" onClick={() => window.print()}><Download size={16} /> Exportar {fmt}</button>} />
-      <div className="grid stack-md" style={{ gridTemplateColumns: '340px 1fr', alignItems: 'start' }}>
-        <div className="grid no-print">
-          <div className="card">
-            <h2>Configurar exportação</h2><p className="sub">Opções visuais do protótipo</p>
-            <div className="field" style={{ marginTop: 16 }}><label>Título do relatório</label><div className="input"><input value={titulo} onChange={e => setTitulo(e.target.value)} /><Pencil size={16} color="var(--secundario)" /></div></div>
-            <div className="field" style={{ marginTop: 16 }}><label>Escopo</label><div className="select"><span>Item selecionado</span><ChevronDown size={16} /></div></div>
-            <div className="note" style={{ background: 'var(--sel)', marginTop: 16 }}><b className="t-pet">{p.nome}</b>{p.forn}<br />{p.orgao} · score {p.score}</div>
-            <div className="field" style={{ marginTop: 16 }}><label>Período de referência</label><div className="select"><span>Jan–Jun 2026</span><Calendar size={16} /></div></div>
-            <div className="field" style={{ marginTop: 16 }}><label>Formato</label>
-              <div className="radio">{['PDF', 'CSV'].map(f => <button key={f} className={fmt === f ? 'on' : ''} onClick={() => setFmt(f)}>{fmt === f ? <CircleDot size={16} /> : <Circle size={16} />}{f}</button>)}</div></div>
-            <hr style={{ border: 0, borderTop: '1px solid var(--divisoria)', margin: '20px 0' }} />
-            <label style={{ fontSize: 12, fontWeight: 500, display: 'block', marginBottom: 12 }}>O relatório inclui</label>
-            {['Síntese e valores de itens', 'Sinais e comparação de itens', 'Limitações'].map(l => <p key={l} className="check-fixo"><Check size={16} color="var(--petroleo)" />{l}</p>)}
-            <p className="hint" style={{ display: 'block', marginTop: 12 }}>O aviso de revisão humana é obrigatório e permanece em todas as exportações.</p>
-          </div>
-          <div className="dark-card"><FileCheck size={22} /><b style={{ fontSize: 16 }}>Prévia pronta para revisão</b>
-            <p>1 item · {brl(p.valor)} homologados<br />{fmt} demonstrativo de 1 página.<br />A exportação não gera um arquivo real.</p></div>
-        </div>
-        <div className="preview">
-          <div className="mini no-print"><b>Prévia do relatório</b><span className="hint"><span className="pill rev" style={{ background: 'var(--superficie)' }}>100%</span>&nbsp; Página 1 de 1</span></div>
-          <div className="paper">
-            <div className="mini"><div className="mono-row"><Mark size={34} /><span style={{ fontSize: 22 }}><b style={{ fontWeight: 650 }}>Licita</b> Clara</span></div>
-              <small style={{ textAlign: 'right', color: 'var(--secundario)', fontSize: 11 }}>AUDITORIA E COMPLIANCE<br />30 jun 2026 · emissão simulada</small></div>
-            <hr style={{ border: 0, borderTop: '2px solid var(--petroleo)', width: '100%' }} />
-            <h3>Relatório de {titulo.toLowerCase()}</h3>
-            <p className="sub" style={{ margin: 0 }}>Item: {p.nome} · {p.id} · Jan–Jun 2026 · 1 item selecionado</p>
-            <span className="demo" style={{ alignSelf: 'flex-start' }}>Dados simulados • Protótipo acadêmico</span>
-            <Sec>01 / Síntese e valores do item</Sec>
-            <p>O item “{p.nome}” ({p.cat.toLowerCase()}), adquirido pelo {p.orgao}, foi priorizado para revisão humana. Fornecedor: {p.forn} Modalidade: pregão eletrônico. Situação: {p.rev.toLowerCase()}, sem conclusão de auditoria.</p>
-            <div className="stats" style={{ background: 'var(--fundo)', padding: 16 }}>
-              <div><small>Estimado</small><strong style={{ fontSize: 22, fontWeight: 500 }}>{brl(d.estimado)}</strong></div>
-              <div><small>Homologado</small><strong style={{ fontSize: 22, fontWeight: 500 }}>{brl(p.valor)}</strong></div>
-              <div><small>Score ilustrativo</small><strong className="t-alta" style={{ fontSize: 22, fontWeight: 500 }}>{p.score} / 100</strong></div>
-            </div>
-            <Sec>02 / Sinais e comparação de itens</Sec>
-            <table className="tbl" style={{ marginTop: 0 }}><thead><tr><th>Atributo</th><th>Item</th><th>Referência</th></tr></thead>
-              <tbody>{rows.map(r => <tr key={r[0]}>{r.map(c => <td key={c}>{c}</td>)}</tr>)}</tbody></table>
-            <p className="hint" style={{ display: 'block' }}>Comparação de preço: 18 compras similares de “{p.nome}”. Frequência de {marca} no {p.orgao}: 18 contratos no semestre.</p>
-            <Sec>03 / Limitações</Sec>
-            <p className="sub" style={{ margin: 0 }}>Isolation Forest: {p.score}/100 · Autoencoder: {d.auto}/100. Comparação simulada e ilustrativa, não uma avaliação validada. Contribuição por atributo também ilustrativa; sem SHAP calculado, modelo treinado ou métricas de acurácia.</p>
-            <div style={{ background: 'var(--aviso)', borderLeft: '3px solid var(--media)', padding: '12px 16px' }}>
-              <b>Anomalia estatística não é prova de irregularidade. Os sinais indicam prioridade de análise e exigem revisão humana.</b>
-              <p className="hint" style={{ display: 'block', marginTop: 4 }}>O score não é probabilidade de fraude. Limitações: falsos positivos, itens raros, qualidade variável de descrições e ausência de rótulos. Confirmar equivalência dos itens e documentos antes de concluir.</p></div>
-            <div><b style={{ fontSize: 11 }}>Fonte e rastreabilidade</b><p className="hint" style={{ display: 'block', marginTop: 4 }}>Fonte prevista: Kaggle Brazilian Public Tenders / Licitações e Contratos, compilado do Portal da Transparência. Este relatório não usa registros reais; todos os órgãos, fornecedores e resultados são fictícios.</p></div>
-            <div className="hint" style={{ borderTop: '1px solid var(--divisoria)', paddingTop: 12 }}><span>Licita Clara · FATEC Jacareí · Governança e Compliance</span><span>01 / 01</span></div>
-          </div>
-        </div>
+  const { baseId } = useBase()
+  const analysis = useAnalysis()
+  const [params, setParams] = useSearchParams()
+  const processId = params.get('processo_id') || ''
+  const [busca, setBusca] = useState('')
+  const [search, setSearch] = useState('')
+  const [titulo, setTitulo] = useState('Relatório de anomalias')
+  const [appliedTitle, setAppliedTitle] = useState('Relatório de anomalias')
+  const [format, setFormat] = useState('pdf')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const processes = useApi('/processos', { base_id: baseId, busca: search, tamanho_pagina: 100 }, !!baseId)
+  const selectionReady = analysis.ready && (!analysis.executionId || !!analysis.run.data)
+  const queryParams = { base_id: baseId, execucao_id: analysis.executionId || undefined, titulo: appliedTitle }
+  const preview = useApi(`/relatorios/processos/${encodeURIComponent(processId)}/previa`, queryParams, !!processId && selectionReady)
+  const data = preview.data
+  const setProcess = value => { setError(''); setParams(previous => { const next = new URLSearchParams(previous); next.set('processo_id', value); next.delete('item'); return next }) }
+  const download = async () => {
+    setBusy(true); setError('')
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 30000)
+    try {
+      const options = new URLSearchParams({ base_id: baseId, titulo: data.titulo, formato: format, snapshot_sha256: data.snapshot_sha256 })
+      if (data.analise) options.set('execucao_id', data.analise.id)
+      const response = await fetch(`${apiBase}/relatorios/processos/${encodeURIComponent(processId)}/arquivo?${options}`, { signal: controller.signal })
+      if (!response.ok) { const body = await response.json(); throw new Error(body.erro?.mensagem || 'Não foi possível gerar o arquivo.') }
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url; anchor.download = `licita-clara-${processId.slice(0, 8)}.${format}`
+      document.body.appendChild(anchor); anchor.click(); anchor.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    } catch (e) { setError(e.name === 'AbortError' ? 'A exportação demorou mais que o esperado. Tente novamente.' : e.message || 'Não foi possível exportar.') }
+    finally { clearTimeout(timer); setBusy(false) }
+  }
+  const process = data?.processo
+  return <>
+    <Head kicker="Exportação / Anomalias em compras públicas" title="Relatórios" sub="Selecione o processo, confira a prévia e baixe os dados reais."
+      action={<button className="btn primary" onClick={download} disabled={!data || busy || titulo !== appliedTitle}><Download size={16} />{busy ? 'Gerando arquivo…' : `Exportar ${format.toUpperCase()}`}</button>} />
+    <AnalysisSelector allModels />
+    <div className="grid stack-md report-grid">
+      <div className="grid report-config">
+        <section className="card"><h2>Configurar exportação</h2>
+          <form onSubmit={e => { e.preventDefault(); setSearch(busca.trim()) }}>
+            <Field label="Buscar processo"><input className="input" value={busca} maxLength={200} onChange={e => setBusca(e.target.value)} /></Field>
+            <button className="btn" type="submit">Buscar</button>
+          </form>
+          <QueryState query={processes} loading="Carregando processos…" />
+          <Field label="Processo selecionado"><select className="select" value={processId} onChange={e => setProcess(e.target.value)}>
+            <option value="">Selecione um processo</option>
+            {processId && !processes.data?.dados.some(p => p.id === processId) && <option value={processId}>{process?.numero_compra || processId}</option>}
+            {processes.data?.dados.map(p => <option value={p.id} key={p.id}>Compra {p.numero_compra} · {p.orgao_nome}</option>)}
+          </select></Field>
+          {processes.data?.meta.total > 100 && <p className="hint">Mostrando os primeiros 100 processos. Refine a busca para encontrar os demais.</p>}
+          <form onSubmit={e => { e.preventDefault(); setAppliedTitle(titulo.trim()); setTitulo(titulo.trim()); setError('') }}>
+            <Field label="Título do relatório"><input className="input" required maxLength={120} value={titulo} onChange={e => setTitulo(e.target.value)} /></Field>
+            <button className="btn" type="submit" disabled={!titulo.trim()}>Atualizar prévia</button>
+          </form>
+          <Field label="Formato"><div className="radio">{['pdf', 'csv'].map(f => <button key={f} type="button" aria-pressed={format === f} className={format === f ? 'on' : ''} onClick={() => setFormat(f)}>{f.toUpperCase()}</button>)}</div></Field>
+          <p className="hint">Período da base: {date(data?.base.periodo_inicio)} – {date(data?.base.periodo_fim)}</p>
+          <hr />
+          <h3>O relatório inclui</h3>
+          {['Síntese e valores do processo', 'Itens, resultados e índices dos modelos', 'Comparações disponíveis, fontes e limitações'].map(text => <p className="check-fixo" key={text}><Check size={16} />{text}</p>)}
+          <p className="hint">Até 200 itens por processo. O PDF pode ter várias páginas. O CSV tem uma linha por resultado/modelo; não some valores repetidos entre modelos.</p>
+        </section>
+        {data && <div className="dark-card"><FileCheck size={22} /><b>Prévia pronta para revisão</b><p>{data.resumo.itens} itens importados · {data.resumo.itens_analisados} com análise<br />{data.resumo.scores} pontuações, mantendo os algoritmos separados.</p></div>}
       </div>
-    </>
-  )
+      <div>
+        {error && <div className="card" role="alert">{error} <button className="link-a" onClick={preview.retry}>Atualizar prévia</button></div>}
+        {!processId ? <section className="card"><h2>{params.has('item') ? 'Relatório indisponível' : 'Selecione um processo'}</h2><p>Escolha uma compra na configuração ou abra o relatório pelo detalhe do processo.</p></section> : <QueryState query={preview} loading="Preparando a prévia…" />}
+        {data && <div className="preview report-preview"><div className="mini"><b>Prévia do relatório</b><span className="hint">{data.resumo.itens} itens no recorte</span></div>
+          <article className="paper">
+            <div className="mini"><div className="mono-row"><Mark size={34} /><span><b>Licita</b> Clara</span></div><small>ANÁLISE DE ANOMALIAS</small></div>
+            <hr className="report-rule" /><h2>{data.titulo}</h2>
+            <p className="sub">Compra {process.numero_compra} · {process.orgao_nome}</p>
+            <span className="demo">Dados oficiais · {data.analise ? 'análise experimental' : 'sem análise selecionada'}</span>
+            <h3>01 / Síntese do processo</h3><p>{process.objeto}</p>
+            <div className="stats"><div><small>Estimado global</small><strong>{money(process.valor_estimado_processo)}</strong></div><div><small>Homologado global</small><strong>{money(process.valor_homologado_processo)}</strong></div><div><small>Homologado no recorte</small><strong>{money(process.valor_homologado_itens_recorte)}</strong></div></div>
+            <p className="hint">Valores globais e do recorte são medidas distintas. O recorte pode conter somente parte da compra.</p>
+            <h3>02 / Sinais e comparação de itens</h3>
+            {data.itens.map(item => <section className="report-item" key={item.id}><h4>Item {item.numero_item} · {item.descricao}</h4><p>Unidade: {item.unidade_medida || 'Não informada'} · Quantidade: {decimal(item.quantidade)} · Estimado unitário: {money(item.valor_unitario_estimado)}</p>
+              {item.resultados.length ? item.resultados.map(r => <p key={r.id}>{r.fornecedor_nome} · {r.cancelado ? 'Cancelado' : 'Não cancelado'} · Unitário: {money(r.valor_unitario_homologado)} · Quantidade homologada: {decimal(r.quantidade_homologada)} · Total: {money(r.valor_total_homologado)} · Data: {date(r.data_resultado)}</p>) : <p>Sem resultado conhecido.</p>}
+              {item.scores.length ? item.scores.map(s => <div className="note" key={s.id}><b>{s.algoritmo} · Índice {decimal(s.indice)} / 100</b>Mediana do treino: {money(s.mediana_treino)} · Preço/mediana: {decimal(s.razao_preco_mediana)} · Exemplos de treino: {s.n_treino ?? 'Não informado'}<small>Resultado: {s.resultado_item_id} · Modelo: {s.modelo_id}<br />Fonte: {s.fonte.membro || 'Não informada'} · registro {s.fonte.linha ?? 'não informado'} · SHA-256: {s.fonte.arquivo_sha256 || 'não informado'}</small></div>) : <p>Sem análise disponível para este item na seleção.</p>}
+              {!!item.cobertura.filter(r => r.motivo).length && <p className="hint">Motivos de ausência: {[...new Set(item.cobertura.map(r => r.motivo).filter(Boolean))].join(', ')}</p>}
+            </section>)}
+            <h3>03 / Método e limites de interpretação</h3><div className="note">{data.limites.map(text => <p key={text}>{text}</p>)}</div>
+            <h3>Fonte e rastreabilidade</h3><p>{data.fonte}</p>
+            <p className="hint">Base: {data.base.id} · versão {data.base.versao}<br />Manifesto da base: {data.base.manifesto_sha256}<br />Execução: {data.analise?.id || 'Sem análise selecionada'}<br />Manifesto da análise: {data.analise?.manifesto_sha256 || 'Não disponível'}<br />Snapshot: {data.snapshot_sha256}</p>
+            <Link className="link-a" to={`/processos/${process.id}?${new URLSearchParams({ base_id: baseId, ...(data.analise ? { execucao_id: data.analise.id } : {}) })}`}>Ver processo da compra →</Link>
+          </article>
+        </div>}
+      </div>
+    </div>
+  </>
 }

@@ -95,3 +95,39 @@ separadas da prioridade de auditoria. As consultas publicadas
 `base_id` explícito e aceitam `modelo_id`. Score integral permanece nulo se
 o universo oficial ou a cobertura forem insuficientes; a média observada é
 um campo distinto. Não há faixas de fraude ou combinação de algoritmos.
+
+## Relatórios públicos por processo
+
+Sem login, filas ou gravação em tabelas de usuários. A prévia e os arquivos usam o
+mesmo serviço de dados; bases, resultados cancelados e algoritmos são explícitos.
+
+- `GET /api/v1/relatorios/processos/{processo_id}/previa?base_id=UUID`
+- `GET /api/v1/relatorios/processos/{processo_id}/arquivo?base_id=UUID&formato=pdf&snapshot_sha256=HASH`
+
+Ambas aceitam `execucao_id=UUID` de uma análise publicada e `titulo` (até 120
+caracteres). Sem execução, geram relatório de dados sem pontuações; não escolhem
+outra análise silenciosamente. O hash retornado na prévia deve acompanhar o
+arquivo, junto da mesma seleção/título. Divergência retorna 409 para atualizar a
+prévia. Publicar outra execução não troca a selecionada, inclusive publicações
+históricas. O SHA identifica o conteúdo do snapshot, não os bytes do PDF.
+
+PDF usa [ReportLab/Platypus](https://docs.reportlab.com/reportlab/userguide/ch5_platypus/)
+com fontes TrueType distribuídas pelo pacote, texto escapado e paginação A4.
+O download é um arquivo PDF, não a impressão do navegador. CSV usa UTF-8 com BOM,
+separador ponto e vírgula e campos entre aspas; textos que possam iniciar fórmulas
+recebem apóstrofo de proteção. Importar identificadores como texto na planilha.
+
+CSV tem uma linha por resultado/modelo; resultados sem score e itens sem resultado
+continuam presentes. Valores repetidos entre modelos não devem ser somados.
+Cancelados são identificados; totais de síntese do recorte seguem as consultas
+existentes (resultados ativos, sem transformar valores ausentes em zero).
+Limites: 200 itens, mil resultados, duas mil pontuações e snapshot de até 2 MiB.
+Excesso retorna 413, sem truncar silenciosamente. Não são buscados anexos ou URLs
+externos durante a geração. Não há armazenamento de solicitações/identidades;
+a tabela antiga `relatorios` não é utilizada por esse fluxo público.
+
+Validação específica:
+
+```bash
+uv run --locked --all-packages --extra validation pytest backend/tests/test_reports.py -q
+```

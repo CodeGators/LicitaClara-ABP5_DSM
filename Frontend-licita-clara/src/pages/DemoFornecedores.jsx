@@ -14,7 +14,7 @@ export default function Fornecedores() {
   return (
     <>
       <Head kicker="Relações e concentração / Jan–Jun 2026" title="Fornecedores" sub="Explore vínculos de contratação e participação no gasto de cada órgão."
-        action={<Link to="/relatorios" className="btn primary"><FileOutput size={16} /> Preparar relatório</Link>} />
+        action={<Link to="/demonstracao/relatorios" className="btn primary"><FileOutput size={16} /> Preparar relatório</Link>} />
       <div className="grid g3">
         <K l="Fornecedores no recorte" v="146" s="Entidades fictícias · base demonstrativa" i={Building2} />
         <K l="Órgãos contratantes" v="8" s="Concentração calculada por órgão" i={Landmark} />

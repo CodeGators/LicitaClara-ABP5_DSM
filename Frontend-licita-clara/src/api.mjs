@@ -72,3 +72,10 @@ export const selectionLink = (path, source) => {
   const params = new URLSearchParams(source)
   return `${path}?${new URLSearchParams([...params].filter(([key]) => keys.includes(key)))}`
 }
+
+export const reportLink = (processId, source) => {
+  const previous = new URLSearchParams(source)
+  const params = new URLSearchParams({ processo_id: processId })
+  for (const key of ['base_id', 'execucao_id']) if (previous.has(key)) params.set(key, previous.get(key))
+  return `/relatorios?${params}`
+}

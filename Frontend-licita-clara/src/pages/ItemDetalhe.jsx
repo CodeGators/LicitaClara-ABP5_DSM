@@ -2,7 +2,7 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { Head, Aviso } from '../components/ui.jsx'
 import { Documents, Info, QueryState, Results } from '../components/consultas.jsx'
 import { useBase } from '../BaseContext.jsx'
-import { baseLink, date, decimal, money } from '../api.mjs'
+import { baseLink, date, decimal, money, reportLink } from '../api.mjs'
 import useApi from '../useApi.js'
 import AnaliseItem from '../components/AnaliseItem.jsx'
 import { selectionLink } from '../AnalysisContext.jsx'
@@ -28,7 +28,7 @@ export default function ItemDetalhe() {
     <AnaliseItem item={item} />
     <Results results={item.resultados} />
     <Documents key={`${baseId}:${process.id}`} processId={process.id} baseId={baseId} />
-    <section className="card"><h2>Revisão e relatório</h2><p className="sub">O registro de revisões e a emissão de relatórios destes dados estarão disponíveis após a integração dessas funcionalidades. Nenhuma revisão é registrada nesta tela.</p></section>
+    <section className="card"><h2>Revisão e relatório</h2><p className="sub">Exporte o processo da compra com os itens do recorte e as análises disponíveis.</p><Link className="btn primary" to={reportLink(process.id, location.search)}>Preparar relatório</Link></section>
     <Aviso detalhe />
   </>
 }

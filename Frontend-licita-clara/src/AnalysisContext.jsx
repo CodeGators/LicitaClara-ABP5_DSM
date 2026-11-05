@@ -55,7 +55,7 @@ export function AnalysisGate({ children }) {
   return children
 }
 
-export function AnalysisSelector() {
+export function AnalysisSelector({ allModels = false }) {
   const s = useAnalysis()
   return <section className="card analysis-selection"><h2>Versão da análise</h2>
     <div className="filters real-filters">
@@ -64,15 +64,15 @@ export function AnalysisSelector() {
         {s.executionId && !s.runs.data?.dados.some(r => r.id === s.executionId) && <option value={s.executionId}>Execução selecionada · {s.executionId.slice(0, 8)}</option>}
         {(s.runs.data?.dados || []).map(r => <option key={r.id} value={r.id}>{new Date(r.concluido_em).toLocaleString('pt-BR')} · {r.id.slice(0, 8)}</option>)}
       </select></Field>
-      <Field label="Modelo experimental"><select className="select" value={s.modelId} disabled={!s.executionId} onChange={e => s.setSelection('modelo_id', e.target.value)}>
+      {!allModels && <Field label="Modelo experimental"><select className="select" value={s.modelId} disabled={!s.executionId} onChange={e => s.setSelection('modelo_id', e.target.value)}>
         {s.run.data?.roteamento_automatico && <option value="">Automático por item</option>}
         {!s.run.data?.modelos.length && <option value="">Sem modelo selecionado</option>}
         {s.modelId && !s.run.data?.modelos.some(m => m.id === s.modelId) && <option value={s.modelId}>Modelo fora desta execução</option>}
         {(s.run.data?.modelos || []).map(m => <option key={m.id} value={m.id}>{m.algoritmo === 'autoencoder' ? 'Autoencoder' : m.algoritmo === 'isolation_forest' ? 'Isolation Forest' : m.algoritmo} · {m.catalogo ? `CATMAT ${m.catalogo} · ` : ""}{m.id.slice(0, 8)}</option>)}
-      </select></Field>
+      </select></Field>}
     </div>
     {s.runs.error && <p role="alert">Não foi possível carregar as versões. <button className="link-a" onClick={s.runs.retry}>Tentar novamente</button></p>}
     {s.runs.data?.total_paginas > 1 && <div className="pager"><button disabled={s.page === 1} onClick={() => s.setPage(p => p - 1)}>Versões anteriores</button><span>{s.page}/{s.runs.data.total_paginas}</span><button disabled={s.page >= s.runs.data.total_paginas} onClick={() => s.setPage(p => p + 1)}>Mais versões</button></div>}
-    <p className="hint">Base e execução ficam fixadas na URL. No modo automático, cada item usa seu grupo: Isolation Forest quando estável, Autoencoder quando apenas ele está estável. Os índices são relativos ao treino de cada grupo.</p>
+    <p className="hint">{allModels ? "O relatório inclui todos os modelos disponíveis da execução, separados por item. Base e execução ficam fixadas na URL; índices não são somados." : "Base e execução ficam fixadas na URL. No modo automático, cada item usa seu grupo: Isolation Forest quando estável, Autoencoder quando apenas ele está estável. Os índices são relativos ao treino de cada grupo."}</p>
   </section>
 }

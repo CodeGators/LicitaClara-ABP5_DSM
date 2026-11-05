@@ -31,6 +31,8 @@ export async function mockApi(page, overrides = {}) {
     if (state.handler && await state.handler({ url, path, send, error })) return
     const base = url.searchParams.get('base_id') || state.latest
     if (![BASE, OTHER_BASE].includes(base)) return error('Não há base validada para esta consulta.', 404)
+    if (path === '/analises/publicacao') return send({ base_id: base, status: 'nao_publicada', execucao_id: null })
+    if (path === '/analises/execucoes') return send({ dados: [], total_paginas: 0 })
     if (path === '/base/status') return send(state.noBase ? { status: 'sem_base', base: null, cobertura: null } : { ...status, base: { ...status.base, id: base } })
     if (path === '/orgaos') return send(pageOf([{ id: ORGANIZATION, nome: 'Órgão do recorte' }], url, base))
     if (path === '/modalidades') return send(pageOf([{ id: MODALITY, nome: 'Pregão' }], url, base))

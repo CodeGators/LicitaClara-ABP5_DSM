@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { Head, Aviso } from '../components/ui.jsx'
 import { Documents, Info, Pager, QueryState } from '../components/consultas.jsx'
 import { useBase } from '../BaseContext.jsx'
-import { baseLink, date, money, selectionLink } from '../api.mjs'
+import { baseLink, date, money, selectionLink, reportLink } from '../api.mjs'
 import useApi from '../useApi.js'
 import SinteseProcesso from '../components/SinteseProcesso.jsx'
 
@@ -19,7 +19,7 @@ export default function Processo() {
   const process = query.data.processo
   return <>
     <Link className="link-a" to={baseLink('/itens', baseId)}>← Consultar itens</Link>
-    <Head kicker="Consulta / Processo da compra" title={`Compra ${process.numero_compra}`} sub={process.objeto} />
+    <Head kicker="Consulta / Processo da compra" title={`Compra ${process.numero_compra}`} sub={process.objeto} action={<Link className="btn primary" to={reportLink(id, location.search)}>Preparar relatório</Link>} />
     <div className="card stats">
       <Info label="Órgão">{process.orgao_nome}</Info><Info label="Modalidade">{process.modalidade_nome || 'Não informada'}</Info><Info label="Número do processo">{process.numero_processo || 'Não informado'}</Info>
       <Info label="Publicação">{date(process.data_publicacao)}</Info><Info label="Estimado global da compra">{money(process.valor_estimado_processo)}</Info><Info label="Homologado global da compra">{money(process.valor_homologado_processo)}</Info>
