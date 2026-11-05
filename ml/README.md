@@ -511,3 +511,31 @@ relativas ao treino de cada grupo, sem interpretar percentis como probabilidade
 de fraude. A síntese de processo apresenta contagens de cobertura e grupos;
 não calcula média ou score integral combinando índices de grupos diferentes.
 A quantidade importada não comprova o universo oficial completo da compra.
+
+## Conferência e exportação do snapshot agrupado
+
+Na raiz do repositório, informe o manifesto e seu SHA-256 registrado na saída da
+inferência. A exportação não executa treino, não carrega pickle e não aprova
+utilidade automaticamente:
+
+```bash
+uv run --locked --all-packages python -m licita_ml.validation.closure \
+  --manifesto CAMINHO_MANIFESTO --sha256 SHA256_REGISTRADO \
+  --saida data/conferencia_ml --conferir-banco
+```
+
+Gera `scores.csv`, `cobertura.csv`, `resumo.json` e `revisao_original.csv`.
+A conferência local verifica hash, grupos, intervalo dos índices e correspondência
+entre cobertura e scores. `--conferir-banco` também usa o reconciliador existente
+para verificar registros persistidos, fatores e roteamento, sem escrever no banco.
+Sem essa opção, a exportação não verifica o estado atual do banco nem repete as
+predições. A saída do comando informa o resultado da conferência adicional.
+
+A planilha contém um caso por grupo, escolhido pelo menor ID de score, sem
+ordenar grupos pelo índice. Ela serve para revisão exploratória, não é teste cego
+prospectivo, amostra representativa de todos os resultados ou estimativa de
+acurácia. Copie `revisao_original.csv` para `revisao_preenchida.csv` antes de editar.
+Conferir especificação, unidade/embalagem, quantidade, preço, referência e datas;
+registrar parecer, justificativa, fonte verificável, revisor e data. Todos os
+pareceres começam pendentes. O exportador preserva arquivos existentes divergentes
+em vez de sobrescrevê-los. Exportações e revisões permanecem fora do Git.
