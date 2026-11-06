@@ -316,3 +316,6 @@ h1{font-size:30px;font-weight:500;letter-spacing:-.01em}
 
 .dashboard-start .tbl .dashboard-clamp { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
 .dashboard-supplier { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.dashboard-analysis-link { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; color: var(--petroleo); border-radius: 6px; }
+.dashboard-analysis-link:hover { background: var(--sel); }
