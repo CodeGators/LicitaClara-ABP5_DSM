@@ -36,7 +36,7 @@ export default function Processos() {
 
   return (
     <>
-      <Head kicker="Fila de análise / Ranking" title="Processos sinalizados" sub="Encontre os itens prioritários. Dica: clique em uma linha para selecioná-la e depois em “Ver detalhe do item”."
+      <Head kicker="Fila de análise / Ranking" title="Itens Sinalizados" sub="Encontre os itens prioritários. Dica: clique em uma linha para selecioná-la e depois em “Ver detalhe do item”."
         action={<Link to={`/demonstracao/relatorios?item=${atual?.id || itens[0].id}`} className="btn primary"><FileOutput size={16} /> Preparar relatório</Link>} />
       <div className="card">
         <div className="mini"><h2>Refine o recorte</h2><button className="link-a" style={{ background: 'none', border: 0 }} onClick={limpar}>Limpar filtros</button></div>

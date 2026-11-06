@@ -24,7 +24,7 @@ export default function Detalhe() {
   ]
   return (
     <>
-      <Head kicker="Processos sinalizados / Detalhe do item" title={p.nome} sub={`${p.cat} · ${p.orgao} · Pregão eletrônico · ${p.id}`}
+      <Head kicker="Itens Sinalizados / Detalhe do item" title={p.nome} sub={`${p.cat} · ${p.orgao} · Pregão eletrônico · ${p.id}`}
         action={<Link to={`/demonstracao/relatorios?item=${p.id}`} className="btn primary"><FilePlus2 size={16} /> Incluir no relatório</Link>} />
       <div className="card stack-md" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 220px', gap: 24 }}>
         <div className="stats" style={{ gridColumn: '1 / 4' }}>

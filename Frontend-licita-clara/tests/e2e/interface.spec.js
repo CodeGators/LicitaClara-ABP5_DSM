@@ -64,7 +64,7 @@ test('atalho pula navegação; mudar de tela atualiza título e foco no conteúd
   await mockApi(page)
   await page.goto('/itens')
   await expect(page.getByRole('heading', { name: 'Consultar itens', exact: true })).toBeVisible()
-  await expect(page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('link')).toHaveText(['Painel Geral', 'Processos sinalizados', 'Fornecedores', 'Relatórios'])
+  await expect(page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('link')).toHaveText(['Painel Geral', 'Itens Sinalizados', 'Fornecedores', 'Relatórios'])
   await page.keyboard.press('Tab')
   await expect(page.getByRole('link', { name: 'Pular para o conteúdo' })).toBeFocused()
   await page.keyboard.press('Enter')

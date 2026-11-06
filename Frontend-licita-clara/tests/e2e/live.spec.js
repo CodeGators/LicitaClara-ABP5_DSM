@@ -47,7 +47,7 @@ test('painel, ranking e fornecedores reais reconciliam recorte e conservam a anÃ
   expect(snapshot.resumo.analisados+snapshot.resumo.parcial+snapshot.resumo.nao_analisados).toBe(snapshot.resumo.itens)
   expect(snapshot.evolucao.reduce((n,m)=>n+m.itens,0)).toBe(snapshot.resumo.itens)
   await page.screenshot({path:testInfo.outputPath('painel-real.png'),fullPage:true})
-  await page.getByRole('link',{name:'Processos sinalizados',exact:true}).click()
+  await page.getByRole('link',{name:'Itens Sinalizados',exact:true}).click()
   await expect(page.getByRole('heading',{name:`${snapshot.resumo.itens} item(ns) no ranking`})).toBeVisible()
   expect(new URL(page.url()).searchParams.get('execucao_id')).toBe(run)
   await page.locator('section.card tbody a.link-a').first().click()
