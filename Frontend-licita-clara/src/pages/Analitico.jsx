@@ -7,11 +7,12 @@ import { Field, LookupFilter, Pager, QueryState } from '../components/consultas.
 import { Head } from '../components/ui.jsx'
 import useApi from '../useApi.js'
 import PainelGeral from './PainelGeral.jsx'
+import ItemFilters from '../components/ItemFilters.jsx'
 
 export const indexText = value => value == null ? 'Indisponível' : decimal(value)
 const read = params => Object.fromEntries(viewFields.map(key => [key, params.get(key) || (key === 'analise' ? 'todos' : key === 'ordenacao' ? 'indice_desc' : key === 'tamanho_pagina' ? '20' : '')]))
 
-function Filters({ overview = false }) {
+function Filters({ overview = false, simple = false }) {
   const { params, setParams } = useAnalysis()
   const { baseId } = useBase()
   const [draft, setDraft] = useState(() => read(params))
@@ -26,6 +27,10 @@ function Filters({ overview = false }) {
       return next
     })
   }
+  const clear = () => setParams(previous => {
+    const next = new URLSearchParams(previous); for (const key of [...viewFields, 'pagina']) next.delete(key); return next
+  })
+  if (simple) return <ItemFilters draft={draft} change={change} apply={apply} clear={clear} baseId={baseId} params={params} />
   return <form className="card" aria-label="Filtros do recorte" onSubmit={apply}><h2>Filtros do recorte</h2><div className="filters real-filters">
     <Field label="Buscar item, compra ou fornecedor"><input className="input" type="search" maxLength={200} value={draft.busca} onChange={e => change('busca', e.target.value)} /></Field>
     <LookupFilter kind="/orgaos" title="Órgão" baseId={baseId} value={draft.orgao_id} onChange={v => change('orgao_id', v)} />
@@ -84,7 +89,7 @@ function ItemRows({ rows, params }) {
 }
 
 function Shell({ title, summary, children }) {
-  return <><Head kicker="Dados oficiais / Recorte selecionado" title={title} sub="Consultas reais, com base e análise versionadas. Filtros compartilhados entre painel, ranking e fornecedores." />{summary && <Cards summary={summary} />}<AnalysisSelector /><Notice /><Filters />{children}</>
+  return <><Head kicker="Dados oficiais / Recorte selecionado" title={title} sub={title === 'Itens Sinalizados' ? 'Consulte os itens importados e seus Scores. Use a busca ou refine a seleção em Mais filtros.' : 'Consultas reais, com base e análise versionadas. Filtros compartilhados entre painel, ranking e fornecedores.'} />{summary && <Cards summary={summary} />}<AnalysisSelector /><Notice /><Filters simple={title === 'Itens Sinalizados'} />{children}</>
 }
 
 function DashboardContent() {

@@ -23,7 +23,7 @@ export function NoAnalysis() {
   return <div className="note"><b>{selected ? 'Análise selecionada' : 'Sem análise selecionada'}</b>{selected ? 'Abra o detalhe de um item para consultar os índices ou os motivos de ausência na execução escolhida.' : 'Esta consulta mostra os dados importados. No painel ou ranking, selecione uma execução para consultar os índices disponíveis.'} Ausência de índice não representa conclusão sobre regularidade.</div>
 }
 
-export function LookupFilter({ kind, title, value, onChange, baseId }) {
+export function LookupFilter({ kind, title, value, onChange, baseId, compact = false }) {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [label, setLabel] = useState('')
@@ -38,7 +38,7 @@ export function LookupFilter({ kind, title, value, onChange, baseId }) {
     </select></Field>
     {query.loading && <small role="status">Carregando opções…</small>}
     {query.error && <div role="alert">Não foi possível carregar as opções. <button type="button" className="link-a" onClick={query.retry}>Tentar novamente</button></div>}
-    {query.data?.meta.total_paginas > 1 && <div className="pager"><button className="btn ghost sm" type="button" disabled={page === 1 || query.loading} onClick={() => setPage(p => p - 1)}>Opções anteriores</button><small>{page}/{query.data.meta.total_paginas}</small><button className="btn ghost sm" type="button" disabled={page >= query.data.meta.total_paginas || query.loading} onClick={() => setPage(p => p + 1)}>Mais opções</button></div>}
+    {query.data?.meta.total_paginas > 1 && <div className="pager"><button className="btn ghost sm" type="button" disabled={page === 1 || query.loading} onClick={() => setPage(p => p - 1)}>{compact ? 'Lista anterior' : 'Opções anteriores'}</button><small>{compact ? `${title}: página ${page} de ${query.data.meta.total_paginas}` : `${page}/${query.data.meta.total_paginas}`}</small><button className="btn ghost sm" type="button" disabled={page >= query.data.meta.total_paginas || query.loading} onClick={() => setPage(p => p + 1)}>{compact ? 'Próxima lista' : 'Mais opções'}</button></div>}
   </div>
 }
 
