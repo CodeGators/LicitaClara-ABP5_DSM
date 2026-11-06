@@ -13,7 +13,7 @@ for (const theme of ['light', 'dark']) for (const width of [1280, 1062, 390]) {
     await expect(page.getByRole('heading', { name: 'Por onde começar' })).toBeVisible()
     await expect(page.locator('[role="status"]')).toHaveCount(0)
     await expect(page.locator('.query-error')).toHaveCount(0)
-    await expect(page.locator('#dashboard-settings')).not.toHaveAttribute('open')
+    await expect(page.getByRole('form', { name: 'Filtros do recorte' })).toHaveCount(0)
     if (width >= 1062) {
       const positions = await page.locator('.dashboard-kpis .kpi').evaluateAll(cards => cards.map(el => el.getBoundingClientRect().top))
       expect(new Set(positions).size).toBe(1)

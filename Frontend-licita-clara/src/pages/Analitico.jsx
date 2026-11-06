@@ -45,7 +45,6 @@ function Filters({ overview = false }) {
   })}>Limpar filtros</button></div><p className="hint">O fornecedor seleciona itens com resultado dele. Valores e HHI conservam os demais vencedores desses itens no período. Contratos são vínculos conhecidos, não contagem de compras.</p></form>
 }
 
-function DashboardFilters() { return <Filters overview /> }
 
 function Notice() {
   return <div className="note"><b>Análise experimental · utilidade não validada</b>O índice é uma posição em relação ao treino do modelo, não probabilidade de fraude ou prioridade de auditoria. Sem faixas de risco validadas. Ausência de índice não representa regularidade.</div>
@@ -97,7 +96,7 @@ function DashboardContent() {
     base_id: baseId, execucao_id: s.executionId, modelo_id: s.modelId,
     ...filters, ordenacao: 'indice_desc', pagina: 1, tamanho_pagina: 3,
   }, !!s.ready && !!query.data)
-  return <PainelGeral query={query} ranking={ranking} params={params} Filters={DashboardFilters} />
+  return <PainelGeral query={query} ranking={ranking} params={params} />
 }
 
 function RankingContent() {

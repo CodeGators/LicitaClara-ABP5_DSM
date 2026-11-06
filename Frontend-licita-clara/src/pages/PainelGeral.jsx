@@ -2,7 +2,7 @@ import { useId, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Files, Wallet, Activity, ScanSearch, CalendarDays, ArrowRight } from 'lucide-react'
 import { useBase } from '../BaseContext.jsx'
-import { AnalysisSelector, useAnalysis } from '../AnalysisContext.jsx'
+import { useAnalysis } from '../AnalysisContext.jsx'
 import { decimal, money, selectionLink } from '../api.mjs'
 import { QueryState, Field } from '../components/consultas.jsx'
 import { Head, Aviso } from '../components/ui.jsx'
@@ -80,17 +80,15 @@ function ModelReading({ item, baseId, executionId }) {
   </section>
 }
 
-export default function PainelGeral({ query, ranking, params, Filters }) {
+export default function PainelGeral({ query, ranking, params }) {
   const { baseId, data: baseData } = useBase()
   const selection = useAnalysis()
-  const [settings, setSettings] = useState(false)
   const [chosen, setChosen] = useState('')
   const data = query.data
   const rows = ranking.data?.dados.filter(r => r.indice_experimental != null) || []
   const selected = rows.find(r => r.id === chosen) || rows[0]
   const summary = data?.resumo
   const periodLabel = period(baseData?.base?.periodo_inicio, baseData?.base?.periodo_fim)
-  const activeFilters = ['busca', 'orgao_id', 'fornecedor_id', 'modalidade_id', 'homologacao_inicio', 'homologacao_fim', 'valor_minimo', 'valor_maximo'].filter(key => params.get(key)).length + (params.get('analise') && params.get('analise') !== 'todos' ? 1 : 0)
   const withAnalysis = summary ? summary.analisados + summary.parcial : 0
   const cards = summary ? [
     ['Processos no recorte', number(summary.processos), `${number(summary.orgaos)} órgãos · ${number(summary.fornecedores)} fornecedores`, Files],
@@ -100,8 +98,7 @@ export default function PainelGeral({ query, ranking, params, Filters }) {
   ] : []
   return <div className="dashboard">
     <Head kicker={`Visão consolidada / ${periodLabel}`} title="Clareza para priorizar a análise." sub="Acompanhe sinais estatísticos de compras públicas em um único lugar."
-      action={<button className="btn ghost dashboard-period" aria-expanded={settings} aria-controls="dashboard-settings" title="Período da base; abrir filtros e versão da análise" onClick={() => setSettings(s => !s)}><CalendarDays size={16} />{periodLabel}</button>} />
-    <details id="dashboard-settings" className="dashboard-settings" open={settings} onToggle={e => setSettings(e.currentTarget.open)}><summary>Filtros e versão da análise{activeFilters > 0 && <span className="pill ana">{activeFilters} filtro(s) aplicado(s)</span>}</summary><AnalysisSelector /><Filters /></details>
+      action={<span className="btn ghost dashboard-period" title="Período da base"><CalendarDays size={16} aria-hidden="true" />{periodLabel}</span>} />
     <QueryState query={query} />
     {data && <>
       <div className="dashboard-kpis">{cards.map(([label, value, note, Icon], i) => <section className="card kpi" key={label}><div className="dashboard-kpi-label"><span>{label}</span><Icon size={17} aria-hidden="true" /></div><strong title={i === 1 ? money(summary.valor_homologado) : undefined}>{value}</strong><small>{note}</small></section>)}</div>

@@ -82,9 +82,9 @@ O comportamento dos diálogos segue a [referência WAI-ARIA](https://www.w3.org/
 ## Painel Geral
 
 O painel tem quatro indicadores, distribuição em barras, evolução temporal e uma
-seleção de itens para comparar resultados dos modelos. “Filtros e versão da
-análise” fica recolhido; o botão do período abre essa configuração. Ordenação e
-paginação permanecem nas listas, sem controles sem efeito na visão consolidada.
+seleção de itens para comparar resultados dos modelos. O período é apenas
+informativo; o painel não exibe controles de filtros ou de versão da análise.
+Ordenação, paginação e filtros permanecem nas telas de consulta.
 
 Os cards mostram processos, homologado, itens com índice e itens sem análise.
 Valores grandes são abreviados no card; o valor exato fica no título do valor.
