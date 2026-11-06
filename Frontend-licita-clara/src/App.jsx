@@ -7,6 +7,7 @@ import DemoItens from './pages/DemoItens.jsx'
 import Detalhe from './pages/Detalhe.jsx'
 import Itens from './pages/Itens.jsx'
 import ItemDetalhe from './pages/ItemDetalhe.jsx'
+import DetalheAnalise from './pages/DetalheAnalise.jsx'
 import Processo from './pages/Processo.jsx'
 import { BaseGate, BaseProvider } from './BaseContext.jsx'
 import DemoFornecedores from './pages/DemoFornecedores.jsx'
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="processos" element={<Navigate to={`/itens?${legacyParams}`} replace />} />
         <Route path="processos/:id" element={<BaseGate><Processo /></BaseGate>} />
         <Route path="painel" element={<BaseGate><PainelReal /></BaseGate>} />
+        <Route path="ranking/:id" element={<BaseGate><AnalysisGate><DetalheAnalise /></AnalysisGate></BaseGate>} />
         <Route path="ranking" element={<BaseGate><RankingReal /></BaseGate>} />
         <Route path="demonstracao/painel" element={<DemoPainel />} />
         <Route path="demonstracao/fornecedores" element={<DemoFornecedores />} />

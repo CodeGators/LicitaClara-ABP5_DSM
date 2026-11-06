@@ -104,3 +104,25 @@ claro/escuro e regras automatizadas de acessibilidade:
 ```bash
 PLAYWRIGHT_CHANNEL=chrome API_PROXY_TARGET=http://127.0.0.1:8000 LICITA_INTERFACE_CONFIG=../data/diagnostico/11/config.json npx playwright test --project=painel-live
 ```
+
+## Detalhe do item sinalizado
+
+A lupa do painel e os links de itens do ranking abrem `/ranking/:id`, mantendo
+base, execução e modelo. A tela consulta o item, a compra e os scores existentes;
+não executa inferência. Os valores globais da compra são identificados separadamente
+do total do resultado do item. Fornecedores e modelos não têm seus scores combinados.
+
+A comparação mostra a mediana e o tamanho do treino registrados com o modelo,
+preço unitário estimado e homologado. O Autoencoder mostra as parcelas disponíveis
+do erro de reconstrução; contribuição por atributo do Isolation Forest permanece
+indisponível. Documentos usam links oficiais e o relatório mantém processo/base/execução.
+A revisão humana é indicada como não registrada; persistência de pareceres e lista
+individual de exemplos históricos ainda não estão disponíveis nessa tela.
+
+Verificação com API real, a partir desta pasta e com o servidor acessível:
+
+```bash
+LICITA_INTERFACE_CONFIG=../data/diagnostico/11/config.json PLAYWRIGHT_CHANNEL=chrome npx playwright test --project=detalhe-live
+```
+
+O arquivo local de configuração segue o formato `{ "base": "UUID", "execucao": "UUID", "routes": [["painel", "/painel?base_id=UUID&execucao_id=UUID"]] }`.

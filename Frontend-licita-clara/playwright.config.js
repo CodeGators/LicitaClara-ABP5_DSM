@@ -18,6 +18,7 @@ export default defineConfig({
     { name: 'live', testMatch: 'live.spec.js' },
     { name: 'reports-live', testMatch: 'relatorios-live.spec.js' },
     { name: 'interface-live', testMatch: 'interface-live.spec.js' },
+    { name: 'detalhe-live', testMatch: 'detalhe-live.spec.js' },
     { name: 'painel-live', testMatch: 'painel-live.spec.js' },
   ],
   webServer: {
