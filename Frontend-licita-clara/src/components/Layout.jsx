@@ -11,7 +11,7 @@ import { selectionLink } from '../AnalysisContext.jsx'
 
 const nav = [
   { to: '/painel', label: 'Painel Geral', icon: LayoutGrid },
-  { to: '/ranking', label: 'Processos sinalizados', icon: ListFilter },
+  { to: '/ranking', label: 'Processos sinalizados', icon: ListFilter, end: true },
   { to: '/fornecedores', label: 'Fornecedores', icon: Building2 },
   { to: '/relatorios', label: 'Relatórios', icon: FileText },
 ]
@@ -82,7 +82,7 @@ export default function Layout() {
           <div className="crumb">
             <button className="icon-btn menu-btn" onClick={() => setMenu(true)} aria-label="Abrir menu" aria-controls="menu-principal" aria-expanded={menu}><Menu size={20} /></button>
             <Layers size={18} className="hide-sm" />
-            <span><span className="hide-sm">Auditoria cidadã / </span>{names[parts[0] || '']}</span>
+            <span><span className="hide-sm">Auditoria cidadã / </span>{parts[0] === 'ranking' && parts[1] ? 'Ranking' : names[parts[0] || '']}</span>
           </div>
           <div className="chips">
             <span className="demo">{real ? (new URLSearchParams(search).get('execucao_id') && new URLSearchParams(search).get('execucao_id') !== 'nenhuma' ? 'Dados oficiais · análise experimental' : 'Dados oficiais · consulta de dados') : 'Demonstração · dados simulados'}</span>
