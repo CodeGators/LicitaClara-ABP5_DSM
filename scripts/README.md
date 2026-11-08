@@ -7,7 +7,8 @@ com os mesmos arquivos de entrada. Não precisam receber o `.env` de outra pesso
 Use Linux ou WSL2 com Docker disponível. O pipeline usa locks Unix e processos
 Python. Dependências: Git, Python 3.12, uv 0.13.2, Node.js 20.19+ da linha 20,
 npm e Docker Compose. Reserve espaço para os ZIPs, Parquet, banco e modelos;
-os 312 MB de ZIPs não representam o tamanho final do processamento.
+os 312 MB de ZIPs não representam o tamanho final do processamento. Para esse
+pacote, recomendamos reservar 30 GB livres, incluindo arquivos temporários.
 
 ## 1. Clonar e instalar
 

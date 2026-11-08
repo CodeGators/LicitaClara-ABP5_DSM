@@ -1,6 +1,10 @@
 # Backend — FastAPI
 
-Ambiente local, endpoints operacionais, consultas versionadas de processos/itens/documentos e esquema PostgreSQL com quatro migrações implementados. O coletor e a preparação/importação estão operacionais. Os ensaios de ML permanecem sem publicação de scores. Veja os contratos, filtros e comandos da etapa 06 (documentação local).
+API FastAPI com consultas versionadas de processos, itens e documentos,
+análises experimentais e relatórios PDF/CSV. Para uma instalação nova e os
+scripts de dados/treinamento, siga o [guia da equipe](../scripts/README.md).
+As referências a pilotos e etapas abaixo registram a evolução do backend; a
+cobertura atual depende da base e da execução selecionadas.
 
 A etapa 02 do plano de conclusão acrescenta `GET /api/v1/itens` e `GET /api/v1/itens/{item_id}`. Esses endpoints retornam uma linha por item, contexto do processo e resultados por fornecedor, sem modificar as sete rotas originais. Ver contratos de itens/processos e testes manuais (documentação local).
 
