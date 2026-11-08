@@ -1,0 +1,50 @@
+{
+  "versao": "catalogo-itens-v2",
+  "escopo": "todas_referencias_e_itens_da_base_organizada_sem_filtro_categoria",
+  "grupo": [
+    "CATMAT",
+    "catalogo",
+    "especificacao_catalogo_completa",
+    "especificacao_detalhada_completa",
+    "unidade",
+    "capacidade",
+    "medida"
+  ],
+  "normalizacao": [
+    "acentos_caixa_espacos",
+    "espaco_entre_numero_e_unidade",
+    "ordem_atributos_nomeados"
+  ],
+  "preservar": [
+    "cores",
+    "dimensoes",
+    "numeros",
+    "qualificadores",
+    "texto_livre",
+    "atributos_repetidos"
+  ],
+  "unidades": "unidades-preco-v1: unidade/capacidade/medida validadas; dimensoes contraditorias excluidas",
+  "capacidade_unidade_simples": "zero_ausente_ou_um_com_medida_compativel_mesmo_sentinela_sem_converter_preco",
+  "preco": "por_unidade_de_fornecimento_original_sem_converter_caixa_em_unidade",
+  "estatisticas": "media_mediana_minimo_maximo_descritivos_por_grupo_excluindo_precos_nao_positivos_e_suspensoes_documentais_sem_remover_outliers",
+  "treino": "estatisticas_da_janela_sao_diagnosticas_nao_liberacao_automatica",
+  "observacoes": "preservar_cada_referencia_com_preco_quantidade_data_e_proveniencia",
+  "itens_sem_catalogo": "registrar_ausencia_e_candidatos_por_chave_sem_fabricar_catalogo",
+  "resultados": "exportar_separados_nao_somar_com_referencias_que_podem_repetir_mesma_compra",
+  "aprovacao_comercial_automatica": false,
+  "treinar_modelos": false,
+  "alterar_banco": false,
+  "unidades_simples_sem_capacidade_embalagem": [
+    "UN",
+    "KG",
+    "G",
+    "L",
+    "ML",
+    "M",
+    "M2",
+    "M3"
+  ],
+  "conversoes_entre_unidades": false,
+  "copia_catalogo_sem_marcadores": "somente_copia_exata_dos_atributos_conhecidos_preservando_todos_valores_e_qualificadores",
+  "conversoes": "valores-base exatos informativos; nao fundir grupos de embalagens/unidades comerciais distintas"
+}

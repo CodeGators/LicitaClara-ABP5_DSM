@@ -2,7 +2,6 @@
 
 import hashlib
 import json
-import re
 from collections import Counter, defaultdict
 from datetime import date
 from decimal import Decimal
@@ -13,7 +12,8 @@ import pyarrow.dataset as ds
 
 from licita_ml.analytical.operational import read_base
 from licita_ml.analytical.rules import digest
-from licita_ml.catalog.rules import ALIASES, SIMPLE_UNITS, grouping, text
+from licita_ml.catalog.rules import ALIASES, grouping
+from licita_ml.catalog.rules import VERSION as CATALOG_VERSION
 from licita_ml.diagnostics import checksum
 from licita_ml.experiments.evaluate import features
 from licita_ml.grouped.training import checked
@@ -23,9 +23,10 @@ from licita_ml.inference.temporal import frozen_models, sql_targets
 from licita_ml.repository import identifier
 from licita_ml.resources import RESOURCE_DIR
 from licita_ml.temporal.pipeline import FEATURES
+from licita_ml.units import measurement, operational_matches
 
 VERSION = "inferencia-agrupada-v1"
-PROTOCOL = RESOURCE_DIR / "POLITICA_INFERENCIA_AGRUPADA_V1.json"
+PROTOCOL = RESOURCE_DIR / "POLITICA_INFERENCIA_AGRUPADA_UNIDADES_V2.json"
 UNIT_NAMES = {
     **ALIASES,
     "embalagem": "emb",
@@ -44,34 +45,19 @@ UNIT_NAMES = {
 
 def code_hash():
     root = Path(__file__).parents[1]
-    paths = [Path(__file__), root / "catalog/rules.py", root / "grouped/training.py"]
+    paths = [
+        Path(__file__),
+        root / "catalog/rules.py",
+        root / "grouped/training.py",
+        root / "units.py",
+    ]
     return digest([inference_hash(), [(str(p.relative_to(root)), checksum(p)) for p in paths]])
 
 
 def unit_matches(observed, model):
     spec = model["canonical_spec"]
-    label = text(observed)
-    unit = UNIT_NAMES.get(label, label)
-    if unit == spec["unidade"]:
-        # Non-simple units require the exact price/quantity reference link before this check.
-        return True
-    match = re.fullmatch(r"([a-z]+)\s+(\d+(?:[.,]\d+)?)\s+(.+)", label)
-    if not match:
-        return False
-    name, capacity, measure = match.groups()
-    packed_unit, packed_measure = UNIT_NAMES.get(name, name), UNIT_NAMES.get(measure, measure)
-    if (
-        packed_unit in SIMPLE_UNITS
-        and packed_unit == packed_measure == spec["unidade"]
-        and Decimal(spec["capacidade"]) == 0
-        and Decimal(capacity.replace(",", ".")) == 1
-    ):
-        return True
-    return (
-        UNIT_NAMES.get(name, name) == spec["unidade"]
-        and Decimal(capacity.replace(",", ".")) == Decimal(spec["capacidade"])
-        and UNIT_NAMES.get(measure, measure) == spec["medida"]
-    )
+    info, reason = measurement(spec["unidade"], spec["capacidade"], spec["medida"])
+    return not reason and operational_matches(observed, info)
 
 
 def description_matches(item, row, model):
@@ -117,6 +103,7 @@ def load_models(folder, objects, result_end):
                 **model["record"]["parametros"],
                 "contrato": VERSION,
                 "assinatura_catalogo": model["canonical_spec"],
+                "catalogo_versao": CATALOG_VERSION,
             }
             fp = digest(descriptor)
             model["id"] = identifier("versoes_modelo", fp)
@@ -392,7 +379,7 @@ def validate_routing(by_item, config, model_rows, coverage, scores):
         if params.get("contrato") != VERSION or model["versao"] != digest(params):
             raise ValueError("Contrato de modelo agrupado divergente")
         spec = params["assinatura_catalogo"]
-        if digest(["catalogo-itens-v1", spec]) != params["grupo"]:
+        if digest([params.get("catalogo_versao", "catalogo-itens-v1"), spec]) != params["grupo"]:
             raise ValueError("Assinatura do modelo agrupado divergente")
         grouped[params["grupo"]].add(uid)
     routes = config["roteamento"]

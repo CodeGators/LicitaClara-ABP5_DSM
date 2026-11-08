@@ -383,3 +383,6 @@ h1{font-size:30px;font-weight:500;letter-spacing:-.01em}
 .tenders-page .tender-table td:last-child { min-width: 52px; width: 52px; }
 .tenders-page .tender-table td:nth-child(5), .tenders-page .tender-table td:nth-child(6) { min-width: 88px; }
 .tenders-page .tender-table th { white-space: normal; }
+
+.detail-unit-basis { background: var(--fundo); border-radius: 8px; padding: 12px; margin: 14px 0; color: var(--secundario); font-size: 12px; overflow-wrap: anywhere; }
+.detail-unit-basis strong { color: var(--texto); }

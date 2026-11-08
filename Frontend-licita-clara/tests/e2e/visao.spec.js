@@ -207,13 +207,15 @@ test('detalhe sinalizado separa resultado, referência de treino e explicação 
   const errors = []; page.on('pageerror', e => errors.push(e.message))
   const state = await mockView(page, { automatic: true })
   await page.route(`**/analises/execucoes/${EXEC}/itens/${ITEM}*`, route => route.fulfill({ json: { dados: [{ cobertura: [], resultados: [
-    { id: 'score-if', modelo_id: MODEL, resultado_item_id: item.resultados[0].id, algoritmo: 'isolation_forest', indice_experimental: '88.125', score_bruto: '0.514', atributos: { comparacao: { mediana: '0.05', n_treino: 100, grupo: 'CATMAT-123' } }, explicacao: { status: 'indisponivel', parcelas: [] } },
-    { id: 'score-ae', modelo_id: AE, resultado_item_id: item.resultados[0].id, algoritmo: 'autoencoder', indice_experimental: '77.800', score_bruto: '0.4', atributos: { comparacao: { mediana: '0.05', n_treino: 100, grupo: 'CATMAT-123' } }, explicacao: { status: 'disponivel', parcelas: [{ atributo: 'log_quantidade', parcela_score_bruto: '0.3' }, { atributo: 'log_preco_mediana', parcela_score_bruto: '0.1' }] } },
+    { id: 'score-if', modelo_id: MODEL, resultado_item_id: item.resultados[0].id, algoritmo: 'isolation_forest', indice_experimental: '88.125', score_bruto: '0.514', atributos: { comparacao: { mediana: '0.05', n_treino: 100, grupo: 'CATMAT-123', unidade_preco: { unidade_preco: 'kg' } } }, explicacao: { status: 'indisponivel', parcelas: [] } },
+    { id: 'score-ae', modelo_id: AE, resultado_item_id: item.resultados[0].id, algoritmo: 'autoencoder', indice_experimental: '77.800', score_bruto: '0.4', atributos: { comparacao: { mediana: '0.05', n_treino: 100, grupo: 'CATMAT-123', unidade_preco: { unidade_preco: 'kg' } } }, explicacao: { status: 'disponivel', parcelas: [{ atributo: 'log_quantidade', parcela_score_bruto: '0.3' }, { atributo: 'log_preco_mediana', parcela_score_bruto: '0.1' }] } },
   ] }] } }))
   await page.goto(`/ranking/${ITEM}?base_id=${BASE}&execucao_id=${EXEC}`)
   await expect(page.getByRole('heading', { name: 'Compra 00001 · Item 00001' })).toBeVisible()
   await expect(page.locator('.detail-score-number')).toContainText('88,125')
   await expect(page.getByText('100 observações no treino', { exact: false })).toBeVisible()
+  await expect(page.getByText('Unidade da mediana: kg', { exact: true })).toBeVisible()
+  await expect(page.getByText('Unidade registrada no item: UN', { exact: false })).toBeVisible()
   await expect(page.getByText('Contribuição por atributo indisponível para este modelo.', { exact: true })).toBeVisible()
   await page.getByLabel('Modelo da comparação').selectOption(AE)
   await expect(page.locator('.detail-score-number')).toContainText('77,8')

@@ -140,3 +140,7 @@ inteiras; a média do detalhe usa todos os itens importados, independentemente
 da pesquisa ou página atual. Valores globais e dos itens importados são
 identificados separadamente. O back-end precisa carregar as novas rotas
 `/api/v1/visao/licitacoes` e `/api/v1/visao/licitacoes/:id`.
+
+A comparação no detalhe identifica separadamente a unidade da mediana histórica
+e a unidade registrada no item. Unidades ausentes permanecem “Não informada”.
+A unidade do grupo não é inferida da descrição do item atual.

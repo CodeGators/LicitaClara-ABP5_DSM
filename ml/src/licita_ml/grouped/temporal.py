@@ -3,6 +3,7 @@
 import fcntl
 import json
 import logging
+import re
 import tempfile
 from collections import Counter
 from contextlib import ExitStack
@@ -31,7 +32,7 @@ from licita_ml.temporal.rules import TemporalPolicy, build_groups, inspect_row
 
 LOGGER = logging.getLogger(__name__)
 VERSION = "temporal-agrupado-v1"
-PROTOCOL = RESOURCE_DIR / "PROTOCOLO_TEMPORAL_AGRUPADO_V1.json"
+PROTOCOL = RESOURCE_DIR / "PROTOCOLO_TEMPORAL_AGRUPADO_UNIDADES_V2.json"
 COLUMNS = [
     "id_registro",
     "id_compra",
@@ -66,6 +67,7 @@ def code_hash():
         root / "temporal/rules.py",
         root / "temporal/export.py",
         root / "catalog/rules.py",
+        root / "units.py",
         root / "organized/schema.py",
         root / "analytical/rules.py",
     ]
@@ -77,6 +79,21 @@ def structural_blockers(spec):
     for key in ("especificacao", "especificacao_catalogo"):
         if spec[key]["modo"] != "atributos_nomeados" or not spec[key].get("atributos"):
             reasons.append("ESPECIFICACAO_NAO_ESTRUTURADA_REQUER_REVISAO")
+    if spec.get("unidade") == "un" and spec.get("capacidade") == "0":
+        attributes = [
+            pair
+            for key in ("especificacao", "especificacao_catalogo")
+            for pair in spec[key].get("atributos", [])
+        ]
+        if any(
+            "embalagem" in key
+            or re.search(
+                r"\b(caixa|pacote|frasco|ampola|seringa|garrafa|garrafao|bandeja|saco|fardo)\b",
+                value,
+            )
+            for key, value in attributes
+        ):
+            reasons.append("CONTEUDO_EMBALAGEM_NAO_CONFIRMADO")
     product = spec["especificacao_catalogo"].get("produto", "")
     if product.startswith("livro"):
         reasons.append("OBRA_EDICAO_ISBN_NAO_CONFIRMADOS")

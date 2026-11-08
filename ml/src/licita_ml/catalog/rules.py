@@ -6,8 +6,10 @@ from decimal import Decimal
 from functools import lru_cache
 
 from licita_ml.analytical.rules import digest
+from licita_ml.units import ALIASES as UNIT_ALIASES
+from licita_ml.units import FACTORS, measurement
 
-VERSION = "catalogo-itens-v1"
+VERSION = "catalogo-itens-v2"
 ALIASES = {
     "un": "un",
     "unidade": "un",
@@ -27,7 +29,8 @@ ALIASES = {
     "m 2": "m2",
     "m 3": "m3",
 }
-SIMPLE_UNITS = {"un", "kg", "g", "l", "ml", "m", "m2", "m3"}
+ALIASES.update(UNIT_ALIASES)
+SIMPLE_UNITS = set(FACTORS)
 LABEL = re.compile(r"(?:^|[,;|])\s*([a-z][a-z0-9 /()_-]{0,80}?)\s*:")
 
 
@@ -93,6 +96,9 @@ def grouping(row):
         raw_unit = name if name in ALIASES else ""
     if not raw_unit:
         return None, "UNIDADE_FORNECIMENTO_AUSENTE"
+    name = text(row.get("unidade_fornecimento_nome"))
+    if name in ALIASES and raw_unit in ALIASES and ALIASES[name] != ALIASES[raw_unit]:
+        return None, "UNIDADE_NOME_SIGLA_DIVERGENTES"
     unit = ALIASES.get(raw_unit, raw_unit)
     measure = text(row.get("unidade_medida_sigla"))
     measure = ALIASES.get(measure, measure)
@@ -108,8 +114,12 @@ def grouping(row):
             capacity = Decimal(0)
     elif capacity is None or capacity <= 0:
         return None, "CAPACIDADE_EMBALAGEM_AUSENTE"
+    physical, reason = measurement(unit, capacity, measure)
+    if reason:
+        return None, reason
     spec = {
         "tipo_catalogo": "CATMAT",
+        "unidade_preco": physical,
         "catalogo": code,
         "unidade": unit,
         "capacidade": format(capacity.normalize(), "f"),

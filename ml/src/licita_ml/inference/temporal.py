@@ -505,7 +505,13 @@ def sql_targets(base, data, rows, models, description_match=None, unit_match=Non
                             if unit_match
                             else compatible_unit(item["unidade_medida"], model["spec"])
                         ):
-                            reason = "UNIDADE_OPERACIONAL_DIVERGENTE"
+                            reason = (
+                                "EMBALAGEM_OPERACIONAL_SEM_CAPACIDADE_CONFIRMADA"
+                                if model.get("canonical_spec", {})
+                                .get("unidade_preco", {})
+                                .get("embalagem")
+                                else "UNIDADE_OPERACIONAL_DIVERGENTE"
+                            )
                         elif (
                             parent["atributos_origem"].get(
                                 "idCompra", parent["atributos_origem"].get("id_compra")
@@ -568,6 +574,9 @@ def sql_targets(base, data, rows, models, description_match=None, unit_match=Non
                                     "grupo": model["group"],
                                     "mediana": str(model["bundle"]["mediana_treino"]),
                                     "n_treino": len(model["train_ids"]),
+                                    "unidade_preco": model.get("canonical_spec", {}).get(
+                                        "unidade_preco"
+                                    ),
                                     "manifesto_treino": model["record"]["preprocessamento"][
                                         "manifesto_treino"
                                     ],

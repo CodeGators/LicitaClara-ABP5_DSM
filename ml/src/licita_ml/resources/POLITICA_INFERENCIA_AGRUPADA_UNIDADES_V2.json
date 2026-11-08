@@ -1,0 +1,16 @@
+{
+  "versao": "inferencia-agrupada-v1",
+  "roteamento": "assinatura_completa_CATMAT_especificacoes_unidade_capacidade_medida",
+  "vinculo_operacional": "compra_item_fornecedor_preco_quantidade_data_exatos",
+  "modelos": "ancoras_congeladas_com_estabilidade_individual_aprovada_sem_fit_na_aplicacao",
+  "embalagem": "unidades-preco-v1: capacidade e medida devem estar explicitas no rotulo operacional; equivalencias fisicas exatas apenas na mesma embalagem; rotulo generico e bloqueado",
+  "consulta_automatica": "IF_por_grupo_quando_estavel_AE_apenas_quando_IF_nao_estavel_nunca_pelo_score",
+  "normalizacao": "CDF_do_treino_do_modelo_do_grupo",
+  "sintese_processo": "somente_contagens_de_cobertura_sem_media_entre_grupos_sem_score_integral",
+  "universo": "importado_distinto_do_oficial_confirmado_no_snapshot",
+  "reavaliacao_temporal": "apenas_resultado_posterior_ao_corte_original_quando_unico_impedimento_e_conhecido_no_corte_explicito",
+  "probabilidade_fraude": false,
+  "prioridade_auditoria_validada": false,
+  "revisao_humana": "pendente",
+  "politica_unidades": "unidades-preco-v1"
+}

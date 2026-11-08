@@ -544,3 +544,29 @@ O objetivo da aplicação é identificar e explorar **anomalias estatísticas po
 item**, com referências, cobertura e rastreabilidade. Os índices não identificam
 fraude nem determinam irregularidade. A revisão registra a investigação dos
 sinais. Não há score integral validado que combine grupos de uma licitação.
+
+## Unidades e embalagens comparáveis
+
+O catálogo V2 usa `unidades-preco-v1` para validar fornecimento, capacidade e
+medida. Produtos, especificações, unidades comerciais e embalagens diferentes
+permanecem em grupos separados. UN não vira kg/l por peso ou volume presumido.
+Capacidade ausente, unidade desconhecida ou dimensões contraditórias excluem a
+referência daquela comparação. Os CSVs originais não são modificados.
+
+`python -m licita_ml.units_audit --base CAMINHO_BASE_ORGANIZADA --saida CAMINHO_AUDITORIA`
+percorre todas as referências e exporta contagens, motivos, amostras rastreáveis
+e conversões exatas de preço/quantidade para unidades-base. Essas conversões são
+informativas: não substituem os preços originais do modelo nem autorizam fundir
+embalagens ou especificações distintas. A identidade do catálogo é V2; V1 e seus
+modelos permanecem históricos, sem alteração de artefatos.
+
+Na aplicação, o rótulo operacional precisa confirmar capacidade e medida de uma
+embalagem. “Pacote” sozinho não confirma 500 g. “Pacote 500 g” e “Pacote 0,5 kg”
+são equivalentes no mesmo tipo de embalagem. Conversões entre massa e volume,
+contagem e peso, ou quantidades não informadas não são feitas.
+
+Regerar catálogo com `python -m licita_ml.catalog`, preparar/treinar com
+`python -m licita_ml.grouped preparar` e `treinar`, e só então inferir sobre a base
+operacional. Manter cortes temporais e mínimos de diversidade. A nova execução
+registra unidade da mediana, versão do catálogo e exclusões; publicação continua
+explícita pelo comando administrativo `licita-ml publicar-experimental`.

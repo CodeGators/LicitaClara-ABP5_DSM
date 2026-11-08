@@ -10,6 +10,37 @@ from licita_backend.models import procurement as p
 from licita_backend.repositories.consultas import QueryRepository
 
 
+def price_unit(parameters):
+    """Expose the trained signature; never guess the median unit from the current item."""
+    spec = parameters.get("assinatura_catalogo", {})
+    if spec.get("unidade_preco"):
+        return spec["unidade_preco"]
+    supply, measure, capacity = spec.get("unidade"), spec.get("medida"), spec.get("capacidade")
+    if not supply or capacity is None:
+        return None
+    from decimal import Decimal, InvalidOperation
+
+    try:
+        amount = Decimal(capacity)
+    except InvalidOperation:
+        return None
+    if not amount.is_finite() or amount < 0:
+        return None
+    if amount == 0 and supply == measure:
+        label = supply
+    elif amount > 0 and measure:
+        label = f"{supply} de {amount.normalize():f} {measure}"
+    else:
+        return None
+    return {
+        "unidade_preco": label,
+        "fornecimento": supply,
+        "capacidade": capacity,
+        "medida": measure,
+        "origem": "assinatura_modelo_legada",
+    }
+
+
 class AnalysisRepository:
     def __init__(self, session):
         self.session = session
@@ -139,7 +170,11 @@ class AnalysisRepository:
         ids = [r["id"] for r in rows]
         scores = (
             self.session.execute(
-                sa.select(a.resultados_modelo, a.versoes_modelo.c.algoritmo)
+                sa.select(
+                    a.resultados_modelo,
+                    a.versoes_modelo.c.algoritmo,
+                    a.versoes_modelo.c.parametros.label("parametros_modelo"),
+                )
                 .join(a.versoes_modelo, a.versoes_modelo.c.id == a.resultados_modelo.c.modelo_id)
                 .where(
                     a.resultados_modelo.c.execucao_id == execution_id,
@@ -178,7 +213,13 @@ class AnalysisRepository:
                     "score_bruto": row["score_bruto"],
                     "indice_experimental": row["score_normalizado"],
                     "normalizacao": row["versao_normalizacao"],
-                    "atributos": row["atributos"],
+                    "atributos": {
+                        **row["atributos"],
+                        "comparacao": {
+                            **row["atributos"].get("comparacao", {}),
+                            "unidade_preco": price_unit(row["parametros_modelo"]),
+                        },
+                    },
                     "explicacao": {
                         "status": "disponivel" if factors[row["id"]] else "indisponivel",
                         "motivo": None

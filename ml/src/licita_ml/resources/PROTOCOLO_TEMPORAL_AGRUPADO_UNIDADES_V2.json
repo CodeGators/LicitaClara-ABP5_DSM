@@ -1,0 +1,19 @@
+{
+  "versao": "temporal-agrupado-v1",
+  "grupos": "assinatura_completa_catalogo_v2_com_unidade_de_preco_sem_filtro_categoria",
+  "triagem": "candidatos_100_30_do_catalogo_verificado",
+  "controles": "mesmos_minimos_diversidade_concentracao_e_datas_da_politica_temporal_v1",
+  "especificacoes": "atributos_nomeados_em_ambas_descricoes_sem_inferir_texto_livre",
+  "exclusoes_estruturais": [
+    "livros_sem_obra_edicao_isbn",
+    "acessorios_sem_modelo_confirmado",
+    "UN_com_embalagem_descrita_sem_conteudo_estruturado"
+  ],
+  "precos_extremos": "preservados_sem_corte_por_preco",
+  "selecao": "todos_os_grupos_elegiveis_ordenados_pela_assinatura_em_lotes_de_ate_20",
+  "ajustes": "protocolo_treino_temporal_v1_sem_otimizar_no_holdout",
+  "scores_combinados": false,
+  "revisao_humana": "pendente_nao_inferir_utilidade_por_estabilidade",
+  "aplicacao": "separada_do_treino_e_reconciliada_com_SQL_em_ML_A3",
+  "politica_unidades": "unidades-preco-v1"
+}

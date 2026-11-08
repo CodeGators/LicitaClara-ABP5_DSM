@@ -153,3 +153,8 @@ da importação não foi confirmada. A média é descritiva, sem prioridade vali
 paginados. Os filtros da listagem são ignorados no detalhe para conservar toda
 a compra importada. Paginar os itens não modifica o resumo. Nenhum modelo é
 treinado ou executado por essas consultas; elas leem resultados persistidos.
+
+A consulta da análise de um item também informa
+`atributos.comparacao.unidade_preco`, obtido da assinatura do modelo. Para modelos
+históricos sem esse campo, a unidade de preço é exposta a partir da assinatura
+armazenada, sem assumir a unidade do item atual ou modificar seus scores.

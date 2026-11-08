@@ -259,6 +259,7 @@ def test_reconciliation_rejects_wrong_or_missing_routes(change):
         )
         params = {
             "contrato": inference.VERSION,
+            "catalogo_versao": inference.CATALOG_VERSION,
             "grupo": group["id"],
             "assinatura_catalogo": group["especificacao"],
         }

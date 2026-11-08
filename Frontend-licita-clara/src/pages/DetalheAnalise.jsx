@@ -13,17 +13,19 @@ const numeric = value => value != null && value !== '' && Number.isFinite(Number
 
 function Comparison({ item, result, score }) {
   const comparison = score?.atributos?.comparacao
+  const basis = comparison?.unidade_preco?.unidade_preco
   const median = numeric(comparison?.mediana)
   const price = numeric(result?.valor_unitario_homologado)
   const estimate = numeric(item.valor_unitario_estimado)
-  const bars = [['Mediana do grupo de treino', median, 'var(--petroleo)'], ['Estimado do item', estimate, 'var(--secundario)'], ['Homologado do resultado', price, 'var(--alta)']]
+  const bars = [[`Mediana do grupo de treino${basis ? ` (R$/${basis})` : ''}`, median, 'var(--petroleo)'], ['Estimado do item', estimate, 'var(--secundario)'], ['Homologado do resultado', price, 'var(--alta)']]
   const max = Math.max(1, ...bars.map(([, value]) => value || 0)) * 1.1
-  return <section className="card detail-comparison"><h2>Comparação com itens similares</h2><p className="sub">Preços unitários · referência histórica do modelo selecionado</p>
+  return <section className="card detail-comparison"><h2>Comparação com itens similares</h2><p className="sub">Preços por unidade de fornecimento · referência histórica do modelo selecionado</p>
+    <p className="detail-unit-basis"><strong>Unidade da mediana: {basis || 'Não informada'}</strong><br />Unidade registrada no item: {item.unidade_medida || 'Não informada'}</p>
     <p className="detail-item-description">{item.descricao}</p><p className="hint">{item.catalogo || 'Catálogo não informado'} {item.codigo_catalogo} · {item.unidade_medida || 'Unidade não informada'} · Quantidade: {decimal(result?.quantidade_homologada ?? item.quantidade)}</p>
     {comparison ? <p className="hint">{comparison.n_treino != null ? `${Number(comparison.n_treino).toLocaleString('pt-BR')} observações no treino` : 'Quantidade do treino não informada'}</p> : <p className="hint">Referência de treino indisponível para este resultado.</p>}
     <div className="detail-bars">{bars.map(([label, value, color]) => <div key={label}><div className="mini"><span>{label}</span><strong style={{ color }}>{value == null ? 'Não informado' : money(value)}</strong></div>{value != null && <Progress pct={value} max={max} cor={color} />}</div>)}</div>
     {median > 0 && price != null && <p className="detail-price-ratio"><span className="pill ana">{(price / median).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}× a mediana</span> {((price / median - 1) * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}% em relação à mediana do treino</p>}
-    <p className="hint">A referência usa o grupo histórico do modelo. A equivalência de especificações e condições de entrega exige conferência documental.</p>
+    <p className="hint">As unidades e embalagens são conferidas antes da comparação. A equivalência de especificações e condições de entrega ainda exige conferência documental. Não se presume peso por unidade.</p>
     <details className="detail-result-data"><summary>Ver resultados e dados do item</summary><Results results={item.resultados} /><div className="stats"><Info label="Total homologado do item">{money(item.valor_homologado_item)}</Info><Info label="Quantidade do item">{decimal(item.quantidade)}</Info><Info label="Unidade">{item.unidade_medida || 'Não informada'}</Info></div></details>
   </section>
 }

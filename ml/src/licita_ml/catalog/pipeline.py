@@ -28,7 +28,7 @@ from licita_ml.temporal.rules import TemporalPolicy, specification
 
 LOGGER = logging.getLogger(__name__)
 
-PROTOCOL = RESOURCE_DIR / "PROTOCOLO_CATALOGO_ITENS_V1.json"
+PROTOCOL = RESOURCE_DIR / "PROTOCOLO_CATALOGO_ITENS_V2.json"
 OBS = {
     "id_observacao": "texto",
     "grupo": "texto",
@@ -145,6 +145,7 @@ def code_hash():
                 "organized/schema.py",
                 "temporal/rules.py",
                 "diagnostics.py",
+                "units.py",
             )
         ),
     ]
