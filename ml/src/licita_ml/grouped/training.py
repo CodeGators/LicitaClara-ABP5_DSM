@@ -63,7 +63,7 @@ def checked(folder):
     return result
 
 
-def run(source, output, reviews, workers=2):
+def run(source, output, reviews, workers=2, progress=None):
     source, output, reviews = Path(source), Path(output), Path(reviews)
     if not 1 <= workers <= 3:
         raise ValueError("Usar entre um e três processos de treino")
@@ -82,7 +82,12 @@ def run(source, output, reviews, workers=2):
     with (output / ".lotes-treino.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         if (folder / "manifesto.json").exists():
-            return {"diretorio": str(folder), "reutilizada": True, "manifesto": checked(folder)}
+            manifest = checked(folder)
+            if progress:
+                progress(manifest["grupos_treinados"], origin["grupos_selecionados"])
+            return {"diretorio": str(folder), "reutilizada": True, "manifesto": manifest}
+        if progress:
+            progress(0, origin["grupos_selecionados"])
         jobs = [source / b["diretorio"] for b in origin["lotes"]]
         results = []
         with ProcessPoolExecutor(max_workers=workers, mp_context=get_context("spawn")) as executor:
@@ -94,6 +99,8 @@ def run(source, output, reviews, workers=2):
             }
             for future in as_completed(pending):
                 results.append(future.result())
+                if progress:
+                    progress(sum(len(r["grupos"]) for r in results), origin["grupos_selecionados"])
                 LOGGER.info(
                     "Treinados %s/%s lotes (%s grupos)",
                     len(results),

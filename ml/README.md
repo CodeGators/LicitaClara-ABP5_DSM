@@ -577,3 +577,11 @@ elegibilidade permanecem consultáveis e recebem motivo de ausência de score;
 a identidade oficial é obrigatória para preservar o item. A descrição mencionar
 “pacote com 40” sem confirmar se o preço é por peça ou por pacote não autoriza
 converter o preço automaticamente.
+
+## Instalação da equipe com dois scripts
+
+O [guia da equipe](../scripts/README.md) reúne preparação/importação e treino/
+inferência/publicação nos scripts `popular_banco.py` e `treinar_e_analisar.py`.
+Usa as mesmas funções deste pacote, com conferência dos ZIPs por manifesto,
+progresso real por grupos concluídos em lotes e reutilização de lotes completos.
+Os CSVs continuam distribuídos separadamente do Git.

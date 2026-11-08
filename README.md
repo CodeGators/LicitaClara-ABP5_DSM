@@ -1,74 +1,76 @@
 # Licita Clara — ABP5 DSM
 
-Projeto acadêmico de detecção de anomalias em licitações públicas. A proposta prevê coleta de dados públicos, modelos de aprendizado não supervisionado e uma interface para priorizar processos para análise.
+Aplicação acadêmica para explorar anomalias estatísticas em itens de compras
+públicas. Inclui frontend React/Vite, API FastAPI, PostgreSQL, preparação de
+CSVs, Isolation Forest, Autoencoder e relatórios PDF/CSV. Scores são sinais
+experimentais; não representam probabilidade de fraude.
 
-Anomalia estatística não comprova irregularidade.
+## Instalar na máquina de outro integrante
 
-## Acompanhamento e estado da entrega
+Siga o **[guia de instalação da equipe](scripts/README.md)**. Ele cobre instalação,
+PostgreSQL/migrações, recebimento dos ZIPs e estes dois comandos, na raiz:
 
-O plano de conclusão (documentação local) é o ponto de entrada para continuar o trabalho: contém etapas, branches, critérios de aceitação e instruções de teste. A consolidação do repositório (documentação local) registra o inventário e a verificação da instalação em uma cópia limpa.
+```bash
+uv run --locked --all-packages --extra validation python scripts/popular_banco.py
+uv run --locked --all-packages --extra validation python scripts/treinar_e_analisar.py
+```
 
-O frontend incorporou a entrega de 01/11/2026 e a integração de consultas reais (documentação local): entrada em `/itens`, detalhe do item/processo e documentos. Painel, ranking experimental e fornecedores estão integrados à API; versões demonstrativas permanecem separadas e identificadas. Autenticação, revisão persistente, relatórios reais e publicação de análises validadas permanecem pendentes. A publicação experimental versionada já é selecionável nas telas reais. O piloto permanece sem índices elegíveis, com motivos explícitos. O Autoencoder está implementado para comparação experimental; a utilidade dos modelos continua inconclusiva. Clonar o repositório não importa automaticamente os dados locais nem instala modelos treinados.
+O primeiro organiza e importa os dados. O segundo treina os modelos, mostra
+progresso por grupos concluídos, analisa a base e publica os Scores experimentais
+localmente. Consulte os pré-requisitos antes de executá-los. O GitHub não inclui
+os ZIPs, modelos, banco populado ou senhas. O manifesto de entradas está em
+[`config/equipe/dados.json`](config/equipe/dados.json).
+
+Uma reconstrução por CSV não inclui enriquecimentos de API e bases históricas
+existentes em outra máquina; para duplicar exatamente um estado operacional,
+é necessário restaurar também seu banco e objetos. Detalhes no guia.
 
 ## Estrutura
 
-| Diretório | Conteúdo |
+| Pasta | Conteúdo |
 | --- | --- |
-| `Frontend-licita-clara/` | React/Vite, consultas reais e demonstrações identificadas |
-| `backend/` | FastAPI, consultas versionadas de processos/itens/documentos e endpoints operacionais |
-| `collector/` | Coleta versionada do Compras.gov.br e diagnósticos |
-| `shared/` | Contrato e adaptadores de armazenamento compartilhados |
-| `ml/` | Preparação/importação reproduzível e ensaios de Isolation Forest; sem publicação de scores |
-| `docs/` | Documentação local opcional, fora do versionamento |
-| `infra/` | PostgreSQL local com Docker Compose e documentação |
-| `.github/workflows/` | CI Python com PostgreSQL descartável e build do frontend |
+| `Frontend-licita-clara/` | Painel, itens/licitações sinalizadas, fornecedores e relatórios |
+| `backend/` | API e migrações Alembic |
+| `collector/` | Aquisição versionada de fontes públicas |
+| `ml/` | Organização, agrupamento, treino, avaliação e inferência |
+| `shared/` | Contratos de armazenamento compartilhados |
+| `scripts/` | Instalação e processamento para a equipe |
+| `config/equipe/` | Manifesto dos arquivos necessários |
+| `infra/` | PostgreSQL local com Docker Compose |
+| `docs/` | Documentação local opcional, ignorada pelo Git |
 
-Além do protótipo visual, há uma API FastAPI com consultas de processos, itens e documentos (documentação local) e ambiente PostgreSQL local. O esquema PostgreSQL tem 35 tabelas versionadas por Alembic. O coletor em lote já baixa e registra ZIPs reais; a preparação/importação de um recorte CATMAT está implementada. Um ensaio do núcleo de ML (documentação local) treinou Isolation Forest com dados reais; sua utilidade para auditoria aguarda revisão independente. Não há modelo ou score publicado em produção. Nenhuma infraestrutura de nuvem foi provisionada. Compras.gov.br é a fonte principal; PNCP complementa a aquisição de metadados de documentos e detalhe contratual; Portal da Transparência permanece como diagnóstico histórico.
+## Executar após a configuração
 
-## Executar o frontend
-
-Pré-requisitos: Node.js 20.19+ da linha 20 e npm; validação local realizada com Node.js 20.19.0 e npm 10.8.2. Executar na raiz:
+Em dois terminais, na raiz:
 
 ```bash
-npm ci --prefix Frontend-licita-clara
+uv run --locked --all-packages --extra validation uvicorn licita_backend.main:create_app --factory --reload --host 127.0.0.1 --port 8000 --no-access-log
+```
+
+```bash
 npm run dev --prefix Frontend-licita-clara
 ```
 
-Para gerar a versão de produção, execute `npm run build` nessa mesma pasta. Mais detalhes no [README do frontend](Frontend-licita-clara/README.md).
+Frontend: http://localhost:5173. Swagger: http://127.0.0.1:8000/docs.
 
-## Dados e configurações
+## Verificação do código
 
-Arquivos brutos, dados processados e modelos gerados não devem ser versionados. Para desenvolvimento local, utilize `data/` e `models/`, ignorados pelo Git; o armazenamento remoto proposto está descrito em [infra/README.md](infra/README.md).
-
-Credenciais devem ficar em variáveis de ambiente ou secrets do provedor. Arquivos `.env.example` podem documentar as variáveis necessárias, sem valores secretos.
-
-## Backend e dados
-
-Python 3.12.x, uv 0.13.2 e dependências em `uv.lock`. Instruções de configuração, PostgreSQL, execução da API e testes no [README do backend](backend/README.md).
-
-Para instalar e verificar o código sem configurar dados da aplicação:
+Python 3.12, uv 0.13.2 e Node.js 20.19+ da linha 20. Dependências fixadas nos locks.
 
 ```bash
 uv sync --locked --all-packages --extra validation
 uv run --locked --all-packages --extra validation ruff check .
 uv run --locked --all-packages --extra validation ruff format --check .
 uv run --locked --all-packages --extra validation pytest -m 'not integration' -q
+npm ci --prefix Frontend-licita-clara
 npm run build --prefix Frontend-licita-clara
 ```
 
-A suíte completa usa PostgreSQL e `TEST_DATABASE_URL` em banco descartável terminado em `_test`. Siga a configuração no README do backend; testes sem integração não comprovam o acesso ao banco. Nenhum dataset ou `.env` pessoal é necessário para os testes unitários.
-
-- Preparação e importação de dados (documentação local).
-- Índice da documentação (documentação local).
-- Contratos de itens/processos e testes no Swagger (documentação local).
-- Frontend integrado: configuração e teste no navegador (documentação local).
-- [Comandos de coleta e armazenamento](collector/README.md).
-- Checklist de implementação (documentação local).
-- Contexto da arquitetura (documentação local).
-- Contratos entre componentes (documentação local).
-- Diagnóstico do Compras.gov.br (documentação local).
-
-O dicionário do banco (documentação local) registra o esquema aplicado, snapshots e permissões dos serviços.
+Integração exige PostgreSQL e `TEST_DATABASE_URL` em banco descartável terminado
+em `_test`; consulte [backend/README.md](backend/README.md). Não execute testes
+contra o banco da aplicação. Instruções específicas:
+[ML](ml/README.md), [coleta](collector/README.md),
+[frontend](Frontend-licita-clara/README.md) e [infraestrutura](infra/README.md).
 
 ## 📌 Sobre o projeto
 
@@ -93,13 +95,3 @@ A ferramenta pode ser útil para **cidadãos**, **empresas que vendem para o gov
 ## 👥 Equipe CodeGators
 
 Projeto desenvolvido por estudantes como parte da disciplina de Aprendizagem Baseada em Projetos (ABP) do curso de Desenvolvimento de Software Multiplataforma (DSM).
-
-Consulte a base e atributos analíticos (documentação local) para aquisição histórica registrada, preparo versionado, critérios e testes da etapa 04.
-
-A avaliação versionada do Isolation Forest (documentação local) consome o dataset analítico, compara regras e prepara revisão documental; utilidade ainda inconclusiva.
-
-A comparação Autoencoder/Isolation Forest (documentação local) usa a mesma coorte e regras de referência, sem vencedor validado ou publicação de scores.
-
-A inferência/publicação versionada (documentação local) registra treino/modelos, cobertura por resultado e canal experimental explícito; o piloto atual tem zero scores elegíveis.
-
-O painel, ranking e fornecedores reais (documentação local) compartilha base/execução/modelo e filtros; leia as definições de universo, valores, HHI e indisponibilidade antes de interpretar os indicadores.

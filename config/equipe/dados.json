@@ -1,0 +1,76 @@
+{
+  "versao": 1,
+  "descricao": "Entradas exatas da base organizada usada no treino por unidades V2. ZIPs distribuídos separadamente.",
+  "arquivos": [
+    {
+      "arquivo": "2025-07/material_2025_07.csv.zip",
+      "sha256": "2a7d9328aec8642bb2f4f97451d25f8e3dfc62ba46942bec001f2c9108e779ae",
+      "bytes": 24132281
+    },
+    {
+      "arquivo": "2025-08/material_2025_08.csv.zip",
+      "sha256": "f7234c5e3a8a5c35345247f736c93e36cd6c0057a091a43d74f5df2eff88d0d9",
+      "bytes": 23793246
+    },
+    {
+      "arquivo": "2025-09/material_2025_09.csv.zip",
+      "sha256": "0552e55c8d15849d536a043bfb7887d7c81128c8f63cc4cd27286fa6d7439b70",
+      "bytes": 31657838
+    },
+    {
+      "arquivo": "2025-10/material_2025_10.csv.zip",
+      "sha256": "7aad84fe58f4b7005aec1c8250223e16facee7b874d02ffc030f0a9a1a4c0b88",
+      "bytes": 30872616
+    },
+    {
+      "arquivo": "2025-11/material_2025_11.csv.zip",
+      "sha256": "af1e1e964258857319a3cb75fd791f4df23844a97f466f84158ffcce05698008",
+      "bytes": 28653660
+    },
+    {
+      "arquivo": "2025-12/material_2025_12.csv.zip",
+      "sha256": "5eee3866cbf134cbb743a8ee3236523b5f36a320377308f41de3fd7910a29722",
+      "bytes": 24387216
+    },
+    {
+      "arquivo": "2026-05/compra_item_2026_05.csv.zip",
+      "sha256": "e93602497bcf466dafe8513c5aececc0d2ccbe24cd6180120d9f18a0ec1adf03",
+      "bytes": 18711812
+    },
+    {
+      "arquivo": "2026-05/item_resultado_2026_05.csv.zip",
+      "sha256": "9e63d69b3c0103f3476a34eb987efcba96765f73f08e05d52a1f1536f774b19f",
+      "bytes": 7701239
+    },
+    {
+      "arquivo": "2026-07/material_2026_07.csv.zip",
+      "sha256": "a68718a9d87088cdb38e07601c4497dec15e8bd67ea87e1098123c8f4ff085eb",
+      "bytes": 32199018
+    },
+    {
+      "arquivo": "2026-08/material_2026_08.csv.zip",
+      "sha256": "d26c1d4154d88078c46083ba90e47e6e734ea0e96867a7cb847f549f52bbf39b",
+      "bytes": 35571753
+    },
+    {
+      "arquivo": "2026-09/compra_2026_09.csv.zip",
+      "sha256": "e11d86146dbea4b2965f7de92545bf1fed0ef7153f41416f3eba61d0a04ae14e",
+      "bytes": 6266130
+    },
+    {
+      "arquivo": "2026-09/compra_item_2026_09.csv.zip",
+      "sha256": "b240f85f8e85e3741da4cd2af11455153f2fc75fde34e3a8328f091dad97ae9f",
+      "bytes": 25698133
+    },
+    {
+      "arquivo": "2026-09/item_resultado_2026_09.csv.zip",
+      "sha256": "e03179a0f29de9802019a7e108cb9fd563c0869b181b569d989fd2ef8722e073",
+      "bytes": 2236913
+    },
+    {
+      "arquivo": "2026-09/material_2026_09.csv.zip",
+      "sha256": "2db1fa67fbd15afb3a4ad18faa1e9ba9c1f382beb81b3a19bb7c9c0ad7c50b13",
+      "bytes": 19696451
+    }
+  ]
+}

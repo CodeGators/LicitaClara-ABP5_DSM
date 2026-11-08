@@ -141,7 +141,8 @@ def pdf_file(data):
             content.append(
                 para(
                     f"Precisão original do preço unitário: "
-                    f"{display(result['valor_unitario_homologado'])}", small,
+                    f"{display(result['valor_unitario_homologado'])}",
+                    small,
                 )
             )
         if not item["scores"]:

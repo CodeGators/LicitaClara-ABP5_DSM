@@ -23,7 +23,7 @@ markers = ["integration: requires TEST_DATABASE_URL pointing to disposable Postg
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-include = ["backend/**/*.py", "collector/src/**/*.py", "collector/tests/**/*.py", "shared/**/*.py", "ml/src/**/*.py", "ml/tests/**/*.py", "pyproject.toml"]
+include = ["scripts/**/*.py", "backend/**/*.py", "collector/src/**/*.py", "collector/tests/**/*.py", "shared/**/*.py", "ml/src/**/*.py", "ml/tests/**/*.py", "pyproject.toml"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
