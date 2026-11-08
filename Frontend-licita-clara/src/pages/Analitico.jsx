@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { useBase } from '../BaseContext.jsx'
 import { AnalysisGate, AnalysisSelector, selectionLink, useAnalysis, viewFields } from '../AnalysisContext.jsx'
-import { decimal, money } from '../api.mjs'
+import { decimal, money, reportLink } from '../api.mjs'
 import { Pager, QueryState } from '../components/consultas.jsx'
-import { Head } from '../components/ui.jsx'
+import { FileOutput, Building2, Landmark, ScanSearch } from 'lucide-react'
+import { Head, Aviso } from '../components/ui.jsx'
 import useApi from '../useApi.js'
 import PainelGeral from './PainelGeral.jsx'
 import ItemFilters from '../components/ItemFilters.jsx'
@@ -22,13 +23,13 @@ export function Filters({ purchases = false, suppliers = false }) {
     event.preventDefault()
     setParams(previous => {
       const next = new URLSearchParams(previous)
-      for (const key of [...viewFields, 'pagina']) next.delete(key)
+      for (const key of [...viewFields, 'pagina', 'pagina_itens']) next.delete(key)
       for (const key of viewFields) if (draft[key]) next.set(key, draft[key])
       return next
     })
   }
   const clear = () => { setDraft(read(new URLSearchParams())); setParams(previous => {
-    const next = new URLSearchParams(previous); for (const key of [...viewFields, 'pagina']) next.delete(key); return next
+    const next = new URLSearchParams(previous); for (const key of [...viewFields, 'pagina', 'pagina_itens']) next.delete(key); return next
   }) }
   return <ItemFilters draft={draft} change={change} apply={apply} clear={clear} baseId={baseId} params={params} purchases={purchases} suppliers={suppliers}>
     {suppliers && <p className="hint">O fornecedor seleciona itens com resultado dele. Valores e concentração conservam os demais vencedores desses itens no período.</p>}
@@ -62,9 +63,9 @@ export function useView(path) {
   return { query, params: s.params, changePage }
 }
 
-export function ItemRows({ rows, params }) {
+export function ItemRows({ rows, params, scoreLabel = 'Índice experimental' }) {
   const location = useLocation()
-  return <div className="table-scroll" role="region" aria-label="Itens e resultados do recorte; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Item / compra</th><th scope="col">Órgão / fornecedores</th><th scope="col">Total homologado no recorte</th><th scope="col">Índice experimental</th><th scope="col">Cobertura</th></tr></thead><tbody>{rows.map(r => <tr key={r.id}>
+  return <div className="table-scroll" role="region" aria-label="Itens e resultados do recorte; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Item / compra</th><th scope="col">Órgão / fornecedores</th><th scope="col">Total homologado no recorte</th><th scope="col">{scoreLabel}</th><th scope="col">Cobertura</th></tr></thead><tbody>{rows.map(r => <tr key={r.id}>
     <td><Link className="link-a" to={selectionLink(`/ranking/${r.id}`, params)} state={{ from: location.pathname + location.search }}>{r.descricao}</Link><small>Item {r.numero_item} · Compra {r.processo.numero_compra}</small></td>
     <td>{r.processo.orgao_nome}<small>{[...new Set(r.resultados.map(e => e.fornecedor_nome))].join('; ') || 'Nenhum resultado conhecido'}</small></td>
     <td>{money(r.valor_homologado)}{r.resultados_sem_total > 0 && <small>Total incompleto na fonte</small>}</td>
@@ -97,14 +98,72 @@ function RankingContent() {
 
 function SuppliersContent() {
   const { id } = useParams()
-  const { query, params, changePage } = useView(id ? `/visao/fornecedores/${encodeURIComponent(id)}` : '/visao/fornecedores')
+  const { query, params, changePage } = useView('/visao/fornecedores')
+  const { baseId } = useBase()
+  const analysis = useAnalysis()
+  const selectedId = id || query.data?.dados[0]?.id
+  const detail = useApi(`/visao/fornecedores/${encodeURIComponent(selectedId || '')}`, {
+    base_id: baseId, execucao_id: analysis.executionId, modelo_id: analysis.modelId,
+    ...read(params), pagina: params.get('pagina_itens') || '1',
+  }, !!selectedId && analysis.ready)
   const data = query.data
-  return <Shell title={id ? 'Relações do fornecedor' : 'Fornecedores do recorte'} summary={data?.resumo}><QueryState query={query} />{data && <>
-    {id ? <><Link className="link-a" to={selectionLink('/fornecedores', params)}>← Todos os fornecedores</Link><section className="card"><h2>{data.fornecedor.nome}</h2><p>{data.fornecedor.compras_com_resultado} compras com resultado · {data.fornecedor.contratos_vinculados} contratos vinculados conhecidos · {data.fornecedor.orgaos} órgãos</p><p>Total homologado deste fornecedor: {money(data.fornecedor.valor_homologado)} · Maior índice disponível: {indexText(data.fornecedor.indice_experimental)}</p></section>
-      <section className="card"><h2>Participação e concentração por órgão</h2><p className="sub">HHI de todos os fornecedores dos itens filtrados, no período selecionado. Não representa o universo completo do órgão. Concentração não comprova irregularidade.</p><div className="table-scroll" role="region" aria-label="Participação e concentração por órgão; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Órgão</th><th scope="col">Compras com resultado</th><th scope="col">Homologado ao fornecedor</th><th scope="col">Total do universo</th><th scope="col">Participação</th><th scope="col">HHI</th></tr></thead><tbody>{data.relacoes.map(r => <tr key={r.orgao_id}><td>{r.orgao_nome}</td><td>{r.compras_com_resultado}</td><td>{money(r.valor_fornecedor)}</td><td>{money(r.valor_homologado)}</td><td>{r.participacao == null ? 'Indisponível' : `${decimal((Number(r.participacao)*100).toFixed(2))}%`}</td><td>{r.hhi == null ? 'Indisponível' : decimal(Number(r.hhi).toFixed(4))}{r.motivo && <small>{r.motivo.replaceAll('_',' ').toLowerCase()}</small>}</td></tr>)}</tbody></table></div></section>
-      <section className="card"><h2>Itens com resultado deste fornecedor</h2><p className="sub">Valores e índices abaixo consideram somente seus resultados; o detalhe do item apresenta todos os vencedores.</p><ItemRows rows={data.itens.dados} params={params} /><Pager meta={data.itens} onChange={changePage} /></section></>
-      : <section className="card"><h2>{data.total} fornecedor(es) encontrado(s)</h2>{data.dados.length ? <div className="table-scroll" role="region" aria-label="Ranking de fornecedores; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Compras com resultado</th><th scope="col">Contratos vinculados</th><th scope="col">Homologado</th><th scope="col">Maior índice disponível</th></tr></thead><tbody>{data.dados.map(r => <tr key={r.id}><td><Link className="link-a" to={selectionLink(`/fornecedores/${r.id}`, params)}>{r.nome}</Link><small>{r.itens} itens · {r.orgaos} órgãos</small></td><td>{r.compras_com_resultado}</td><td>{r.contratos_vinculados}</td><td>{money(r.valor_homologado)}{r.resultados_sem_total > 0 && <small>Total incompleto</small>}</td><td>{indexText(r.indice_experimental)}</td></tr>)}</tbody></table></div> : <p>Nenhum fornecedor encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section>}
-    </>}</Shell>
+  const selected = detail.data
+  const supplier = selected?.fornecedor
+  const selectLink = supplierId => {
+    const next = new URLSearchParams(params)
+    next.delete('pagina_itens')
+    return `/fornecedores/${supplierId}?${next}`
+  }
+  const relatedPage = page => analysis.setParams(previous => {
+    const next = new URLSearchParams(previous); next.set('pagina_itens', String(page)); return next
+  })
+  const processId = selected?.itens.dados[0]?.processo.id
+  return <div className="suppliers-page">
+    <Head kicker="Relações e concentração / Recorte importado" title="Fornecedores" sub="Explore vínculos de contratação e participação no gasto de cada órgão."
+      action={<Link className="btn primary" to={processId ? reportLink(processId, params) : selectionLink('/relatorios', params)}><FileOutput size={16} /> Preparar relatório</Link>} />
+    <div className="grid g3">
+      {[
+        ['Fornecedores no recorte', data?.resumo.fornecedores, 'Fornecedores com resultados no recorte', Building2],
+        ['Órgãos contratantes', data?.resumo.orgaos, 'Concentração calculada por órgão', Landmark],
+        ['Itens com análise completa', data?.resumo.analisados, 'Cobertura da análise no recorte selecionado', ScanSearch],
+      ].map(([label, value, hint, Icon]) => <div className="card kpi" key={label}><div className="row"><span>{label}</span><Icon size={18} /></div><strong>{value ?? '—'}</strong><small>{hint}</small></div>)}
+    </div>
+    <details className="supplier-analysis"><summary>Versão da análise</summary><AnalysisSelector /></details>
+    <div className="supplier-columns">
+      <section className="card supplier-ranking">
+        <h2>Ranking de fornecedores</h2><p className="sub">Maior Score disponível entre os resultados do fornecedor. Ordenação ajustável nos filtros.</p>
+        <Filters suppliers />
+        <QueryState query={query} />
+        {data && <>{data.dados.length ? <div className="table-scroll" role="region" aria-label="Ranking de fornecedores; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Compras</th><th scope="col">Homologado</th><th scope="col">Maior Score</th></tr></thead><tbody>{data.dados.map(r => <tr key={r.id} className={r.id === selectedId ? 'sel' : ''}>
+          <td><Link className="link-a" to={selectLink(r.id)} aria-current={r.id === selectedId ? 'true' : undefined}>{r.nome}</Link><small>{r.orgaos} órgãos · {r.itens} itens</small></td><td>{r.compras_com_resultado}<small>{r.contratos_vinculados} contratos vinculados</small></td><td>{money(r.valor_homologado)}{r.resultados_sem_total > 0 && <small>Total incompleto</small>}</td><td>{indexText(r.indice_experimental)}</td>
+        </tr>)}</tbody></table></div> : <p>Nenhum fornecedor encontrado neste recorte.</p>}<Pager meta={data} onChange={changePage} /></>}
+      </section>
+      <div className="grid supplier-summary" aria-label="Fornecedor selecionado">
+        <QueryState query={detail} loading="Carregando fornecedor…" />
+        {supplier && <><section className="card">
+          <div className="mini"><h2>{supplier.nome}</h2><span className="pill ana">Selecionado</span></div><p className="sub">Fornecedor selecionado · dados oficiais do recorte</p>
+          <div className="stats supplier-stats"><div><strong>{supplier.compras_com_resultado}</strong><small>compras com resultado</small></div><div><strong>{money(supplier.valor_homologado)}</strong><small>homologado</small></div><div><strong>{supplier.orgaos}</strong><small>órgãos</small></div></div>
+          <p className="hint">Maior Score: {indexText(supplier.indice_experimental)} · {supplier.contratos_vinculados} contratos vinculados conhecidos</p>
+          {supplier.resultados_sem_total > 0 && <p className="hint">Total incompleto na fonte.</p>}
+        </section>
+        <section className="card"><h2>Participação no gasto por órgão</h2><p className="sub">Valor deste fornecedor ÷ total dos resultados no recorte de cada órgão.</p>
+          <div className="supplier-relations">{selected.relacoes.map(r => <div key={r.orgao_id}>
+            <div className="mini"><b>{r.orgao_nome}</b><span className="t-pet">{r.participacao == null ? 'Indisponível' : `${decimal((Number(r.participacao) * 100).toFixed(2))}%`}</span></div>
+            {r.participacao != null && <div className="supplier-bar" role="meter" aria-label={`Participação em ${r.orgao_nome}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Number(r.participacao) * 100}><span style={{ width: `${Math.min(100, Math.max(0, Number(r.participacao) * 100))}%` }} /></div>}
+            <p className="hint">{money(r.valor_fornecedor)} · {r.compras_com_resultado} compras com resultado <span>HHI: {r.hhi == null ? 'Indisponível' : decimal(Number(r.hhi).toFixed(4))}</span></p>
+            {r.motivo && <small className="hint">{r.motivo.replaceAll('_', ' ').toLowerCase()}</small>}
+          </div>)}</div>
+          {!selected.relacoes.length && <p>Sem relações disponíveis neste recorte.</p>}
+          <p className="hint supplier-limit">HHI mede a concentração de todos os fornecedores dos itens filtrados por órgão, de 0 a 1. Quanto maior, mais concentrado. O recorte não representa o universo completo do órgão. Concentração, isoladamente, não indica irregularidade.</p>
+        </section></>}
+        {!selectedId && data && <section className="card"><h2>Selecione um fornecedor</h2><p>Os vínculos e a participação aparecem aqui.</p></section>}
+      </div>
+    </div>
+    {selected && <section className="card supplier-related"><h2>Itens relacionados a {supplier.nome}</h2><p className="sub">Valores e Scores consideram somente os resultados deste fornecedor; o detalhe do item apresenta todos os vencedores.</p>
+      {selected.itens.dados.length ? <ItemRows rows={selected.itens.dados} params={params} scoreLabel="Score" /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={selected.itens} onChange={relatedPage} />
+    </section>}
+    <Aviso detalhe />
+  </div>
 }
 
 export const PainelReal = () => <AnalysisGate><DashboardContent /></AnalysisGate>

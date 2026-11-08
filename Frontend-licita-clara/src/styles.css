@@ -391,3 +391,34 @@ h1{font-size:30px;font-weight:500;letter-spacing:-.01em}
 
 .item-filters-primary.item-filters-two > :first-child { grid-column: auto; }
 .item-filters-primary.item-filters-one { grid-template-columns: 1fr; }
+
+.suppliers-page { display: grid; gap: 20px; min-width: 0; }
+.supplier-columns { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.supplier-columns > *, .supplier-summary > *, .supplier-stats > * { min-width: 0; }
+.supplier-ranking .item-filters { padding: 0; border: 0; box-shadow: none; margin: 16px 0; }
+.supplier-ranking .item-filters h2 { font-size: 13px; }
+.supplier-ranking .tbl td:first-child { min-width: 155px; }
+.supplier-ranking .tbl td { overflow-wrap: anywhere; }
+.supplier-summary h2 { overflow-wrap: anywhere; }
+.supplier-stats { margin: 24px 0 18px; gap: 12px; }
+.supplier-stats strong { display: block; font-size: 22px; font-weight: 400; overflow-wrap: anywhere; }
+.supplier-stats small { color: var(--secundario); }
+.supplier-relations { display: grid; gap: 22px; margin-top: 22px; }
+.supplier-bar { height: 5px; border-radius: 4px; background: var(--fundo); margin: 10px 0 6px; overflow: hidden; }
+.supplier-bar span { display: block; height: 100%; background: var(--petroleo); border-radius: inherit; }
+.supplier-limit { border-top: 1px solid var(--divisoria); padding-top: 16px; margin-top: 20px; }
+.supplier-analysis > summary { cursor: pointer; color: var(--petroleo); font-size: 13px; }
+.supplier-analysis[open] > summary { margin-bottom: 12px; }
+.suppliers-page .kpi .row svg { color: var(--petroleo); }
+@media (max-width: 900px) { .supplier-columns { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .supplier-stats { grid-template-columns: 1fr; } }
+.supplier-ranking .item-filters-primary { grid-template-columns: 1fr 1fr; }
+.supplier-ranking .item-filters-primary > :first-child { grid-column: 1 / -1; }
+.supplier-ranking .item-filters-lookups { grid-template-columns: 1fr; }
+.supplier-ranking .item-filters-ranges { grid-template-columns: 1fr; }
+@media (max-width: 560px) { .supplier-ranking .item-filters-primary { grid-template-columns: 1fr; } }
+.suppliers-page { grid-template-columns: minmax(0, 1fr); }
+.suppliers-page > *, .suppliers-page .grid > * { min-width: 0; }
+.supplier-stats { grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr) minmax(0, .7fr); }
+.supplier-stats > :nth-child(2) strong { font-size: 18px; }
+@media (max-width: 560px) { .supplier-stats { grid-template-columns: 1fr; } }

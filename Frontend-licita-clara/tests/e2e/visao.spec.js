@@ -1,9 +1,11 @@
+import AxeBuilder from '@axe-core/playwright'
 import { test, expect } from '@playwright/test'
 import { BASE, ITEM, PROCESS, SUPPLIER, item, otherItem, mockApi } from './fixtures.js'
 
 const EXEC = '77777777-7777-4777-8777-777777777777'
 const NEW_EXEC = '77777777-7777-4777-8777-888888888888'
 const MODEL = '88888888-8888-4888-8888-888888888888'
+const OTHER_SUPPLIER = '99999999-9999-4999-8999-999999999999'
 const AE = '88888888-8888-4888-8888-999999999999'
 
 async function mockView(page, overrides = {}) {
@@ -38,7 +40,8 @@ async function mockView(page, overrides = {}) {
     if (path === '/visao/painel') return done({ ...context, distribuicao: Array.from({ length: 10 }, (_,i) => ({ inicio: i*10, fim: (i+1)*10, itens: i === 8 ? context.resumo.analisados : 0 })), evolucao: rows.length ? [{ mes: '2026-09', itens: rows.length, analisados: context.resumo.analisados, parcial: 0, nao_analisados: context.resumo.nao_analisados }] : [], motivos_indisponibilidade: context.resumo.nao_analisados ? { SEM_REFERENCIA_EXATA: context.resumo.nao_analisados } : {} })
     if (path === '/visao/ranking') return done({ ...context, ...pageOf(rows) })
     const supplier = { id: SUPPLIER, nome: 'Fornecedor do recorte', compras_com_resultado: 1, contratos_vinculados: 0, itens: 1, orgaos: 1, valor_homologado: '0.10000001', resultados_sem_total: 0, indice_experimental: hasScore ? '88.125' : null }
-    if (path === '/visao/fornecedores') return done({ ...context, ...pageOf(rows.length ? [supplier] : []) })
+    if (path === '/visao/fornecedores') return done({ ...context, ...pageOf(rows.length ? (state.twoSuppliers ? [supplier, { ...supplier, id: OTHER_SUPPLIER, nome: 'Segundo fornecedor' }] : [supplier]) : []) })
+    if (state.twoSuppliers && path === `/visao/fornecedores/${OTHER_SUPPLIER}`) return done({ ...context, fornecedor: { ...supplier, id: OTHER_SUPPLIER, nome: 'Segundo fornecedor' }, relacoes: [], itens: pageOf(rows) })
     if (path === `/visao/fornecedores/${SUPPLIER}`) return done({ ...context, fornecedor: supplier, relacoes: [{ orgao_id: 'org', orgao_nome: 'Órgão do recorte', compras_com_resultado: 1, valor_fornecedor: null, valor_homologado: null, participacao: null, hhi: null, motivo: 'TOTAIS_INCOMPLETOS' }], itens: pageOf(rows.slice(0,1)) })
     return bad('Fornecedor não encontrado neste recorte.', 404)
   } })
@@ -93,9 +96,11 @@ test('fornecedor mostra compras e contratos separados e concentração desconhec
   await page.goto('/fornecedores')
   await page.getByRole('link', { name: 'Fornecedor do recorte', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Fornecedor do recorte', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Participação e concentração por órgão' })).toBeVisible()
-  await expect(page.getByRole('cell', { name: 'Indisponível', exact: false })).toHaveCount(2)
-  await expect(page.getByText('1 compras com resultado · 0 contratos vinculados conhecidos · 1 órgãos')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Participação no gasto por órgão' })).toBeVisible()
+  await expect(page.getByLabel('Fornecedor selecionado').getByText('Indisponível', { exact: true })).toBeVisible()
+  await expect(page.getByText('HHI: Indisponível', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('Fornecedor selecionado').getByText('compras com resultado', { exact: true })).toBeVisible()
+  await expect(page.getByText(/0 contratos vinculados conhecidos/)).toBeVisible()
 })
 
 test('troca de modelo, paginação, erro e retentativa mantêm seleção explícita', async ({ page }) => {
@@ -327,4 +332,42 @@ test('filtros avançados preservam valores ao recolher e funcionam no celular', 
   expect((await new AxeBuilder({ page }).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations).toEqual([])
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.screenshot({ path: testInfo.outputPath('filtros-mobile.png'), fullPage: true })
+})
+
+
+test('fornecedores seleciona o primeiro, mantém relatório vinculado e adapta o layout ao celular', async ({ page }, testInfo) => {
+  await mockView(page)
+  await page.goto(`/fornecedores?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=${MODEL}`)
+  await expect(page.getByRole('heading', { name: 'Fornecedores', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Ranking de fornecedores' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Fornecedor do recorte', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Itens relacionados a Fornecedor do recorte' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Preparar relatório' })).toHaveAttribute('href', new RegExp(`processo_id=${PROCESS}`))
+  expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations).toEqual([])
+  await page.screenshot({ path: testInfo.outputPath('fornecedores-desktop.png'), fullPage: true })
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.getByRole('button', { name: 'Ativar modo escuro' }).click()
+  await page.getByText('Mais filtros', { exact: true }).click()
+  await expect(page.getByLabel('Homologação a partir de')).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.screenshot({ path: testInfo.outputPath('fornecedores-mobile.png'), fullPage: true })
+})
+
+
+test('selecionar fornecedor atualiza o painel e pagina itens sem paginar o ranking', async ({ page }) => {
+  await mockView(page, { twoSuppliers: true })
+  await page.goto(`/fornecedores?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=${MODEL}&tamanho_pagina=1`)
+  const ranking = page.locator('.supplier-ranking')
+  await expect(page.getByRole('heading', { name: 'Fornecedor do recorte', exact: true })).toBeVisible()
+  await ranking.getByRole('button', { name: 'Próxima', exact: true }).click()
+  await ranking.getByRole('link', { name: 'Segundo fornecedor', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Segundo fornecedor', exact: true })).toBeVisible()
+  await expect(ranking.getByRole('link', { name: 'Segundo fornecedor', exact: true })).toHaveAttribute('aria-current', 'true')
+  await expect(page.getByText('Sem relações disponíveis neste recorte.')).toBeVisible()
+  const related = page.locator('.supplier-related')
+  await related.getByRole('button', { name: 'Próxima', exact: true }).click()
+  await expect(page).toHaveURL(/pagina_itens=2/)
+  await expect(related.getByRole('link', { name: 'Caneta do recorte', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Limpar filtros', exact: true }).click()
+  await expect(page).not.toHaveURL(/pagina_itens=/)
 })

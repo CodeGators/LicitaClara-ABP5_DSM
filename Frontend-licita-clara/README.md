@@ -152,3 +152,11 @@ modalidade, período, valores e tamanho da página ficam em **Mais filtros**.
 preservando a base e a versão da análise. Na consulta oficial de itens, os
 campos principais são busca e ordenação. A seleção de licitação dos relatórios
 usa o mesmo estilo e mantém os controles de exportação separados.
+
+A tela **Fornecedores** reúne ranking e detalhe na mesma página. O primeiro
+fornecedor da página é selecionado inicialmente; links no ranking atualizam o
+resumo, a participação por órgão e os itens relacionados. Os itens têm
+paginação independente (`pagina_itens`). Compras com resultado e contratos
+vinculados são contagens separadas; participação e HHI ausentes não recebem
+zero. **Preparar relatório** abre a compra do primeiro item relacionado exibido;
+a tela de relatórios permite selecionar outra compra.

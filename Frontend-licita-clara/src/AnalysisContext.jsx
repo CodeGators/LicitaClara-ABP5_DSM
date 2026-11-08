@@ -41,7 +41,7 @@ export function AnalysisProvider({ enabled, children }) {
   const ready = validBase && params.has('execucao_id') && (!executionId || (run.data && (modelId || run.data.roteamento_automatico || !run.data.modelos.length)))
   const setSelection = (key, value) => setParams(previous => {
     const next = new URLSearchParams(previous)
-    next.set(key, value); next.delete('pagina')
+    next.set(key, value); next.delete('pagina'); next.delete('pagina_itens')
     if (key === 'execucao_id') next.delete('modelo_id')
     return next
   })
