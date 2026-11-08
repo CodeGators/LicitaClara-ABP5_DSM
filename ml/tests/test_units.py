@@ -120,3 +120,18 @@ def test_generic_unit_with_packaging_description_needs_structured_content():
     source.update(unidade_fornecimento_sigla="GRF", capacidade=500, unidade_medida_sigla="ML")
     value = grouping(source)[0]["especificacao"]
     assert "CONTEUDO_EMBALAGEM_NAO_CONFIRMADO" not in structural_blockers(value)
+
+
+def test_rebuilding_models_preserves_previous_operational_items():
+    from licita_ml.grouped.operational import preserve_selection
+
+    chosen = {"itens": ["a"], "catalogos": ["123"], "inicio": "2026-09-01"}
+    data = {
+        "itens_versoes": [{"atributos_origem": {"id_compra_item": "b"}}],
+        "catalogos": {"id": "456"},
+    }
+    result = preserve_selection(chosen, data)
+    assert result["itens"] == ["a", "b"] and result["catalogos"] == ["123", "456"]
+    data["itens_versoes"][0]["atributos_origem"] = {}
+    with pytest.raises(ValueError, match="identidade oficial"):
+        preserve_selection(chosen, data)

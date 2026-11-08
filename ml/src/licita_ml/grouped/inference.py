@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import re
 from collections import Counter, defaultdict
 from datetime import date
 from decimal import Decimal
@@ -12,7 +13,7 @@ import pyarrow.dataset as ds
 
 from licita_ml.analytical.operational import read_base
 from licita_ml.analytical.rules import digest
-from licita_ml.catalog.rules import ALIASES, grouping
+from licita_ml.catalog.rules import ALIASES, grouping, text
 from licita_ml.catalog.rules import VERSION as CATALOG_VERSION
 from licita_ml.diagnostics import checksum
 from licita_ml.experiments.evaluate import features
@@ -23,7 +24,7 @@ from licita_ml.inference.temporal import frozen_models, sql_targets
 from licita_ml.repository import identifier
 from licita_ml.resources import RESOURCE_DIR
 from licita_ml.temporal.pipeline import FEATURES
-from licita_ml.units import measurement, operational_matches
+from licita_ml.units import measurement, operational_matches, unit
 
 VERSION = "inferencia-agrupada-v1"
 PROTOCOL = RESOURCE_DIR / "POLITICA_INFERENCIA_AGRUPADA_UNIDADES_V2.json"
@@ -255,6 +256,12 @@ def route(base, data, rows, models):
                     if ambiguous_item
                     else "VINCULO_REFERENCIA_AMBIGUO"
                     if len(exact) > 1
+                    else "CONTEUDO_EMBALAGEM_NAO_CONFIRMADO"
+                    if unit(item["unidade_medida"]) == "un"
+                    and re.search(
+                        r"\b(embalagem|caixa|pacote|frasco|ampola|garrafa|bandeja|fardo)\b",
+                        text(item["descricao"]),
+                    )
                     else "GRUPO_SEM_MODELO_TECNICAMENTE_ESTAVEL"
                     if gid
                     else "DATA_RESULTADO_DIVERGENTE_DA_REFERENCIA"

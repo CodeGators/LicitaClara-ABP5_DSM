@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pyarrow.dataset as ds
 
+from licita_ml.analytical.operational import read_base
 from licita_ml.grouped.temporal import validate
 from licita_ml.pipeline import Pipeline
 
@@ -34,8 +35,15 @@ def selection(preparation):
     }
 
 
-def run(preparation, settings, repository, objects, ids=None, fail_after=None):
+def run(
+    preparation, settings, repository, objects, ids=None, fail_after=None, preserve_base_id=None
+):
     chosen = selection(preparation)
+    if preserve_base_id is not None:
+        with repository.locked() as cn:
+            _, data = read_base(repository, cn, preserve_base_id)
+        chosen = preserve_selection(chosen, data)
+
     result = Pipeline(settings, repository, objects).run(
         date.fromisoformat(chosen["inicio"]),
         date.fromisoformat(chosen["fim"]),
@@ -49,4 +57,22 @@ def run(preparation, settings, repository, objects, ids=None, fail_after=None):
         "itens_solicitados": len(chosen["itens"]),
         "catalogos_solicitados": len(chosen["catalogos"]),
         "compras_solicitadas": len(chosen["compras"]),
+    }
+
+
+def preserve_selection(chosen, data):
+    """A atualização de modelos não deve apagar itens anteriormente consultáveis."""
+    selected = set(chosen["itens"])
+    for item in data["itens_versoes"]:
+        origin = item["atributos_origem"]
+        uid = origin.get("idCompraItem") or origin.get("id_compra_item")
+        if not uid:
+            raise ValueError("Item anterior sem identidade oficial; não reduzir cobertura")
+        selected.add(str(uid))
+    if len(selected) > 20000:
+        raise ValueError("União operacional excede limite; preparar lotes explícitos")
+    return {
+        **chosen,
+        "itens": sorted(selected),
+        "catalogos": sorted(set(chosen["catalogos"]) | set(data["catalogos"].values())),
     }

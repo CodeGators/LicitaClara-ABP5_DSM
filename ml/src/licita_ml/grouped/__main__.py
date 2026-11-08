@@ -26,6 +26,7 @@ def main():
     imp = commands.add_parser("importar")
     imp.add_argument("--preparacao", type=Path, required=True)
     imp.add_argument("--arquivos", type=UUID, nargs="+")
+    imp.add_argument("--preservar-base", type=UUID)
     infer = commands.add_parser("inferir")
     infer.add_argument("--treino", type=Path, required=True)
     infer.add_argument("--base-id", type=UUID, required=True)
@@ -52,7 +53,14 @@ def main():
         try:
             repo, objects = Repository(engine), storage(settings)
             if args.command == "importar":
-                result = operational.run(args.preparacao, settings, repo, objects, args.arquivos)
+                result = operational.run(
+                    args.preparacao,
+                    settings,
+                    repo,
+                    objects,
+                    args.arquivos,
+                    preserve_base_id=args.preservar_base,
+                )
             else:
                 result = inference.infer(
                     InferencePipeline(settings, repo, objects),

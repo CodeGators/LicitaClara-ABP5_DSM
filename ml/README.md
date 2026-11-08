@@ -570,3 +570,10 @@ Regerar catálogo com `python -m licita_ml.catalog`, preparar/treinar com
 operacional. Manter cortes temporais e mínimos de diversidade. A nova execução
 registra unidade da mediana, versão do catálogo e exclusões; publicação continua
 explícita pelo comando administrativo `licita-ml publicar-experimental`.
+
+Ao atualizar os grupos, `python -m licita_ml.grouped importar --preservar-base UUID`
+conserva os itens da base anterior na seleção operacional. Itens que perderam
+elegibilidade permanecem consultáveis e recebem motivo de ausência de score;
+a identidade oficial é obrigatória para preservar o item. A descrição mencionar
+“pacote com 40” sem confirmar se o preço é por peça ou por pacote não autoriza
+converter o preço automaticamente.
