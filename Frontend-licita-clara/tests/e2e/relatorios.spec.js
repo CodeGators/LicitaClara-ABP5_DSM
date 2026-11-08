@@ -58,3 +58,18 @@ test('download desatualizado mostra erro e prévia é utilizável em celular', a
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await expect(page.getByText('Nexo Suprimentos Ltda.', { exact: true })).toHaveCount(0)
 })
+
+test('filtros do relatório buscam e limpam a seleção sem perder a base', async ({ page }) => {
+  await reportApi(page)
+  await page.goto(`/relatorios?base_id=${BASE}&processo_id=${PROCESS}`)
+  const filters = page.getByRole('form', { name: 'Filtros do relatório' })
+  await filters.getByLabel('Buscar processo').fill('Compra 1')
+  const request = page.waitForRequest(r => new URL(r.url()).pathname.endsWith('/processos') && new URL(r.url()).searchParams.get('busca') === 'Compra 1')
+  await filters.getByRole('button', { name: 'Buscar', exact: true }).click()
+  await request
+  await filters.getByRole('button', { name: 'Limpar filtros' }).click()
+  await expect(filters.getByLabel('Buscar processo')).toHaveValue('')
+  await expect(filters.getByLabel('Processo selecionado')).toHaveValue('')
+  await expect(page).toHaveURL(new RegExp(`base_id=${BASE}`))
+  await expect(page.getByRole('button', { name: 'Exportar PDF', exact: true })).toBeDisabled()
+})

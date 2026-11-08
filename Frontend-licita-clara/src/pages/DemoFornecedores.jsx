@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, FileOutput, Building2, Landmark, ScanSearch, ChevronDown } from 'lucide-react'
+import { FileOutput, Building2, Landmark, ScanSearch, ChevronDown } from 'lucide-react'
 import { Head, Score, Prioridade, Revisao, Aviso, Progress, Tip } from '../components/ui.jsx'
 import { fornecedores, participacao, itens, brl } from '../data.js'
+import FilterPanel from '../components/FilterPanel.jsx'
+import { Field } from '../components/consultas.jsx'
 
 export default function Fornecedores() {
   const [q, setQ] = useState('')
@@ -23,10 +25,7 @@ export default function Fornecedores() {
       <div className="grid stack-md" style={{ gridTemplateColumns: '1.5fr 1fr', alignItems: 'start' }}>
         <div className="card">
           <h2>Ranking de fornecedores</h2><p className="sub">Ordenação: maior score entre os itens do fornecedor</p>
-          <div className="grid stack-sm" style={{ gridTemplateColumns: '1.2fr 1fr', gap: 12, marginTop: 16 }}>
-            <div className="field"><label>Fornecedor</label><div className="input"><input placeholder="Buscar por razão social" value={q} onChange={e => setQ(e.target.value)} /><Search size={16} color="var(--secundario)" /></div></div>
-            <div className="field"><label>Órgão</label><div className="select"><span>Todos os órgãos</span><ChevronDown size={16} /></div></div>
-          </div>
+          <FilterPanel title="Filtrar fornecedores" clear={() => setQ('')} singleColumn primary={<Field label="Buscar fornecedor"><input className="input" placeholder="Buscar por razão social" type="search" value={q} onChange={e => setQ(e.target.value)} /></Field>} advanced={<div className="field"><span>Órgão</span><div className="select"><span>Todos os órgãos</span><ChevronDown size={16} /></div></div>} />
           <table className="tbl">
             <thead><tr><th>Fornecedor</th><th>Contratos</th><th>Homologado</th><th>Maior score</th></tr></thead>
             <tbody>{lista.map(x => (

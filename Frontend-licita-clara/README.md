@@ -144,3 +144,11 @@ identificados separadamente. O back-end precisa carregar as novas rotas
 A comparação no detalhe identifica separadamente a unidade da mediana histórica
 e a unidade registrada no item. Unidades ausentes permanecem “Não informada”.
 A unidade do grupo não é inferida da descrição do item atual.
+
+As consultas de itens, licitações e fornecedores usam o mesmo painel de filtros:
+busca, estado da análise e ordenação ficam à vista; órgão, fornecedor,
+modalidade, período, valores e tamanho da página ficam em **Mais filtros**.
+**Aplicar filtros** confirma o recorte e **Limpar filtros** restaura a consulta,
+preservando a base e a versão da análise. Na consulta oficial de itens, os
+campos principais são busca e ordenação. A seleção de licitação dos relatórios
+usa o mesmo estilo e mantém os controles de exportação separados.

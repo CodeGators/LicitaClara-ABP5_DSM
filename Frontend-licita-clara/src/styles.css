@@ -386,3 +386,8 @@ h1{font-size:30px;font-weight:500;letter-spacing:-.01em}
 
 .detail-unit-basis { background: var(--fundo); border-radius: 8px; padding: 12px; margin: 14px 0; color: var(--secundario); font-size: 12px; overflow-wrap: anywhere; }
 .detail-unit-basis strong { color: var(--texto); }
+.item-filters-primary.item-filters-two { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+@media(max-width: 560px) { .item-filters-primary.item-filters-two { grid-template-columns: 1fr; } }
+
+.item-filters-primary.item-filters-two > :first-child { grid-column: auto; }
+.item-filters-primary.item-filters-one { grid-template-columns: 1fr; }

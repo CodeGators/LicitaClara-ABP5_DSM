@@ -55,7 +55,9 @@ test('menu móvel fechado fica fora do teclado; aberto isola foco e fecha com Es
   await expect(trigger).toBeFocused()
   await expect(trigger).toHaveAttribute('aria-expanded', 'false')
   for (let i = 0; i < 12; i++) { await page.keyboard.press('Tab'); expect(await page.evaluate(() => !!document.activeElement.closest('#menu-principal'))).toBe(false) }
-  await trigger.click()
+  await trigger.focus()
+  await page.keyboard.press('Enter')
+  await expect(dialog).toBeVisible()
   await page.setViewportSize({ width: 1280, height: 900 })
   await expect(page.getByRole('main')).toBeFocused()
 })

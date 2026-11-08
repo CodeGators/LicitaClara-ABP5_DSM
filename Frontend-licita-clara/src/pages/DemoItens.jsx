@@ -1,18 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Search, FileOutput, ChevronDown, Calendar, ArrowRight, ScanSearch, ArrowDownWideNarrow } from 'lucide-react'
+import { FileOutput, ChevronDown, Calendar, ArrowRight, ScanSearch, ArrowDownWideNarrow } from 'lucide-react'
 import { Head, Score, Prioridade, Revisao, Aviso, Tip } from '../components/ui.jsx'
 import { itens, razaoTxt, brl } from '../data.js'
+import FilterPanel from '../components/FilterPanel.jsx'
+import { Field } from '../components/consultas.jsx'
 
 const Visual = ({ label, v, icon: I = ChevronDown }) => (
   <div className="field"><label>{label}</label><div className="select"><span>{v}</span><I size={16} color="var(--secundario)" /></div></div>
 )
 const Pick = ({ label, value, onChange, todos, opts }) => (
-  <div className="field"><label>{label}</label>
+  <Field label={label}>
     <select className="select" value={value} onChange={e => onChange(e.target.value)}>
       <option value="">{todos}</option>
       {opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-    </select></div>
+    </select></Field>
 )
 const fornecedores = [...new Set(itens.map(p => p.forn))]
 
@@ -38,21 +40,18 @@ export default function Processos() {
     <>
       <Head kicker="Fila de análise / Ranking" title="Itens Sinalizados" sub="Encontre os itens prioritários. Dica: clique em uma linha para selecioná-la e depois em “Ver detalhe do item”."
         action={<Link to={`/demonstracao/relatorios?item=${atual?.id || itens[0].id}`} className="btn primary"><FileOutput size={16} /> Preparar relatório</Link>} />
-      <div className="card">
-        <div className="mini"><h2>Refine o recorte</h2><button className="link-a" style={{ background: 'none', border: 0 }} onClick={limpar}>Limpar filtros</button></div>
-        <p className="sub">Escolha um item ou fornecedor para filtrar a lista</p>
-        <div className="filters">
-          <Pick label="Item" value={item} onChange={setItem} todos="Todos os itens" opts={itens.map(p => [p.id, p.nome])} />
-          <Pick label="Fornecedor" value={forn} onChange={setForn} todos="Todos os fornecedores" opts={fornecedores.map(f => [f, f])} />
-          <Visual label="Período de homologação" v="01 jan – 30 jun 2026" icon={Calendar} />
-          <Visual label="Valor homologado" v="Qualquer valor" />
-          <Visual label="Modalidade" v="Todas" />
-        </div>
-      </div>
+      <FilterPanel title="Filtrar itens" clear={limpar} twoColumns primary={<>
+        <Field label="Buscar item ou fornecedor"><input className="input" type="search" placeholder="Buscar item ou fornecedor" value={q} onChange={e => setQ(e.target.value)} /></Field>
+        <Pick label="Item" value={item} onChange={setItem} todos="Todos os itens" opts={itens.map(p => [p.id, p.nome])} />
+      </>} advanced={<div className="item-filters-lookups">
+        <Pick label="Fornecedor" value={forn} onChange={setForn} todos="Todos os fornecedores" opts={fornecedores.map(f => [f, f])} />
+        <Visual label="Período de homologação" v="01 jan – 30 jun 2026" icon={Calendar} />
+        <Visual label="Valor homologado" v="Qualquer valor" />
+        <Visual label="Modalidade" v="Todas" />
+      </div>} />
       <div className="tabs">{tabs.map(([k, l]) => <button key={k} className={aba === k ? 'on' : ''} onClick={() => setAba(k)}>{l}</button>)}</div>
       <div className="card">
         <div className="mini">
-          <div className="input" style={{ maxWidth: 380 }}><Search size={16} color="var(--secundario)" /><input placeholder="Buscar item ou fornecedor" value={q} onChange={e => setQ(e.target.value)} /></div>
           <span style={{ color: 'var(--secundario)', display: 'flex', gap: 8 }}><ArrowDownWideNarrow size={16} /> Ordenado por score: maior primeiro</span>
         </div>
         <table className="tbl">

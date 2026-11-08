@@ -22,7 +22,7 @@ function Content() {
     <Head kicker="Visão por licitação / Resumo dos itens" title={id ? row ? `Compra ${row.processo.numero_compra}` : 'Detalhe da licitação' : 'Licitações Sinalizadas'} sub={id ? row?.processo.objeto : 'Uma linha por compra, com média dos Scores disponíveis e cobertura dos itens importados.'} action={row && <Link className="btn primary" to={reportLink(row.id, params)}><FilePlus2 size={16} />Incluir no relatório</Link>} />
     <div className="note"><b>Como o Score médio é calculado</b>Média simples dos Scores dos itens com análise, com o mesmo peso por item. Cada item usa o maior Score dos seus resultados no modelo selecionado ou preferencial do grupo. Itens sem Score ficam fora da média. É um resumo descritivo; não representa probabilidade de fraude ou prioridade validada.</div>
     <AnalysisSelector />
-    {!id && <Filters simple purchases />}
+    {!id && <Filters purchases />}
     <QueryState query={query} loading="Consultando licitações…" />
     {data && !id && <>
       <div className="grid g3"><section className="card kpi"><span>Licitações no recorte</span><strong>{data.resumo.licitacoes}</strong></section><section className="card kpi"><span>Licitações com Score</span><strong>{data.resumo.com_score}</strong></section><section className="card kpi"><span>Itens com Score / importados</span><strong>{data.resumo.itens_com_score} / {data.resumo.itens_importados}</strong></section></div>

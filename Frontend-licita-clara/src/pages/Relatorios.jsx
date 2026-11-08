@@ -8,6 +8,7 @@ import { AnalysisSelector, useAnalysis } from '../AnalysisContext.jsx'
 import { useBase } from '../BaseContext.jsx'
 import { date, decimal, money } from '../api.mjs'
 import useApi from '../useApi.js'
+import FilterPanel from '../components/FilterPanel.jsx'
 
 const apiBase = (import.meta.env.VITE_API_URL || '/api/v1').replace(/\/$/, '')
 export default function Relatorios() {
@@ -51,20 +52,20 @@ export default function Relatorios() {
     <Head kicker="Exportação / Anomalias em compras públicas" title="Relatórios" sub="Selecione o processo, confira a prévia e baixe os dados reais."
       action={<button className="btn primary" onClick={download} disabled={!data || busy || titulo !== appliedTitle}><Download size={16} />{busy ? 'Gerando arquivo…' : `Exportar ${format.toUpperCase()}`}</button>} />
     <AnalysisSelector allModels />
+    <FilterPanel title="Selecionar licitação" ariaLabel="Filtros do relatório" twoColumns apply={e => { e.preventDefault(); setSearch(busca.trim()) }} applyLabel="Buscar" clear={() => { setBusca(''); setSearch(''); setProcess('') }} primary={<>
+      <Field label="Buscar processo"><input className="input" type="search" value={busca} maxLength={200} onChange={e => setBusca(e.target.value)} /></Field>
+      <Field label="Processo selecionado"><select className="select" value={processId} onChange={e => setProcess(e.target.value)}>
+        <option value="">Selecione um processo</option>
+        {processId && !processes.data?.dados.some(p => p.id === processId) && <option value={processId}>{process?.numero_compra || processId}</option>}
+        {processes.data?.dados.map(p => <option value={p.id} key={p.id}>Compra {p.numero_compra} · {p.orgao_nome}</option>)}
+      </select></Field>
+    </>}>
+      <QueryState query={processes} loading="Carregando processos…" />
+      {processes.data?.meta.total > 100 && <p className="hint">Mostrando os primeiros 100 processos. Refine a busca para encontrar os demais.</p>}
+    </FilterPanel>
     <div className="grid stack-md report-grid">
       <div className="grid report-config">
         <section className="card"><h2>Configurar exportação</h2>
-          <form onSubmit={e => { e.preventDefault(); setSearch(busca.trim()) }}>
-            <Field label="Buscar processo"><input className="input" value={busca} maxLength={200} onChange={e => setBusca(e.target.value)} /></Field>
-            <button className="btn" type="submit">Buscar</button>
-          </form>
-          <QueryState query={processes} loading="Carregando processos…" />
-          <Field label="Processo selecionado"><select className="select" value={processId} onChange={e => setProcess(e.target.value)}>
-            <option value="">Selecione um processo</option>
-            {processId && !processes.data?.dados.some(p => p.id === processId) && <option value={processId}>{process?.numero_compra || processId}</option>}
-            {processes.data?.dados.map(p => <option value={p.id} key={p.id}>Compra {p.numero_compra} · {p.orgao_nome}</option>)}
-          </select></Field>
-          {processes.data?.meta.total > 100 && <p className="hint">Mostrando os primeiros 100 processos. Refine a busca para encontrar os demais.</p>}
           <form onSubmit={e => { e.preventDefault(); setAppliedTitle(titulo.trim()); setTitulo(titulo.trim()); setError('') }}>
             <Field label="Título do relatório"><input className="input" required maxLength={120} value={titulo} onChange={e => setTitulo(e.target.value)} /></Field>
             <button className="btn" type="submit" disabled={!titulo.trim()}>Atualizar prévia</button>

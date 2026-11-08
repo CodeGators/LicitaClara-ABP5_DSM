@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { useBase } from '../BaseContext.jsx'
 import { AnalysisGate, AnalysisSelector, selectionLink, useAnalysis, viewFields } from '../AnalysisContext.jsx'
 import { decimal, money } from '../api.mjs'
-import { Field, LookupFilter, Pager, QueryState } from '../components/consultas.jsx'
+import { Pager, QueryState } from '../components/consultas.jsx'
 import { Head } from '../components/ui.jsx'
 import useApi from '../useApi.js'
 import PainelGeral from './PainelGeral.jsx'
@@ -12,7 +12,7 @@ import ItemFilters from '../components/ItemFilters.jsx'
 export const indexText = value => value == null ? 'Indisponível' : decimal(value)
 const read = params => Object.fromEntries(viewFields.map(key => [key, params.get(key) || (key === 'analise' ? 'todos' : key === 'ordenacao' ? 'indice_desc' : key === 'tamanho_pagina' ? '20' : '')]))
 
-export function Filters({ overview = false, simple = false, purchases = false }) {
+export function Filters({ purchases = false, suppliers = false }) {
   const { params, setParams } = useAnalysis()
   const { baseId } = useBase()
   const [draft, setDraft] = useState(() => read(params))
@@ -27,27 +27,12 @@ export function Filters({ overview = false, simple = false, purchases = false })
       return next
     })
   }
-  const clear = () => setParams(previous => {
+  const clear = () => { setDraft(read(new URLSearchParams())); setParams(previous => {
     const next = new URLSearchParams(previous); for (const key of [...viewFields, 'pagina']) next.delete(key); return next
-  })
-  if (simple) return <ItemFilters draft={draft} change={change} apply={apply} clear={clear} baseId={baseId} params={params} purchases={purchases} />
-  return <form className="card" aria-label="Filtros do recorte" onSubmit={apply}><h2>Filtros do recorte</h2><div className="filters real-filters">
-    <Field label="Buscar item, compra ou fornecedor"><input className="input" type="search" maxLength={200} value={draft.busca} onChange={e => change('busca', e.target.value)} /></Field>
-    <LookupFilter kind="/orgaos" title="Órgão" baseId={baseId} value={draft.orgao_id} onChange={v => change('orgao_id', v)} />
-    <LookupFilter kind="/fornecedores/opcoes" title="Fornecedor" baseId={baseId} value={draft.fornecedor_id} onChange={v => change('fornecedor_id', v)} />
-    <LookupFilter kind="/modalidades" title="Modalidade" baseId={baseId} value={draft.modalidade_id} onChange={v => change('modalidade_id', v)} />
-    <Field label="Homologação a partir de"><input className="input" type="date" value={draft.homologacao_inicio} onChange={e => change('homologacao_inicio', e.target.value)} /></Field>
-    <Field label="Homologação até"><input className="input" type="date" value={draft.homologacao_fim} onChange={e => change('homologacao_fim', e.target.value)} /></Field>
-    <Field label="Total do recorte mínimo (R$)"><input className="input" type="number" min="0" step="0.00000001" value={draft.valor_minimo} onChange={e => change('valor_minimo', e.target.value)} /></Field>
-    <Field label="Total do recorte máximo (R$)"><input className="input" type="number" min="0" step="0.00000001" value={draft.valor_maximo} onChange={e => change('valor_maximo', e.target.value)} /></Field>
-    <Field label="Estado da análise"><select className="select" value={draft.analise} onChange={e => change('analise', e.target.value)}><option value="todos">Todos</option><option value="analisados">Analisados integralmente</option><option value="parcial">Parcialmente analisados</option><option value="nao_analisados">Não analisados</option></select></Field>
-    {!overview && <>
-    <Field label="Ordenação"><select className="select" value={draft.ordenacao} onChange={e => change('ordenacao', e.target.value)}><option value="indice_desc">Maior índice disponível</option><option value="descricao_asc">Nome / descrição</option><option value="valor_desc">Maior total conhecido</option></select></Field>
-    <Field label="Registros por página"><select className="select" value={draft.tamanho_pagina} onChange={e => change('tamanho_pagina', e.target.value)}>{[5,10,20,50,100].map(n => <option key={n}>{n}</option>)}</select></Field>
-    </>}
-  </div><div className="filter-actions"><button className="btn primary" type="submit">Aplicar filtros</button><button className="btn ghost" type="button" onClick={() => setParams(previous => {
-    const next = new URLSearchParams(previous); for (const key of [...viewFields, 'pagina']) next.delete(key); return next
-  })}>Limpar filtros</button></div><p className="hint">O fornecedor seleciona itens com resultado dele. Valores e HHI conservam os demais vencedores desses itens no período. Contratos são vínculos conhecidos, não contagem de compras.</p></form>
+  }) }
+  return <ItemFilters draft={draft} change={change} apply={apply} clear={clear} baseId={baseId} params={params} purchases={purchases} suppliers={suppliers}>
+    {suppliers && <p className="hint">O fornecedor seleciona itens com resultado dele. Valores e concentração conservam os demais vencedores desses itens no período.</p>}
+  </ItemFilters>
 }
 
 
@@ -89,7 +74,7 @@ export function ItemRows({ rows, params }) {
 }
 
 function Shell({ title, summary, children }) {
-  return <><Head kicker="Dados oficiais / Recorte selecionado" title={title} sub={title === 'Itens Sinalizados' ? 'Consulte os itens importados e seus Scores. Use a busca ou refine a seleção em Mais filtros.' : 'Consultas reais, com base e análise versionadas. Filtros compartilhados entre painel, ranking e fornecedores.'} />{summary && <Cards summary={summary} />}<AnalysisSelector /><Notice /><Filters simple={title === 'Itens Sinalizados'} />{children}</>
+  return <><Head kicker="Dados oficiais / Recorte selecionado" title={title} sub={title === 'Itens Sinalizados' ? 'Consulte os itens importados e seus Scores. Use a busca ou refine a seleção em Mais filtros.' : 'Consultas reais, com base e análise versionadas. Filtros compartilhados entre painel, ranking e fornecedores.'} />{summary && <Cards summary={summary} />}<AnalysisSelector /><Notice /><Filters suppliers={title !== 'Itens Sinalizados'} />{children}</>
 }
 
 function DashboardContent() {
