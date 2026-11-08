@@ -131,3 +131,25 @@ Validação específica:
 ```bash
 uv run --locked --all-packages --extra validation pytest backend/tests/test_reports.py -q
 ```
+
+### Resumo de licitações
+
+`GET /api/v1/visao/licitacoes` recebe os mesmos parâmetros de base, execução,
+modelo, filtros e paginação da visão de itens. Agrupa todos os itens importados
+por compra, incluindo compras importadas sem itens. O Score médio é a média
+aritmética dos índices disponíveis por item, arredondada a três casas decimais;
+o índice do item é o máximo dos resultados não cancelados no modelo escolhido
+ou no modelo preferencial de seu grupo. Algoritmos não são somados e itens sem
+índice não entram no denominador. Um índice real igual a zero entra na média.
+
+Busca, fornecedor, período e valores selecionam compras inteiras: não reduzem
+os itens usados no cálculo. O filtro de valor usa o total global homologado na
+origem. `valor_homologado` e `valores_itens_importados` são medidas distintas.
+`itens_com_score`, `itens_importados`, cobertura parcial dos resultados e
+`maior_score` acompanham a média; `itens_oficiais` fica nulo porque a integridade
+da importação não foi confirmada. A média é descritiva, sem prioridade validada.
+
+`GET /api/v1/visao/licitacoes/{process_id}` retorna `licitacao` e `itens`
+paginados. Os filtros da listagem são ignorados no detalhe para conservar toda
+a compra importada. Paginar os itens não modifica o resumo. Nenhum modelo é
+treinado ou executado por essas consultas; elas leem resultados persistidos.

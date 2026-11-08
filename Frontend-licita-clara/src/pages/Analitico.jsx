@@ -12,7 +12,7 @@ import ItemFilters from '../components/ItemFilters.jsx'
 export const indexText = value => value == null ? 'Indisponível' : decimal(value)
 const read = params => Object.fromEntries(viewFields.map(key => [key, params.get(key) || (key === 'analise' ? 'todos' : key === 'ordenacao' ? 'indice_desc' : key === 'tamanho_pagina' ? '20' : '')]))
 
-function Filters({ overview = false, simple = false }) {
+export function Filters({ overview = false, simple = false, purchases = false }) {
   const { params, setParams } = useAnalysis()
   const { baseId } = useBase()
   const [draft, setDraft] = useState(() => read(params))
@@ -30,7 +30,7 @@ function Filters({ overview = false, simple = false }) {
   const clear = () => setParams(previous => {
     const next = new URLSearchParams(previous); for (const key of [...viewFields, 'pagina']) next.delete(key); return next
   })
-  if (simple) return <ItemFilters draft={draft} change={change} apply={apply} clear={clear} baseId={baseId} params={params} />
+  if (simple) return <ItemFilters draft={draft} change={change} apply={apply} clear={clear} baseId={baseId} params={params} purchases={purchases} />
   return <form className="card" aria-label="Filtros do recorte" onSubmit={apply}><h2>Filtros do recorte</h2><div className="filters real-filters">
     <Field label="Buscar item, compra ou fornecedor"><input className="input" type="search" maxLength={200} value={draft.busca} onChange={e => change('busca', e.target.value)} /></Field>
     <LookupFilter kind="/orgaos" title="Órgão" baseId={baseId} value={draft.orgao_id} onChange={v => change('orgao_id', v)} />
@@ -68,7 +68,7 @@ function Cards({ summary }) {
   </div>
 }
 
-function useView(path) {
+export function useView(path) {
   const { baseId } = useBase()
   const s = useAnalysis()
   const filters = read(s.params)
@@ -77,7 +77,7 @@ function useView(path) {
   return { query, params: s.params, changePage }
 }
 
-function ItemRows({ rows, params }) {
+export function ItemRows({ rows, params }) {
   const location = useLocation()
   return <div className="table-scroll" role="region" aria-label="Itens e resultados do recorte; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Item / compra</th><th scope="col">Órgão / fornecedores</th><th scope="col">Total homologado no recorte</th><th scope="col">Índice experimental</th><th scope="col">Cobertura</th></tr></thead><tbody>{rows.map(r => <tr key={r.id}>
     <td><Link className="link-a" to={selectionLink(`/ranking/${r.id}`, params)} state={{ from: location.pathname + location.search }}>{r.descricao}</Link><small>Item {r.numero_item} · Compra {r.processo.numero_compra}</small></td>

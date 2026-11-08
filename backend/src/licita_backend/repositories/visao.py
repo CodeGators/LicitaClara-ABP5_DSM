@@ -335,15 +335,13 @@ class ViewRepository:
             }
         )
 
-    def page(self, rows, filters):
+    def page(self, rows, filters, score_key="indice_experimental"):
         if filters.ordenacao == "descricao_asc":
             rows = sorted(
                 rows, key=lambda r: (r.get("descricao", r.get("nome", "")).casefold(), str(r["id"]))
             )
         else:
-            key = (
-                "indice_experimental" if filters.ordenacao == "indice_desc" else "valor_homologado"
-            )
+            key = score_key if filters.ordenacao == "indice_desc" else "valor_homologado"
             rows = sorted(
                 rows, key=lambda r: (r[key] is None, -(r[key] or Decimal(0)), str(r["id"]))
             )

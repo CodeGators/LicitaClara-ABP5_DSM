@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, model_validator
 
-from licita_backend.schemas.consultas import ProcurementFilters
+from licita_backend.schemas.consultas import Money, ProcurementFilters
 
 
 class ViewFilters(ProcurementFilters):
@@ -48,4 +48,31 @@ class ViewPage(ViewContext):
 class SupplierView(ViewContext):
     fornecedor: dict[str, Any]
     relacoes: list[dict[str, Any]]
+    itens: dict[str, Any]
+
+
+class TenderRow(BaseModel):
+    id: UUID
+    processo: dict[str, Any]
+    descricao: str
+    score_medio: Money | None
+    maior_score: Money | None
+    itens_importados: int
+    itens_com_score: int
+    itens_analise_completa: int
+    itens_analise_parcial: int
+    itens_sem_score: int
+    itens_oficiais: None = None
+    status_analise: Literal["analisados", "parcial", "nao_analisados"]
+    valor_homologado: Money | None
+    valor_estimado: Money | None
+    valores_itens_importados: dict[str, Any]
+
+
+class TenderPage(ViewPage):
+    dados: list[TenderRow]
+
+
+class TenderDetail(ViewContext):
+    licitacao: TenderRow
     itens: dict[str, Any]

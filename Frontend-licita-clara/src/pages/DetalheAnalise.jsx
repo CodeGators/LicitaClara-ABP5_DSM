@@ -72,7 +72,7 @@ function Detail({ item }) {
   const invalidModel = selection.modelId && selection.run.data && !selection.run.data.modelos.some(m => m.id === selection.modelId)
   const activeScore = invalidModel ? null : score
   const mainProcess = processQuery.data?.processo
-  const back = /^\/(painel|ranking|fornecedores)(\/[^?]*)?\?/.test(origin) ? origin : selectionLink('/ranking', location.search)
+  const back = /^\/(painel|ranking|licitacoes|fornecedores)(\/[^?]*)?\?/.test(origin) ? origin : selectionLink('/ranking', location.search)
   const controls = <div className="detail-selection">{results.length > 1 && <Field label="Resultado do fornecedor"><select className="select" value={result?.id || ''} onChange={e => { setResult(e.target.value) }}>{results.map(r => <option key={r.id} value={r.id}>{r.fornecedor_nome} · Resultado {r.sequencial_resultado}</option>)}</select></Field>}{!invalidModel && (scores.length > 1 || (scores.length === 1 && !activeScore)) && <Field label="Modelo da comparação"><select className="select" value={activeScore?.modelo_id || ''} onChange={e => selection.setSelection('modelo_id', e.target.value)}>{!activeScore && <option value="" disabled>Modelo selecionado sem score</option>}{scores.map(s => <option key={s.id} value={s.modelo_id}>{algorithm(s.algoritmo)}</option>)}</select></Field>}</div>
   return <div className="analysis-detail">
     <Head kicker="Ranking / Detalhe do item" title={`Compra ${process.numero_compra} · Item ${item.numero_item}`} sub={`${item.descricao} · ${process.orgao_nome} · ${process.modalidade_nome || 'Modalidade não informada'}`} action={<Link className="btn primary" to={reportLink(process.id, location.search)}><FilePlus2 size={16} />Incluir no relatório</Link>} />

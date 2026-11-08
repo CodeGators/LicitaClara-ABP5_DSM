@@ -176,6 +176,36 @@ def test_model_selection_published_execution_and_partial_coverage(query_client):
             )
         )
     params = {"base_id": str(base), "execucao_id": str(uid), "modelo_id": str(model)}
+
+    tenders = client.get("/api/v1/visao/licitacoes", params=params)
+    assert tenders.status_code == 200, tenders.text
+    purchase = tenders.json()["dados"][0]
+    assert purchase["score_medio"] == "88.125"
+    assert purchase["maior_score"] == "88.125"
+    assert purchase["itens_com_score"] == 1 and purchase["itens_importados"] == 2
+    assert purchase["status_analise"] == "parcial"
+    detail = client.get(
+        "/api/v1/visao/licitacoes/" + purchase["id"],
+        params={**params, "pagina": 2, "tamanho_pagina": 1},
+    )
+    assert detail.status_code == 200, detail.text
+    assert detail.json()["licitacao"] == purchase
+    assert detail.json()["itens"]["total"] == 2
+    assert len(detail.json()["itens"]["dados"]) == 1
+    assert client.get("/api/v1/visao/licitacoes/" + str(uuid4()), params=params).status_code == 404
+    assert (
+        client.get(
+            "/api/v1/visao/licitacoes", params={**params, "modelo_id": str(uuid4())}
+        ).status_code
+        == 422
+    )
+    assert (
+        client.get(
+            "/api/v1/visao/licitacoes", params={**params, "base_id": data["old"]}
+        ).status_code
+        == 404
+    )
+
     body = client.get("/api/v1/visao/painel", params=params)
     assert body.status_code == 200, body.text
     assert body.json()["resumo"]["parcial"] == 1

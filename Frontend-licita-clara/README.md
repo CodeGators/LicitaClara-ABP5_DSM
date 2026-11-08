@@ -126,3 +126,17 @@ LICITA_INTERFACE_CONFIG=../data/diagnostico/11/config.json PLAYWRIGHT_CHANNEL=ch
 ```
 
 O arquivo local de configuração segue o formato `{ "base": "UUID", "execucao": "UUID", "routes": [["painel", "/painel?base_id=UUID&execucao_id=UUID"]] }`.
+
+## Licitações Sinalizadas
+
+O menu abre `/licitacoes`, com uma linha por compra, valor global homologado,
+cobertura, Score médio e maior Score. A média atribui o mesmo peso a cada item
+com Score; itens sem análise não viram zero. O indicador é descritivo e compara
+posições relativas a diferentes grupos de treino, sem representar risco validado.
+
+A lupa abre `/licitacoes/:id`, com resumo e itens paginados. Clicar no item abre
+a análise salva e permite voltar à licitação. Os filtros selecionam compras
+inteiras; a média do detalhe usa todos os itens importados, independentemente
+da pesquisa ou página atual. Valores globais e dos itens importados são
+identificados separadamente. O back-end precisa carregar as novas rotas
+`/api/v1/visao/licitacoes` e `/api/v1/visao/licitacoes/:id`.

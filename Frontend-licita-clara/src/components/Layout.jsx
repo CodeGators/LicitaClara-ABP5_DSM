@@ -12,10 +12,11 @@ import { selectionLink } from '../AnalysisContext.jsx'
 const nav = [
   { to: '/painel', label: 'Painel Geral', icon: LayoutGrid },
   { to: '/ranking', label: 'Itens Sinalizados', icon: ListFilter, end: true },
+  { to: '/licitacoes', label: 'Licitações Sinalizadas', icon: Layers },
   { to: '/fornecedores', label: 'Fornecedores', icon: Building2 },
   { to: '/relatorios', label: 'Relatórios', icon: FileText },
 ]
-const names = { itens: 'Consultar itens', processos: 'Processo da compra', demonstracao: 'Demonstração', painel: 'Painel Geral', ranking: 'Itens Sinalizados', fornecedores: 'Fornecedores', relatorios: 'Relatórios' }
+const names = { itens: 'Consultar itens', processos: 'Processo da compra', demonstracao: 'Demonstração', painel: 'Painel Geral', ranking: 'Itens Sinalizados', licitacoes: 'Licitações Sinalizadas', fornecedores: 'Fornecedores', relatorios: 'Relatórios' }
 const readSeen = () => { try { return localStorage.getItem('lc_ajuda_vista') } catch { return null } }
 
 export default function Layout() {

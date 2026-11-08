@@ -8,6 +8,7 @@ import Detalhe from './pages/Detalhe.jsx'
 import Itens from './pages/Itens.jsx'
 import ItemDetalhe from './pages/ItemDetalhe.jsx'
 import DetalheAnalise from './pages/DetalheAnalise.jsx'
+import Licitacoes from './pages/Licitacoes.jsx'
 import Processo from './pages/Processo.jsx'
 import { BaseGate, BaseProvider } from './BaseContext.jsx'
 import DemoFornecedores from './pages/DemoFornecedores.jsx'
@@ -16,8 +17,8 @@ import DemoRelatorios from './pages/DemoRelatorios.jsx'
 
 export default function App() {
   const location = useLocation()
-  const real = /^\/(itens|processos|painel|ranking|fornecedores|relatorios)(\/|$)/.test(location.pathname)
-  const analytic = /^\/(painel|ranking|fornecedores|relatorios)(\/|$)/.test(location.pathname) || new URLSearchParams(location.search).has('execucao_id')
+  const real = /^\/(itens|processos|painel|ranking|licitacoes|fornecedores|relatorios)(\/|$)/.test(location.pathname)
+  const analytic = /^\/(painel|ranking|licitacoes|fornecedores|relatorios)(\/|$)/.test(location.pathname) || new URLSearchParams(location.search).has('execucao_id')
   const legacyParams = new URLSearchParams(location.search)
   legacyParams.delete('aba')
   return (
@@ -29,6 +30,8 @@ export default function App() {
         <Route path="processos" element={<Navigate to={`/itens?${legacyParams}`} replace />} />
         <Route path="processos/:id" element={<BaseGate><Processo /></BaseGate>} />
         <Route path="painel" element={<BaseGate><PainelReal /></BaseGate>} />
+        <Route path="licitacoes" element={<BaseGate><Licitacoes /></BaseGate>} />
+        <Route path="licitacoes/:id" element={<BaseGate><Licitacoes /></BaseGate>} />
         <Route path="ranking/:id" element={<BaseGate><AnalysisGate><DetalheAnalise /></AnalysisGate></BaseGate>} />
         <Route path="ranking" element={<BaseGate><RankingReal /></BaseGate>} />
         <Route path="demonstracao/painel" element={<DemoPainel />} />
