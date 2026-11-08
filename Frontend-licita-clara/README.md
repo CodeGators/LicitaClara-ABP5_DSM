@@ -160,3 +160,11 @@ paginação independente (`pagina_itens`). Compras com resultado e contratos
 vinculados são contagens separadas; participação e HHI ausentes não recebem
 zero. **Preparar relatório** abre a compra do primeiro item relacionado exibido;
 a tela de relatórios permite selecionar outra compra.
+
+Números exibidos usam até duas casas decimais; valores monetários usam pelo
+menos duas. O arredondamento é apenas de apresentação e preserva inteiros acima
+do limite seguro de JavaScript. Valores não nulos que arredondariam para zero
+mantêm as casas necessárias; HHI usa até quatro casas. Preços unitários e
+medianas têm o valor original no tooltip. Banco, cálculos, respostas da API,
+filtros numéricos e exportação CSV conservam a precisão original. O PDF usa o
+mesmo arredondamento visual e informa também preços unitários e medianas originais.

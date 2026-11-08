@@ -6,7 +6,7 @@ import { Mark } from '../components/Logo.jsx'
 import { Field, QueryState } from '../components/consultas.jsx'
 import { AnalysisSelector, useAnalysis } from '../AnalysisContext.jsx'
 import { useBase } from '../BaseContext.jsx'
-import { date, decimal, money } from '../api.mjs'
+import { date, decimal, exactDecimal, money } from '../api.mjs'
 import useApi from '../useApi.js'
 import FilterPanel from '../components/FilterPanel.jsx'
 
@@ -92,9 +92,9 @@ export default function Relatorios() {
             <div className="stats"><div><small>Estimado global</small><strong>{money(process.valor_estimado_processo)}</strong></div><div><small>Homologado global</small><strong>{money(process.valor_homologado_processo)}</strong></div><div><small>Homologado no recorte</small><strong>{money(process.valor_homologado_itens_recorte)}</strong></div></div>
             <p className="hint">Valores globais e do recorte são medidas distintas. O recorte pode conter somente parte da compra.</p>
             <h3>02 / Sinais e comparação de itens</h3>
-            {data.itens.map(item => <section className="report-item" key={item.id}><h4>Item {item.numero_item} · {item.descricao}</h4><p>Unidade: {item.unidade_medida || 'Não informada'} · Quantidade: {decimal(item.quantidade)} · Estimado unitário: {money(item.valor_unitario_estimado)}</p>
-              {item.resultados.length ? item.resultados.map(r => <p key={r.id}>{r.fornecedor_nome} · {r.cancelado ? 'Cancelado' : 'Não cancelado'} · Unitário: {money(r.valor_unitario_homologado)} · Quantidade homologada: {decimal(r.quantidade_homologada)} · Total: {money(r.valor_total_homologado)} · Data: {date(r.data_resultado)}</p>) : <p>Sem resultado conhecido.</p>}
-              {item.scores.length ? item.scores.map(s => <div className="note" key={s.id}><b>{s.algoritmo} · Índice {decimal(s.indice)} / 100</b>Mediana do treino: {money(s.mediana_treino)} · Preço/mediana: {decimal(s.razao_preco_mediana)} · Exemplos de treino: {s.n_treino ?? 'Não informado'}<small>Resultado: {s.resultado_item_id} · Modelo: {s.modelo_id}<br />Fonte: {s.fonte.membro || 'Não informada'} · registro {s.fonte.linha ?? 'não informado'} · SHA-256: {s.fonte.arquivo_sha256 || 'não informado'}</small></div>) : <p>Sem análise disponível para este item na seleção.</p>}
+            {data.itens.map(item => <section className="report-item" key={item.id}><h4>Item {item.numero_item} · {item.descricao}</h4><p title={`Estimado unitário original: ${exactDecimal(item.valor_unitario_estimado)}`}>Unidade: {item.unidade_medida || 'Não informada'} · Quantidade: {decimal(item.quantidade)} · Estimado unitário: {money(item.valor_unitario_estimado)}</p>
+              {item.resultados.length ? item.resultados.map(r => <p key={r.id} title={`Preço unitário original: ${exactDecimal(r.valor_unitario_homologado)}`}>{r.fornecedor_nome} · {r.cancelado ? 'Cancelado' : 'Não cancelado'} · Unitário: {money(r.valor_unitario_homologado)} · Quantidade homologada: {decimal(r.quantidade_homologada)} · Total: {money(r.valor_total_homologado)} · Data: {date(r.data_resultado)}</p>) : <p>Sem resultado conhecido.</p>}
+              {item.scores.length ? item.scores.map(s => <div className="note" key={s.id} title={`Mediana original: ${exactDecimal(s.mediana_treino)}`}><b>{s.algoritmo} · Índice {decimal(s.indice)} / 100</b>Mediana do treino: {money(s.mediana_treino)} · Preço/mediana: {decimal(s.razao_preco_mediana)} · Exemplos de treino: {s.n_treino ?? 'Não informado'}<small>Resultado: {s.resultado_item_id} · Modelo: {s.modelo_id}<br />Fonte: {s.fonte.membro || 'Não informada'} · registro {s.fonte.linha ?? 'não informado'} · SHA-256: {s.fonte.arquivo_sha256 || 'não informado'}</small></div>) : <p>Sem análise disponível para este item na seleção.</p>}
               {!!item.cobertura.filter(r => r.motivo).length && <p className="hint">Motivos de ausência: {[...new Set(item.cobertura.map(r => r.motivo).filter(Boolean))].join(', ')}</p>}
             </section>)}
             <h3>03 / Método e limites de interpretação</h3><div className="note">{data.limites.map(text => <p key={text}>{text}</p>)}</div>

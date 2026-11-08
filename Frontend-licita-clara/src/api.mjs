@@ -47,13 +47,30 @@ export function createApiClient({ baseUrl = '/api/v1', fetchImpl = globalThis.fe
 export const api = createApiClient({ baseUrl: import.meta.env?.VITE_API_URL || '/api/v1' })
 
 // Formatação textual preserva inclusive valores maiores que Number.MAX_SAFE_INTEGER.
-export function decimal(value, minimumFraction = 0) {
+export function exactDecimal(value, minimumFraction = 0) {
   if (value === null || value === undefined || value === '') return 'Não informado'
   const text = String(value)
   if (!/^-?\d+(\.\d+)?$/.test(text)) return 'Não informado'
   const [integer, raw = ''] = text.split('.')
   const fraction = raw.replace(/0+$/, '').padEnd(minimumFraction, '0')
   return integer.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + (fraction ? `,${fraction}` : '')
+}
+
+// Arredonda apenas o texto exibido, sem converter valores monetários para Number.
+export function decimal(value, minimumFraction = 0, maximumFraction = 2) {
+  if (value === null || value === undefined || value === '') return 'Não informado'
+  const text = String(value)
+  if (!/^-?\d+(\.\d+)?$/.test(text)) return 'Não informado'
+  const negative = text.startsWith('-')
+  const [integer, fraction = ''] = text.replace(/^-/, '').split('.')
+  const scale = 10n ** BigInt(maximumFraction)
+  let rounded = BigInt(integer) * scale + BigInt(fraction.slice(0, maximumFraction).padEnd(maximumFraction, '0') || '0')
+  if (Number(fraction[maximumFraction] || 0) >= 5) rounded += 1n
+  // Não transforma uma quantidade ou preço pequeno não nulo em zero.
+  if (rounded === 0n && /[1-9]/.test(integer + fraction)) return exactDecimal(value, minimumFraction)
+  const digits = rounded.toString().padStart(maximumFraction + 1, '0')
+  const output = maximumFraction ? `${digits.slice(0, -maximumFraction)}.${digits.slice(-maximumFraction)}` : digits
+  return exactDecimal(`${negative && rounded !== 0n ? '-' : ''}${output}`, minimumFraction)
 }
 
 export const money = value => {

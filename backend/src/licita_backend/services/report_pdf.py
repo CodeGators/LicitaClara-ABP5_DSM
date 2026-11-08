@@ -1,6 +1,7 @@
 """PDF paginado a partir do mesmo snapshot público usado na prévia."""
 
 import io
+from decimal import ROUND_HALF_UP, Decimal, localcontext
 from functools import lru_cache
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -28,17 +29,27 @@ def display(value):
     return "Não informado" if value is None or value == "" else str(value)
 
 
-def money(value):
-    if value is None:
+def number(value, minimum=0):
+    if value is None or value == "":
         return "Não informado"
-    integer, _, fraction = str(value).partition(".")
-    sign = "-" if integer.startswith("-") else ""
+    original = Decimal(str(value))
+    with localcontext() as ctx:
+        ctx.prec = max(28, len(original.as_tuple().digits) + abs(original.adjusted()) + 8)
+        rounded = original.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    shown = original if original != 0 and rounded == 0 else rounded
+    integer, _, fraction = format(shown, "f").partition(".")
+    fraction = fraction.rstrip("0").ljust(minimum, "0")
+    sign = "-" if integer.startswith("-") and shown != 0 else ""
     integer = integer.lstrip("-")
     groups = []
     while integer:
         groups.insert(0, integer[-3:])
         integer = integer[:-3]
-    return "R$ " + sign + ".".join(groups) + "," + fraction.rstrip("0").ljust(2, "0")
+    return sign + ".".join(groups) + ("," + fraction if fraction else "")
+
+
+def money(value):
+    return "Não informado" if value is None else "R$ " + number(value, 2)
 
 
 def pdf_file(data):
@@ -86,9 +97,14 @@ def pdf_file(data):
             para(f"Item {item['numero_item']} — {item['descricao']}", heading),
             para(
                 f"Unidade: {display(item['unidade_medida'])}"
-                f" · Quantidade do item: {display(item['quantidade'])}"
+                f" · Quantidade do item: {number(item['quantidade'])}"
             ),
             para(f"Preço unitário estimado: {money(item['valor_unitario_estimado'])}"),
+            para(
+                f"Precisão original do estimado unitário: "
+                f"{display(item['valor_unitario_estimado'])}",
+                small,
+            ),
         ]
         if not item["resultados"]:
             content.append(para("Sem resultado conhecido."))
@@ -104,7 +120,7 @@ def pdf_file(data):
                     [para(label, small), para(value, small)]
                     for label, value in [
                         ("Preço unitário homologado", money(result["valor_unitario_homologado"])),
-                        ("Quantidade homologada", display(result["quantidade_homologada"])),
+                        ("Quantidade homologada", number(result["quantidade_homologada"])),
                         ("Total do resultado", money(result["valor_total_homologado"])),
                         ("Data do resultado", display(result["data_resultado"])),
                     ]
@@ -122,20 +138,27 @@ def pdf_file(data):
                 )
             )
             content.append(table)
+            content.append(
+                para(
+                    f"Precisão original do preço unitário: "
+                    f"{display(result['valor_unitario_homologado'])}", small,
+                )
+            )
         if not item["scores"]:
             content.append(para("Sem análise disponível para este item na seleção."))
         for score in item["scores"]:
             content += [
                 para(
                     f"{score['algoritmo']}"
-                    f" · índice {score['indice']} / 100"
+                    f" · índice {number(score['indice'])} / 100"
                     f" · resultado {score['resultado_item_id']}"
                 ),
                 para(
                     f"Mediana do treino: {money(score['mediana_treino'])}"
-                    f" · Preço/mediana: {display(score['razao_preco_mediana'])}"
+                    f" · Preço/mediana: {number(score['razao_preco_mediana'])}"
                     f" · Exemplos de treino: {display(score['n_treino'])}"
                 ),
+                para(f"Precisão original da mediana: {display(score['mediana_treino'])}", small),
                 para(f"Modelo: {score['modelo_id']} · Grupo: {display(score['grupo'])}", small),
                 para(
                     f"Fonte: {score['fonte'].get('membro')}"

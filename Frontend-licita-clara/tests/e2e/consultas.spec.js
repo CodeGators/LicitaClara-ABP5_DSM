@@ -52,7 +52,7 @@ test('lista, detalhe, processo e documentos preservam o contexto e os nulos', as
   await page.getByRole('link', { name: 'Borracha do recorte', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Borracha do recorte', exact: true })).toBeVisible()
   await expect(page.getByRole('cell', { name: 'Cancelado', exact: false }).last()).toContainText('Cancelado')
-  await expect(page.getByText('R$ 0,10000001', { exact: true }).first()).toBeVisible()
+  await expect(page.getByText('R$ 0,10', { exact: true }).first()).toBeVisible()
   const doc = page.getByRole('link', { name: 'Edital da compra' })
   await expect(doc).toHaveAttribute('href', 'https://pncp.gov.br/arquivo.pdf')
   await expect(doc).toHaveAttribute('rel', 'noopener noreferrer')
@@ -61,7 +61,7 @@ test('lista, detalhe, processo e documentos preservam o contexto e os nulos', as
   await page.getByRole('link', { name: 'Borracha do recorte', exact: true }).click()
   await page.getByRole('link', { name: 'Ver processo da compra' }).click()
   await expect(page).toHaveURL(new RegExp(`/processos/${PROCESS}\\?base_id=${BASE}`))
-  await expect(page.getByText('R$ 200,00000001', { exact: true })).toBeVisible()
+  await expect(page.getByText('R$ 200,00', { exact: true })).toBeVisible()
   await expect(page.getByText('Não informado', { exact: true })).toBeVisible()
 })
 

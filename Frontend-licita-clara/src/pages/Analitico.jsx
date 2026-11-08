@@ -150,7 +150,7 @@ function SuppliersContent() {
           <div className="supplier-relations">{selected.relacoes.map(r => <div key={r.orgao_id}>
             <div className="mini"><b>{r.orgao_nome}</b><span className="t-pet">{r.participacao == null ? 'Indisponível' : `${decimal((Number(r.participacao) * 100).toFixed(2))}%`}</span></div>
             {r.participacao != null && <div className="supplier-bar" role="meter" aria-label={`Participação em ${r.orgao_nome}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Number(r.participacao) * 100}><span style={{ width: `${Math.min(100, Math.max(0, Number(r.participacao) * 100))}%` }} /></div>}
-            <p className="hint">{money(r.valor_fornecedor)} · {r.compras_com_resultado} compras com resultado <span>HHI: {r.hhi == null ? 'Indisponível' : decimal(Number(r.hhi).toFixed(4))}</span></p>
+            <p className="hint">{money(r.valor_fornecedor)} · {r.compras_com_resultado} compras com resultado <span>HHI: {r.hhi == null ? 'Indisponível' : decimal(r.hhi, 0, 4)}</span></p>
             {r.motivo && <small className="hint">{r.motivo.replaceAll('_', ' ').toLowerCase()}</small>}
           </div>)}</div>
           {!selected.relacoes.length && <p>Sem relações disponíveis neste recorte.</p>}

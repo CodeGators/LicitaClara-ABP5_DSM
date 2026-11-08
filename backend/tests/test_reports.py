@@ -36,7 +36,8 @@ def test_preview_pdf_csv_same_snapshot_public_and_decimal_exact(query_client):
     assert pdf.content.startswith(b"%PDF-")
     text = "\n".join(page.extract_text() for page in PdfReader(io.BytesIO(pdf.content)).pages)
     assert "sem análise selecionada" in text
-    assert "Análise de preços e órgãos" in text and "R$ 0,60000001" in text
+    assert "Análise de preços e órgãos" in text and "R$ 0,60" in text
+    assert "Precisão original do preço unitário: 0.10000001" in text
     assert snapshot["snapshot_sha256"] in text
     assert "Sem análise disponível" in text and "Não há score integral validado" in text
     result = client.get(download, params={**args, "formato": "csv"})
@@ -222,3 +223,15 @@ def test_csv_preserves_quoted_newlines_and_neutralizes_formula_from_real_fields(
     assert len(rows) == 4
     assert all(row["titulo"] == "'=1+1" and row["descricao"] == "'=SUM(1;2)" for row in rows)
     assert all(row["fornecedor"] == 'Fornecedor "A"\nLinha dois' for row in rows)
+
+
+def test_pdf_rounding_is_display_only_and_preserves_tiny_values():
+    from licita_backend.services.report_pdf import money, number
+
+    assert money("9007199254740993.995") == "R$ 9.007.199.254.740.994,00"
+    assert money("0.004") == "R$ 0,004"
+    assert number("3.00000001") == "3"
+    assert number("88.125") == "88,13"
+    assert number("-1.235") == "-1,24"
+    assert number("-0.00000001") == "-0,00000001"
+    assert money(None) == "Não informado"

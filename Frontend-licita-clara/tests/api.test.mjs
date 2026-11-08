@@ -1,12 +1,12 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { ApiError, baseLink, createApiClient, date, decimal, money, safeOfficialUrl } from '../src/api.mjs'
+import { ApiError, baseLink, createApiClient, date, decimal, exactDecimal, money, safeOfficialUrl } from '../src/api.mjs'
 
-test('dinheiro preserva decimais e inteiros acima do limite de Number', () => {
-  assert.equal(money('9007199254740993.00000001'), 'R$ 9.007.199.254.740.993,00000001')
+test('exibição arredonda sem perder inteiros acima do limite de Number', () => {
+  assert.equal(money('9007199254740993.00000001'), 'R$ 9.007.199.254.740.993,00')
   assert.equal(money('0.00000000'), 'R$ 0,00')
   assert.equal(money(null), 'Não informado')
-  assert.equal(decimal('3.00000001'), '3,00000001')
+  assert.equal(decimal('3.00000001'), '3')
   assert.equal(decimal(null), 'Não informado')
   assert.equal(date('2026-09-01'), '01/09/2026')
 })
@@ -67,4 +67,16 @@ test('links analíticos preservam seleção e filtros sem carregar página ou pa
   assert.equal(url.searchParams.get('busca'), 'A&B')
   assert.equal(url.searchParams.has('pagina'), false)
   assert.equal(url.searchParams.has('estranho'), false)
+})
+
+
+test('arredondamento visual mantém valores pequenos, precisão original e HHI', () => {
+  assert.equal(decimal('88.125'), '88,13')
+  assert.equal(decimal('-1.235'), '-1,24')
+  assert.equal(money('999.995'), 'R$ 1.000,00')
+  assert.equal(money('0.004'), 'R$ 0,004')
+  assert.equal(decimal('-0.00000001'), '-0,00000001')
+  assert.equal(decimal('0.31567', 0, 4), '0,3157')
+  assert.equal(exactDecimal('20.33333333'), '20,33333333')
+  assert.equal(money('9007199254740993.995'), 'R$ 9.007.199.254.740.994,00')
 })

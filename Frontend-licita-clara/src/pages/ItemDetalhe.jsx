@@ -2,7 +2,7 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { Head, Aviso } from '../components/ui.jsx'
 import { Documents, Info, QueryState, Results } from '../components/consultas.jsx'
 import { useBase } from '../BaseContext.jsx'
-import { baseLink, date, decimal, money, reportLink } from '../api.mjs'
+import { baseLink, date, decimal, exactDecimal, money, reportLink } from '../api.mjs'
 import useApi from '../useApi.js'
 import AnaliseItem from '../components/AnaliseItem.jsx'
 import { selectionLink } from '../AnalysisContext.jsx'
@@ -21,7 +21,7 @@ export default function ItemDetalhe() {
     <Head kicker="Consulta / Detalhe do item" title={item.descricao} sub={`Item ${item.numero_item} · Compra ${process.numero_compra} · ${process.orgao_nome}`} action={<Link className="btn primary" to={selectionLink(`/processos/${process.id}`, location.search)}>Ver processo da compra</Link>} />
     <div className="card stats">
       <Info label="Quantidade do item">{decimal(item.quantidade)}</Info><Info label="Unidade">{item.unidade_medida || 'Não informada'}</Info>
-      <Info label="Preço unitário estimado">{money(item.valor_unitario_estimado)}</Info><Info label="Total homologado do item">{money(item.valor_homologado_item)}</Info>
+      <Info label="Preço unitário estimado" title={`Valor original: ${exactDecimal(item.valor_unitario_estimado)}`}>{money(item.valor_unitario_estimado)}</Info><Info label="Total homologado do item">{money(item.valor_homologado_item)}</Info>
       <Info label="Catálogo">{item.catalogo ? `${item.catalogo} ${item.codigo_catalogo}` : 'Não informado'}</Info><Info label="Último resultado não cancelado">{date(item.ultima_data_resultado)}</Info>
     </div>
     {item.resultados_sem_valor_total > 0 && <p className="note">O total do item está indisponível porque há {item.resultados_sem_valor_total} resultado(s) não cancelado(s) sem valor total informado.</p>}

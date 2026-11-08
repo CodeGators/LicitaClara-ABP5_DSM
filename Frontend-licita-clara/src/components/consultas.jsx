@@ -1,6 +1,6 @@
 import { cloneElement, useId, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { baseLink, date, decimal, money, safeOfficialUrl, selectionLink } from '../api.mjs'
+import { baseLink, date, decimal, exactDecimal, money, safeOfficialUrl, selectionLink } from '../api.mjs'
 import useApi from '../useApi.js'
 
 export function QueryState({ query, loading = 'Carregando…' }) {
@@ -15,7 +15,7 @@ export function Field({ label, children }) {
   const control = ['input', 'select', 'textarea'].includes(children.type)
   return <div className="field">{control ? <label htmlFor={id}>{label}</label> : <span id={id} className="field-label">{label}</span>}{cloneElement(children, control ? { id } : { role: 'group', 'aria-labelledby': id })}</div>
 }
-export const Info = ({ label, children }) => <div><small>{label}</small><strong>{children}</strong></div>
+export const Info = ({ label, children, title }) => <div><small>{label}</small><strong title={title}>{children}</strong></div>
 export function NoAnalysis() {
   const { search } = useLocation()
   const execution = new URLSearchParams(search).get('execucao_id')
@@ -45,7 +45,7 @@ export function LookupFilter({ kind, title, value, onChange, baseId, compact = f
 // Mantido fora das telas para reutilizar o contrato de resultados por fornecedor.
 export function Results({ results }) {
   return <div className="card"><h2>Resultados do item</h2><p className="sub">Preços e quantidades por fornecedor. Resultados cancelados não entram no total homologado do item.</p>
-    {!results.length ? <p className="sub">Nenhum resultado conhecido nesta base.</p> : <div className="table-scroll" role="region" aria-label="Resultados do item; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Quantidade homologada</th><th scope="col">Preço unitário</th><th scope="col">Total homologado</th><th scope="col">Data do resultado</th><th scope="col">Situação</th></tr></thead><tbody>{results.map(r => <tr key={r.id}><td>{r.fornecedor_nome}</td><td>{decimal(r.quantidade_homologada)}</td><td>{money(r.valor_unitario_homologado)}</td><td>{money(r.valor_total_homologado)}</td><td>{date(r.data_resultado)}</td><td>{r.cancelado ? 'Cancelado' : 'Não cancelado'}<small>{r.situacao}</small></td></tr>)}</tbody></table></div>}
+    {!results.length ? <p className="sub">Nenhum resultado conhecido nesta base.</p> : <div className="table-scroll" role="region" aria-label="Resultados do item; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Quantidade homologada</th><th scope="col">Preço unitário</th><th scope="col">Total homologado</th><th scope="col">Data do resultado</th><th scope="col">Situação</th></tr></thead><tbody>{results.map(r => <tr key={r.id}><td>{r.fornecedor_nome}</td><td>{decimal(r.quantidade_homologada)}</td><td title={`Valor original: ${exactDecimal(r.valor_unitario_homologado)}`}>{money(r.valor_unitario_homologado)}</td><td>{money(r.valor_total_homologado)}</td><td>{date(r.data_resultado)}</td><td>{r.cancelado ? 'Cancelado' : 'Não cancelado'}<small>{r.situacao}</small></td></tr>)}</tbody></table></div>}
   </div>
 }
 
