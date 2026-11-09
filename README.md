@@ -5,25 +5,162 @@ públicas. Inclui frontend React/Vite, API FastAPI, PostgreSQL, preparação de
 CSVs, Isolation Forest, Autoencoder e relatórios PDF/CSV. Scores são sinais
 experimentais; não representam probabilidade de fraude.
 
-## Instalar na máquina de outro integrante
+## Instalação passo a passo
 
-Siga o **[guia de instalação da equipe](scripts/README.md)**. Ele cobre instalação,
-PostgreSQL/migrações, recebimento dos ZIPs e estes dois comandos, na raiz:
+Este roteiro prepara uma **instalação local nova**, do clone até a aplicação com
+Scores. Execute os comandos na ordem indicada e espere cada etapa terminar.
+Depois de entrar na pasta clonada, todos os comandos são executados na **raiz do
+projeto**, onde ficam `pyproject.toml`, `alembic.ini` e `.env`.
+
+### 1. Instalar os pré-requisitos
+
+- Linux ou WSL2 com Docker disponível.
+- Git, Python 3.12.x e uv 0.13.2.
+- Node.js 20.19+ da linha 20 e npm.
+- Docker com Docker Compose.
+- Aproximadamente 30 GB livres para dados, modelos e arquivos temporários.
+
+### 2. Clonar o repositório
+
+```bash
+git clone https://github.com/CodeGators/LicitaClara-ABP5_DSM.git
+cd LicitaClara-ABP5_DSM
+```
+
+### 3. Criar o `.env` e instalar as dependências
+
+```bash
+cp .env.example .env
+uv sync --locked --all-packages --extra validation
+npm ci --prefix Frontend-licita-clara
+```
+
+Cada integrante usa seu próprio `.env`. Em uma instalação local nova, os valores
+do exemplo funcionam com o Compose do projeto. Se alterar a senha, o nome ou a
+porta do PostgreSQL, ajuste também `DATABASE_URL` e `MIGRATION_DATABASE_URL`.
+A configuração inicial usa a porta `55432` para o banco.
+
+Não substitua um `.env` de uma instalação existente: mudar o arquivo não altera
+a senha que já foi gravada no volume do PostgreSQL. O `.env` fica fora do Git.
+
+### 4. Subir o PostgreSQL
+
+Com o Docker em execução:
+
+```bash
+docker compose --env-file .env -f infra/compose.yaml up -d --wait
+```
+
+Esse comando cria e inicia o banco local com armazenamento persistente.
+
+### 5. Criar as tabelas e configurar as permissões
+
+Execute nesta ordem:
+
+```bash
+uv run --locked --all-packages --extra validation python -m licita_backend.db.permissions bootstrap
+uv run --locked --all-packages --extra validation alembic -x role=licita_migrator upgrade head
+uv run --locked --all-packages --extra validation python -m licita_backend.db.permissions apply
+uv run --locked --all-packages --extra validation python -m licita_backend.db.permissions local-logins
+```
+
+O Alembic cria as tabelas. O último comando gera no `.env` as conexões locais da
+API, coleta e processamento, com as permissões correspondentes. São credenciais
+de acesso ao banco; a aplicação não exige cadastro ou login de usuário.
+
+### 6. Receber e conferir os arquivos de dados
+
+Receba da equipe o pacote **`dados_equipe.tar`**. Ele é compartilhado separadamente:
+o GitHub não inclui os CSVs, modelos treinados ou banco populado. Quem mantém os
+dados pode gerar o pacote seguindo o [guia da equipe](scripts/README.md#quem-mantém-os-dados-gerar-o-pacote-para-o-grupo).
+
+Extraia o pacote na raiz do projeto, substituindo o caminho abaixo pelo local
+onde você salvou o arquivo:
+
+```bash
+mkdir -p data
+tar -xf /caminho/para/dados_equipe.tar -C data
+uv run --locked --all-packages --extra validation python scripts/popular_banco.py --conferir
+```
+
+Os arquivos devem ficar em `data/entrada_equipe/AAAA-MM/`. A conferência precisa
+confirmar **14 ZIPs**, com os nomes, tamanhos e hashes registrados em
+[`config/equipe/dados.json`](config/equipe/dados.json). `--conferir` apenas valida
+os arquivos; não popula o banco nem treina modelos.
+
+### 7. Popular o banco
 
 ```bash
 uv run --locked --all-packages --extra validation python scripts/popular_banco.py
+```
+
+Esse script organiza os CSVs, cataloga os itens e as unidades, prepara as
+partições temporais e importa os dados operacionais. Espere a mensagem de banco
+populado antes de seguir. A primeira preparação pode demorar vários minutos;
+a saída identifica cada etapa em execução.
+
+Os itens já poderão ser consultados, mas essa instalação ainda não terá seus
+Scores publicados. O estado da importação fica em `data/equipe/estado.json`.
+
+### 8. Treinar os modelos e analisar os itens
+
+```bash
 uv run --locked --all-packages --extra validation python scripts/treinar_e_analisar.py
 ```
 
-O primeiro organiza e importa os dados. O segundo treina os modelos, mostra
-progresso por grupos concluídos, analisa a base e publica os Scores experimentais
-localmente. Consulte os pré-requisitos antes de executá-los. O GitHub não inclui
-os ZIPs, modelos, banco populado ou senhas. O manifesto de entradas está em
-[`config/equipe/dados.json`](config/equipe/dados.json).
+Esse script treina Isolation Forest e Autoencoder, analisa os itens do banco e
+publica a execução experimental para a aplicação local. A barra mostra a
+porcentagem de grupos concluídos, atualizada ao final de cada lote, e uma
+estimativa do tempo restante. O 100% indica o fim do treinamento; aguarde também
+a conclusão da inferência e da publicação.
 
-Uma reconstrução por CSV não inclui enriquecimentos de API e bases históricas
-existentes em outra máquina; para duplicar exatamente um estado operacional,
-é necessário restaurar também seu banco e objetos. Detalhes no guia.
+O padrão usa dois processos. Para reduzir o uso de memória:
+
+```bash
+uv run --locked --all-packages --extra validation python scripts/treinar_e_analisar.py --processos 1
+```
+
+Se houver interrupção, repita o mesmo comando com os mesmos dados: etapas e
+lotes completos são conferidos e reutilizados. Um lote incompleto pode precisar
+recomeçar. Itens sem modelo elegível continuam sem Score, com os motivos disponíveis.
+
+A reconstrução usa os mesmos CSVs e regras de treinamento. Enriquecimentos
+posteriores por API e bases históricas de outra máquina não são restaurados por
+esses scripts, portanto UUIDs, cobertura e totais podem diferir. Para copiar
+exatamente um estado operacional existente, também são necessários seu banco e
+os objetos referenciados. Consulte o [guia detalhado](scripts/README.md).
+
+### 9. Iniciar backend e frontend
+
+Terminal 1, na raiz do projeto:
+
+```bash
+uv run --locked --all-packages --extra validation uvicorn licita_backend.main:create_app --factory --reload --host 127.0.0.1 --port 8000 --no-access-log
+```
+
+Terminal 2, também na raiz:
+
+```bash
+npm run dev --prefix Frontend-licita-clara
+```
+
+Abra **http://localhost:5173**. A documentação da API está em
+http://127.0.0.1:8000/docs. No ambiente local padrão, o frontend usa o proxy para
+a API na porta 8000; não é necessário criar um `.env` adicional no frontend.
+
+### Nas próximas vezes
+
+Basta iniciar o PostgreSQL com o comando da etapa 4 e executar os comandos do
+backend e frontend da etapa 9. **Não é necessário popular o banco ou treinar
+novamente toda vez que abrir o projeto.**
+
+Preserve `data/` e o volume do PostgreSQL: eles guardam os arquivos, modelos e
+resultados. Não use `docker compose down -v` para apenas desligar o ambiente,
+pois `-v` remove o volume do banco. Para parar o PostgreSQL preservando os dados:
+
+```bash
+docker compose --env-file .env -f infra/compose.yaml stop
+```
 
 ## Estrutura
 
@@ -38,20 +175,6 @@ existentes em outra máquina; para duplicar exatamente um estado operacional,
 | `config/equipe/` | Manifesto dos arquivos necessários |
 | `infra/` | PostgreSQL local com Docker Compose |
 | `docs/` | Documentação local opcional, ignorada pelo Git |
-
-## Executar após a configuração
-
-Em dois terminais, na raiz:
-
-```bash
-uv run --locked --all-packages --extra validation uvicorn licita_backend.main:create_app --factory --reload --host 127.0.0.1 --port 8000 --no-access-log
-```
-
-```bash
-npm run dev --prefix Frontend-licita-clara
-```
-
-Frontend: http://localhost:5173. Swagger: http://127.0.0.1:8000/docs.
 
 ## Verificação do código
 
