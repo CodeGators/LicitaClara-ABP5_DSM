@@ -1,9 +1,9 @@
 name: Python CI
 on:
   push:
-    paths: ["scripts/**", "config/equipe/**", "backend/**", "collector/**", "shared/**", "ml/**", "pyproject.toml", "uv.lock", ".python-version", "alembic.ini", "infra/compose.yaml", ".github/workflows/python-ci.yml"]
+    paths: ["datasets/equipe/**", "scripts/**", "config/equipe/**", "backend/**", "collector/**", "shared/**", "ml/**", "pyproject.toml", "uv.lock", ".python-version", "alembic.ini", "infra/compose.yaml", ".github/workflows/python-ci.yml"]
   pull_request:
-    paths: ["scripts/**", "config/equipe/**", "backend/**", "collector/**", "shared/**", "ml/**", "pyproject.toml", "uv.lock", ".python-version", "alembic.ini", "infra/compose.yaml", ".github/workflows/python-ci.yml"]
+    paths: ["datasets/equipe/**", "scripts/**", "config/equipe/**", "backend/**", "collector/**", "shared/**", "ml/**", "pyproject.toml", "uv.lock", ".python-version", "alembic.ini", "infra/compose.yaml", ".github/workflows/python-ci.yml"]
 permissions:
   contents: read
 jobs:

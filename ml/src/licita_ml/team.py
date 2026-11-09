@@ -65,7 +65,9 @@ def inputs(root, manifest):
             raise ValueError("Arquivo repetido no manifesto.")
         seen.add(entry["arquivo"])
         if not path.is_file():
-            raise ValueError(f"Falta {relative}. Receba os ZIPs da equipe; o clone não os inclui.")
+            raise ValueError(
+                f"Falta {relative}. Confira datasets/equipe ou o caminho informado em --dados."
+            )
         if path.stat().st_size != entry["bytes"] or checksum(path) != entry["sha256"]:
             raise ValueError(f"Arquivo divergente: {relative}. Não será usado.")
         rows.append(path)
@@ -362,7 +364,7 @@ def main(command):
     )
     parser.add_argument("--saida", type=Path, default=Path("data/equipe"))
     if command == "popular":
-        parser.add_argument("--dados", type=Path, default=Path("data/entrada_equipe"))
+        parser.add_argument("--dados", type=Path, default=Path("datasets/equipe"))
         parser.add_argument("--manifesto", type=Path, default=Path("config/equipe/dados.json"))
         parser.add_argument(
             "--conferir", action="store_true", help="Somente conferir ZIPs e hashes"

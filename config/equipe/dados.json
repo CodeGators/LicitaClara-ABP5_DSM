@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "descricao": "Entradas exatas da base organizada usada no treino por unidades V2. ZIPs distribuídos separadamente.",
+  "descricao": "Entradas exatas da base organizada usada no treino por unidades V2, versionadas em datasets/equipe.",
   "arquivos": [
     {
       "arquivo": "2025-07/material_2025_07.csv.zip",

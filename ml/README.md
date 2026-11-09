@@ -584,4 +584,4 @@ O [guia da equipe](../scripts/README.md) reúne preparação/importação e trei
 inferência/publicação nos scripts `popular_banco.py` e `treinar_e_analisar.py`.
 Usa as mesmas funções deste pacote, com conferência dos ZIPs por manifesto,
 progresso real por grupos concluídos em lotes e reutilização de lotes completos.
-Os CSVs continuam distribuídos separadamente do Git.
+Os 14 ZIPs originais estão versionados em `datasets/equipe/` e vêm no clone.

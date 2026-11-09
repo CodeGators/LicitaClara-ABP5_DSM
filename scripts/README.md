@@ -1,7 +1,7 @@
 # Instalar e reproduzir o Licita Clara na equipe
 
-O GitHub contém código e configuração, mas não contém CSVs, modelos treinados,
-banco populado ou senhas. Os dois scripts abaixo constroem uma instalação local
+O GitHub contém código, configuração e os 14 ZIPs dos CSVs em `datasets/equipe/`.
+Modelos treinados, banco populado e senhas são criados localmente. Os dois scripts abaixo constroem uma instalação local
 com os mesmos arquivos de entrada. Não precisam receber o `.env` de outra pessoa.
 
 Use Linux ou WSL2 com Docker disponível. O pipeline usa locks Unix e processos
@@ -39,27 +39,24 @@ O último comando gera as conexões locais da API, coleta e processamento no seu
 devem apontar para o mesmo banco e armazenamento. Não use `down -v`: ele apaga
 o volume do PostgreSQL.
 
-## 3. Receber os arquivos de dados
+## 3. Conferir os arquivos incluídos no clone
 
-Receba de quem mantém os dados o pacote `dados_equipe.tar`. Ele contém somente
-os ZIPs originais, organizados em `entrada_equipe/AAAA-MM/`. Na raiz do projeto:
+Os 14 ZIPs originais estão em `datasets/equipe/AAAA-MM/`. Não é necessário
+baixar ou extrair um TAR separado. Na raiz do projeto:
 
 ```bash
-mkdir -p data
-tar -xf /caminho/para/dados_equipe.tar -C data
 uv run --locked --all-packages --extra validation python scripts/popular_banco.py --conferir
 ```
 
 A conferência verifica nomes, tamanhos e SHA-256 contra
 [`config/equipe/dados.json`](../config/equipe/dados.json). Esse manifesto lista os
-14 ZIPs da base usada no treinamento por unidades V2; **não é um download**.
-Arquivos extras na pasta não entram no processamento. Os originais permanecem
-intactos. Se faltar um arquivo ou houver divergência, receba a cópia correta.
+14 ZIPs da base usada no treinamento por unidades V2. Arquivos extras na pasta
+não entram no processamento. Os originais permanecem intactos. Se faltar um
+arquivo, confira seu clone; se houver divergência, restaure a versão do Git.
 
-Também é possível montar manualmente `data/entrada_equipe/AAAA-MM/` com esses
-ZIPs. Para outra pasta, use `--dados /caminho/entrada_equipe`. Para outro conjunto
-de entradas, prepare um manifesto no mesmo formato e passe `--manifesto`; isso
-muda o experimento e os resultados, e precisa respeitar a política temporal.
+Para usar uma pasta de dados externa, passe `--dados /caminho/entrada_equipe`.
+Para outro conjunto de entradas, prepare um manifesto no mesmo formato e passe
+`--manifesto`; isso muda o experimento e precisa respeitar a política temporal.
 
 ## 4. Popular o banco
 
@@ -170,15 +167,16 @@ Confira `/api/v1/base/status`, abra Itens Sinalizados e um item com análise.
 Sem Score não significa item regular. Anomalia estatística não comprova
 irregularidade e os modelos não fornecem probabilidade de fraude.
 
-## Quem mantém os dados: gerar o pacote para o grupo
+## Opcional: gerar um pacote para transferência offline
 
-Com os 14 ZIPs em `data/entrada_equipe/`, execute:
+Os arquivos já vêm no clone. Para gerar também um pacote separado, execute:
 
 ```bash
 uv run --locked --all-packages --extra validation python scripts/popular_banco.py --empacotar data/entrega/dados_equipe.tar
 ```
 
 Isso confere os hashes e gera o TAR e seu arquivo `.sha256`, sem acessar o banco
-ou treinar. Compartilhe os dois arquivos por um meio de transferência da equipe.
+ou treinar. O pacote é opcional. Ao extrair em `data/`, use `--dados data/entrada_equipe`
+na conferência e na importação.
 O TAR contém somente ZIPs listados no manifesto: não inclui `.env`, banco,
-modelos, dependências ou documentos locais. Esses arquivos permanecem fora do Git.
+modelos, dependências ou documentos locais. O TAR gerado permanece fora do Git; os ZIPs de entrada estão versionados.

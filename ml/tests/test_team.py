@@ -293,3 +293,9 @@ def test_bundle_contains_only_verified_zips(tmp_path):
         assert all(name.startswith("entrada_equipe/2026-09/") for name in archive.getnames())
         assert all(name.endswith(".csv.zip") for name in archive.getnames())
     assert target.with_suffix(".tar.sha256").read_text().startswith(checksum(target))
+
+
+def test_versioned_inputs_match_manifest():
+    paths = team.inputs(team.ROOT / "datasets/equipe", team.ROOT / "config/equipe/dados.json")
+    assert len(paths) == 14
+    assert all(path.suffix == ".zip" for path in paths)

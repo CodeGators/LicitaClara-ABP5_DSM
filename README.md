@@ -68,25 +68,21 @@ O Alembic cria as tabelas. O último comando gera no `.env` as conexões locais 
 API, coleta e processamento, com as permissões correspondentes. São credenciais
 de acesso ao banco; a aplicação não exige cadastro ou login de usuário.
 
-### 6. Receber e conferir os arquivos de dados
+### 6. Conferir os arquivos de dados incluídos no clone
 
-Receba da equipe o pacote **`dados_equipe.tar`**. Ele é compartilhado separadamente:
-o GitHub não inclui os CSVs, modelos treinados ou banco populado. Quem mantém os
-dados pode gerar o pacote seguindo o [guia da equipe](scripts/README.md#quem-mantém-os-dados-gerar-o-pacote-para-o-grupo).
-
-Extraia o pacote na raiz do projeto, substituindo o caminho abaixo pelo local
-onde você salvou o arquivo:
+Os **14 ZIPs originais com CSVs** estão versionados em
+[`datasets/equipe/`](datasets/equipe/), organizados por mês. Eles já são baixados
+ao clonar o repositório; não é necessário receber ou extrair um pacote separado.
 
 ```bash
-mkdir -p data
-tar -xf /caminho/para/dados_equipe.tar -C data
 uv run --locked --all-packages --extra validation python scripts/popular_banco.py --conferir
 ```
 
-Os arquivos devem ficar em `data/entrada_equipe/AAAA-MM/`. A conferência precisa
-confirmar **14 ZIPs**, com os nomes, tamanhos e hashes registrados em
+A conferência precisa confirmar **14 ZIPs**, com os nomes, tamanhos e hashes de
 [`config/equipe/dados.json`](config/equipe/dados.json). `--conferir` apenas valida
-os arquivos; não popula o banco nem treina modelos.
+os arquivos; não popula o banco nem treina modelos. A pasta contém cerca de
+312 MB de dados comprimidos. Banco populado e modelos treinados serão gerados
+localmente nos próximos passos.
 
 ### 7. Popular o banco
 
@@ -173,6 +169,7 @@ docker compose --env-file .env -f infra/compose.yaml stop
 | `shared/` | Contratos de armazenamento compartilhados |
 | `scripts/` | Instalação e processamento para a equipe |
 | `config/equipe/` | Manifesto dos arquivos necessários |
+| `datasets/equipe/` | 14 ZIPs originais dos CSVs de treino, avaliação e aplicação |
 | `infra/` | PostgreSQL local com Docker Compose |
 | `docs/` | Documentação local opcional, ignorada pelo Git |
 
