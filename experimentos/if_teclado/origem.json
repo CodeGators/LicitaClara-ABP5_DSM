@@ -1,0 +1,140 @@
+{
+  "versao": 1,
+  "grupo": "5e991ae80fdbdeab1037141f40b96869e07f5a8ae0cb9af7cd18f31adfa71522",
+  "catalogo": "451817",
+  "descricao": "Teclado padrão, USB, com fio, por unidade",
+  "contagens": {
+    "treino": 254,
+    "avaliacao": 44,
+    "setembro": 13
+  },
+  "mediana_treino": "22.80000000",
+  "compras_treino": 250,
+  "compras_avaliacao": 44,
+  "politica": {
+    "train_start": "2025-07-01",
+    "train_end": "2025-12-31",
+    "evaluation_start": "2026-07-01",
+    "evaluation_end": "2026-08-31",
+    "application_start": "2026-09-01",
+    "application_end": "2026-09-30",
+    "classes": [],
+    "catalogs": [],
+    "reference_min": 20,
+    "reference_purchases_min": 10,
+    "train_min": 100,
+    "train_purchases_min": 20,
+    "evaluation_min": 30,
+    "evaluation_purchases_min": 10,
+    "organ_min": 3,
+    "supplier_min": 3,
+    "max_per_purchase": 5,
+    "max_purchase_share": "0.10",
+    "version": "atributos-temporais-v1"
+  },
+  "assinatura_catalogo": {
+    "capacidade": "0",
+    "catalogo": "451817",
+    "especificacao": {
+      "atributos": [
+        [
+          "conectividade",
+          "com fio"
+        ],
+        [
+          "tipo",
+          "padrao"
+        ],
+        [
+          "tipo conector",
+          "usb"
+        ]
+      ],
+      "modo": "atributos_nomeados",
+      "produto": "teclado microcomputador"
+    },
+    "especificacao_catalogo": {
+      "atributos": [
+        [
+          "conectividade",
+          "com fio"
+        ],
+        [
+          "tipo",
+          "padrao"
+        ],
+        [
+          "tipo conector",
+          "usb"
+        ]
+      ],
+      "modo": "atributos_nomeados",
+      "produto": "teclado microcomputador"
+    },
+    "medida": "un",
+    "tipo_catalogo": "CATMAT",
+    "unidade": "un",
+    "unidade_preco": {
+      "capacidade": "1",
+      "dimensao": "contagem",
+      "embalagem": false,
+      "fator_base": "1",
+      "fornecimento": "un",
+      "medida": "un",
+      "unidade_base": "un",
+      "unidade_preco": "un",
+      "versao": "unidades-preco-v1"
+    }
+  },
+  "origem_preparacao": "data/temporal_unidades_v2/execucao=ccf7a0c582bee21a6416a7645a68d1af3dab2e3d0753b1fcff4f92e58e083660/lote=25578a56a90ccb1b2c2040d888b2c32720dac95a9dc252afc558a32bc91808eb",
+  "manifesto_preparacao_sha256": "7a887a526e9c8f8ca77d7b37148615536fed7881b31f41abbb97b4e28ba54647",
+  "fontes": [
+    {
+      "arquivo": "datasets/equipe/2025-07/material_2025_07.csv.zip",
+      "sha256": "2a7d9328aec8642bb2f4f97451d25f8e3dfc62ba46942bec001f2c9108e779ae",
+      "registros_recorte": 29
+    },
+    {
+      "arquivo": "datasets/equipe/2025-08/material_2025_08.csv.zip",
+      "sha256": "f7234c5e3a8a5c35345247f736c93e36cd6c0057a091a43d74f5df2eff88d0d9",
+      "registros_recorte": 46
+    },
+    {
+      "arquivo": "datasets/equipe/2025-09/material_2025_09.csv.zip",
+      "sha256": "0552e55c8d15849d536a043bfb7887d7c81128c8f63cc4cd27286fa6d7439b70",
+      "registros_recorte": 49
+    },
+    {
+      "arquivo": "datasets/equipe/2025-10/material_2025_10.csv.zip",
+      "sha256": "7aad84fe58f4b7005aec1c8250223e16facee7b874d02ffc030f0a9a1a4c0b88",
+      "registros_recorte": 53
+    },
+    {
+      "arquivo": "datasets/equipe/2025-11/material_2025_11.csv.zip",
+      "sha256": "af1e1e964258857319a3cb75fd791f4df23844a97f466f84158ffcce05698008",
+      "registros_recorte": 44
+    },
+    {
+      "arquivo": "datasets/equipe/2025-12/material_2025_12.csv.zip",
+      "sha256": "5eee3866cbf134cbb743a8ee3236523b5f36a320377308f41de3fd7910a29722",
+      "registros_recorte": 33
+    },
+    {
+      "arquivo": "datasets/equipe/2026-07/material_2026_07.csv.zip",
+      "sha256": "a68718a9d87088cdb38e07601c4497dec15e8bd67ea87e1098123c8f4ff085eb",
+      "registros_recorte": 25
+    },
+    {
+      "arquivo": "datasets/equipe/2026-08/material_2026_08.csv.zip",
+      "sha256": "d26c1d4154d88078c46083ba90e47e6e734ea0e96867a7cb847f549f52bbf39b",
+      "registros_recorte": 19
+    },
+    {
+      "arquivo": "datasets/equipe/2026-09/material_2026_09.csv.zip",
+      "sha256": "2db1fa67fbd15afb3a4ad18faa1e9ba9c1f382beb81b3a19bb7c9c0ad7c50b13",
+      "registros_recorte": 13
+    }
+  ],
+  "recorte_sha256": "574e025c1116ba9f7a5ad3bd901c9cef83315309852813ea04a0ade3aa8c8476",
+  "observacao": "Coorte técnica congelada da preparação V2. Não constitui validação comercial. Sem exclusão adicional por preço. Setembro usa referências material, não resultados consultados do SQL."
+}
