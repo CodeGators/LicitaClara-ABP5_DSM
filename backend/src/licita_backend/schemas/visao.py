@@ -55,13 +55,13 @@ class TenderRow(BaseModel):
     id: UUID
     processo: dict[str, Any]
     descricao: str
-    score_medio: Money | None
-    maior_score: Money | None
+    medida_if_media: Money | None
+    maior_medida_if: Money | None
     itens_importados: int
-    itens_com_score: int
+    itens_com_medida_if: int
     itens_analise_completa: int
     itens_analise_parcial: int
-    itens_sem_score: int
+    itens_sem_medida_if: int
     itens_oficiais: None = None
     status_analise: Literal["analisados", "parcial", "nao_analisados"]
     valor_homologado: Money | None

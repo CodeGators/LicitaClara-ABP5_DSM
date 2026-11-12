@@ -131,10 +131,10 @@ def test_derived_process_score_is_atomic_replayable_and_published(
         response = client.get(url, params=params)
         assert response.status_code == 200, response.text
         row = response.json()["dados"][0]
-        assert len(row["resultados"]) == 2
+        assert len(row["resultados"]) == 1
         for summary in row["resultados"]:
             assert summary["status"] == "analisado_experimental"
-            assert summary["score_processo"] == summary["indice_observado"]
+            assert summary["medida_if_processo"] == summary["medida_if_observada"]
             assert summary["cobertura"]["itens_oficiais"] == 1
             with admin.connect() as cn:
                 referenced = UUID(

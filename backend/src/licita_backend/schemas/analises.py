@@ -49,7 +49,8 @@ class ResultScore(BaseModel):
     algoritmo: str
     resultado_item_id: UUID
     score_bruto: Money
-    indice_experimental: Money
+    erro_reconstrucao: Money | None = None
+    medida_if: Money | None
     normalizacao: str
     atributos: dict[str, Any]
     explicacao: dict[str, Any]
@@ -63,7 +64,7 @@ class ItemAnalysis(BaseModel):
     cobertura: list[dict[str, Any]]
     resultados: list[ResultScore]
     prioridade: None = None
-    score_processo: None = None
+    medida_if_processo: None = None
 
 
 class AnalysisItemPage(BaseModel):
@@ -96,8 +97,8 @@ class ProcessScore(BaseModel):
     algoritmo: str
     metodo: str
     status: Literal["nao_analisado", "parcial", "analisado_experimental"]
-    score_processo: Money | None
-    indice_observado: Money | None
+    medida_if_processo: Money | None
+    medida_if_observada: Money | None
     limite_inferior: Money | None
     limite_superior: Money | None
     motivo: str | None

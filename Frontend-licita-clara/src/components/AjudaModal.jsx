@@ -44,7 +44,7 @@ export default function AjudaModal({ onClose, fallbackRef }) {
         {aba === 'como' && (
           <div className="modal-body">
             <p>Em “Consultar itens”, explore os dados oficiais importados, filtre a lista e abra resultados e documentos. Painel, ranking e fornecedores consultam as análises publicadas da base selecionada. Em Relatórios, confira a prévia e baixe PDF ou CSV. Telas identificadas como demonstração usam dados fictícios.</p>
-            <div className="aviso" style={{ margin: '16px 0' }}><ShieldAlert size={18} /><div>Anomalia não comprova irregularidade. Os índices reais descrevem diferenças em relação ao treino de cada grupo de itens. Não representam uma conclusão sobre a compra.</div></div>
+            <div className="aviso" style={{ margin: '16px 0' }}><ShieldAlert size={18} /><div>Anomalia não comprova irregularidade. A medida original do IF vai de 0 a 1; maior indica maior anomalia em relação ao grupo treinado. Não representam uma conclusão sobre a compra.</div></div>
             <div className="wizard">
               <div className="dots" aria-label={`Passo ${i + 1} de ${passos.length}`}>
                 {passos.map((x, k) => <button key={x.t} className={k === i ? 'on' : k < i ? 'done' : ''} onClick={() => setI(k)} aria-label={`Ir ao passo ${k + 1}`} aria-current={k === i ? 'step' : undefined} />)}

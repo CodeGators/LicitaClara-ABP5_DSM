@@ -215,3 +215,11 @@ A ferramenta pode ser útil para **cidadãos**, **empresas que vendem para o gov
 ## 👥 Equipe CodeGators
 
 Projeto desenvolvido por estudantes como parte da disciplina de Aprendizagem Baseada em Projetos (ABP) do curso de Desenvolvimento de Software Multiplataforma (DSM).
+
+### Leitura da análise
+
+As telas reais exibem a **medida original do Isolation Forest (0 a 1)**, com
+quatro casas decimais. Maior valor indica maior anomalia; não é probabilidade
+nem o antigo percentil de 0 a 100. A troca usa valores já salvos: não exige novo
+treinamento ou importação. Reinicie o backend e atualize o frontend para usar
+os campos novos da API. Veja [o contrato da medida](backend/README.md#medida-original-do-isolation-forest).

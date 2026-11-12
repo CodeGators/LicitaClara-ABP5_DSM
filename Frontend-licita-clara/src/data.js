@@ -57,7 +57,7 @@ export const passos = [
   { t: 'Prepare o Relatório', to: '/relatorios', d: 'Selecione uma compra, confira a prévia, escolha PDF ou CSV e exporte. Os arquivos reais incluem valores, análises disponíveis, fontes e limitações; não exigem login.' },
 ]
 export const glossario = [
-  ['Score', 'Índice de anomalia relativo ao treino do modelo e ao grupo do item. Não mede probabilidade de irregularidade; não some índices de grupos diferentes.'],
+  ['Medida IF', 'Saída original do Isolation Forest, de 0 a 1. Quanto maior, maior a indicação de anomalia. Não é percentil nem probabilidade. Grupos diferentes não têm calibração comum de gravidade.'],
   ['Prioridade', 'As faixas baixa, média e alta aparecem apenas nas demonstrações. A consulta real não atribui prioridade validada de auditoria.'],
   ['Mediana', 'Valor central do grupo usado no treino. Exige especificação, unidade e embalagem comparáveis; não é uma cotação atual.'],
   ['Preço / mediana', 'Quantas vezes o preço do item é maior que a mediana dos similares. 1,60× significa 60% acima.'],

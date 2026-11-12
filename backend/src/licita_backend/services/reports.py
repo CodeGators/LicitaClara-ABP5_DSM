@@ -23,12 +23,12 @@ MAX_SCORES = 2000
 LIMITATIONS = [
     "Anomalia estatística não é prova de irregularidade. Os sinais exigem verificação documental.",
     (
-        "Índices são relativos ao treino de cada grupo; "
-        "IF e Autoencoder são apresentados separadamente."
+        "IF usa -score_samples em escala de 0 a 1, sem conversão em percentil; "
+        "o erro de reconstrução do Autoencoder tem outra escala e é apresentado separadamente."
     ),
     (
         "O recorte importado pode não conter todos os itens da compra. "
-        "Não há score integral validado da licitação."
+        "Não há medida de anomalia integral validada da licitação."
     ),
     (
         "Ausência de análise não significa normalidade. "
@@ -103,9 +103,16 @@ def snapshot(session, process_id, params):
                     "resultado_item_id": row["resultado_item_id"],
                     "modelo_id": row["modelo_id"],
                     "algoritmo": row["algoritmo"],
-                    "indice": row["score_normalizado"],
+                    "medida_if": row["score_bruto"]
+                    if row["algoritmo"] == "isolation_forest"
+                    else None,
+                    "erro_reconstrucao": row["score_bruto"]
+                    if row["algoritmo"] == "autoencoder"
+                    else None,
                     "score_bruto": row["score_bruto"],
-                    "normalizacao": row["versao_normalizacao"],
+                    "normalizacao": "if-bruto-v1"
+                    if row["algoritmo"] == "isolation_forest"
+                    else "erro-reconstrucao-bruto-v1",
                     "grupo": comparison.get("grupo"),
                     "mediana_treino": comparison.get("mediana"),
                     "n_treino": comparison.get("n_treino"),
@@ -134,7 +141,7 @@ def snapshot(session, process_id, params):
         output.append(record)
     data = jsonable_encoder(
         {
-            "versao": "relatorio-anomalias-v1",
+            "versao": "relatorio-anomalias-medida-bruta-v2",
             "titulo": params.titulo,
             "base": {
                 "id": base["id"],
@@ -158,7 +165,9 @@ def snapshot(session, process_id, params):
             "limites": LIMITATIONS,
             "resumo": {
                 "itens": len(items),
-                "itens_analisados": sum(bool(r["scores"]) for r in output),
+                "itens_analisados": sum(
+                    any(s["medida_if"] is not None for s in r["scores"]) for r in output
+                ),
                 "scores": sum(len(r["scores"]) for r in output),
             },
             "fonte": "Compras.gov.br e complementos PNCP vinculados ao recorte importado",
@@ -227,7 +236,8 @@ def csv_file(data):
                         "valor_total_resultado": result.get("valor_total_homologado"),
                         "modelo_id": score.get("modelo_id"),
                         "algoritmo": score.get("algoritmo"),
-                        "indice": score.get("indice"),
+                        "medida_if": score.get("medida_if"),
+                        "erro_reconstrucao": score.get("erro_reconstrucao"),
                         "score_bruto": score.get("score_bruto"),
                         "normalizacao": score.get("normalizacao"),
                         "grupo": score.get("grupo"),

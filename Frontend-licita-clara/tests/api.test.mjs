@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { ApiError, baseLink, createApiClient, date, decimal, exactDecimal, money, safeOfficialUrl } from '../src/api.mjs'
+import { ApiError, baseLink, createApiClient, date, decimal, ifMeasure, exactDecimal, money, safeOfficialUrl } from '../src/api.mjs'
 
 test('exibição arredonda sem perder inteiros acima do limite de Number', () => {
   assert.equal(money('9007199254740993.00000001'), 'R$ 9.007.199.254.740.993,00')
@@ -79,4 +79,13 @@ test('arredondamento visual mantém valores pequenos, precisão original e HHI',
   assert.equal(decimal('0.31567', 0, 4), '0,3157')
   assert.equal(exactDecimal('20.33333333'), '20,33333333')
   assert.equal(money('9007199254740993.995'), 'R$ 9.007.199.254.740.994,00')
+})
+
+
+test('medida IF mantém quatro casas e não converte para percentil', () => {
+  assert.equal(ifMeasure('0.69103'), '0,6910')
+  assert.equal(ifMeasure('0.514'), '0,5140')
+  assert.equal(ifMeasure('1'), '1,0000')
+  assert.equal(ifMeasure('0'), '0,0000')
+  assert.equal(ifMeasure(null), 'Indisponível')
 })

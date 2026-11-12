@@ -22,7 +22,7 @@ test('ajuda mantém foco, aceita teclado nas abas e devolve foco ao fechar', asy
   await dialog.getByRole('tab', { name: 'Como funciona', exact: true }).focus()
   await page.keyboard.press('ArrowRight')
   await expect(dialog.getByRole('tab', { name: 'Glossário' })).toBeFocused()
-  await expect(dialog.getByRole('tabpanel')).toContainText('Índice de anomalia relativo ao treino')
+  await expect(dialog.getByRole('tabpanel')).toContainText('Saída original do Isolation Forest')
   await page.keyboard.press('End')
   await expect(dialog.getByRole('tab', { name: 'Créditos' })).toBeFocused()
   await page.keyboard.press('Home')

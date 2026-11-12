@@ -39,7 +39,9 @@ def test_preview_pdf_csv_same_snapshot_public_and_decimal_exact(query_client):
     assert "Análise de preços e órgãos" in text and "R$ 0,60" in text
     assert "Precisão original do preço unitário: 0.10000001" in text
     assert snapshot["snapshot_sha256"] in text
-    assert "Sem análise disponível" in text and "Não há score integral validado" in text
+    assert (
+        "Sem análise disponível" in text and "Não há medida de anomalia integral validada" in text
+    )
     result = client.get(download, params={**args, "formato": "csv"})
     assert result.status_code == 200
     rows = list(csv.DictReader(io.StringIO(result.content.decode("utf-8-sig")), delimiter=";"))
@@ -186,6 +188,19 @@ def test_scores_stay_separate_and_historical_publication_remains_reproducible(qu
     original = client.get(preview, params=params).json()
     assert original["resumo"] == {"itens": 2, "itens_analisados": 1, "scores": 2}
     assert len(original["itens"][0]["scores"]) == 2
+    measures = original["itens"][0]["scores"]
+    forest = next(s for s in measures if s["algoritmo"] == "isolation_forest")
+    ae = next(s for s in measures if s["algoritmo"] == "autoencoder")
+    assert forest["medida_if"] == forest["score_bruto"] == "0.123000000000"
+    assert ae["medida_if"] is None and ae["erro_reconstrucao"] == "0.123000000000"
+    assert all("indice" not in s for s in measures)
+    pdf = client.get(
+        download,
+        params={**params, "formato": "pdf", "snapshot_sha256": original["snapshot_sha256"]},
+    )
+    text = " ".join(p.extract_text() for p in PdfReader(io.BytesIO(pdf.content)).pages)
+    assert "Medida IF 0,1230" in text and "/ 100" not in text
+    assert "Erro de reconstrução (outra escala)" in text
     # Active flag changing must not replace a pinned historical execution.
     with data["engine"].begin() as cn:
         cn.execute(

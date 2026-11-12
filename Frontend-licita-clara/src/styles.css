@@ -422,3 +422,6 @@ h1{font-size:30px;font-weight:500;letter-spacing:-.01em}
 .supplier-stats { grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr) minmax(0, .7fr); }
 .supplier-stats > :nth-child(2) strong { font-size: 18px; }
 @media (max-width: 560px) { .supplier-stats { grid-template-columns: 1fr; } }
+
+/* Mantém o cabeçalho acessível dentro da área de rolagem no celular. */
+.dashboard-start .table-scroll { position: relative; }

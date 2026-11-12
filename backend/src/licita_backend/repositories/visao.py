@@ -107,18 +107,21 @@ class ViewRepository:
                     raise QueryError(
                         "modelo_fora_execucao", "Modelo não pertence à execução selecionada.", 422
                     )
-        automatic = bool(
-            execution
-            and model is None
-            and execution["configuracao"].get("contrato") == "inferencia-agrupada-v1"
-        )
+        if model and model["algoritmo"] != "isolation_forest":
+            raise QueryError(
+                "modelo_nao_if", "Esta visão usa a medida original do Isolation Forest.", 422
+            )
+        automatic = bool(execution and model is None)
         preferred = {}
         if automatic:
             # Fixed algorithm preference, never select a model by its observed score.
             for candidate in sorted(
                 models, key=lambda m: (m["algoritmo"] != "isolation_forest", str(m["id"]))
             ):
-                preferred.setdefault(candidate["parametros"]["grupo"], candidate["id"])
+                if candidate["algoritmo"] == "isolation_forest":
+                    preferred.setdefault(
+                        candidate["parametros"].get("grupo", str(candidate["id"])), candidate["id"]
+                    )
         selected_models = {model["id"]} if model else set(preferred.values())
         rows = self.read(QueryRepository(self.session).item_query(base["id"]))
         events = self.read(
@@ -225,9 +228,7 @@ class ViewRepository:
                     "processo": process,
                     "resultados": candidates,
                     "status_analise": status,
-                    "indice_experimental": max(
-                        (r["score_normalizado"] for r in observed), default=None
-                    ),
+                    "medida_if": max((r["score_bruto"] for r in observed), default=None),
                     "resultados_analisados": len(observed),
                     "resultados_ativos": len(candidates),
                     "motivos": dict(reasons),
@@ -269,13 +270,17 @@ class ViewRepository:
             "modelo_id": model["id"] if model else None,
             "resumo": summary,
             "universo": {
+                "medida": "if-bruto-v1",
+                "escala": [0, 1],
+                "interpretacao": "-score_samples; maior indica maior anomalia; não é probabilidade",
+                "comparabilidade": "grupos distintos não têm gravidade calibrada em comum",
                 "tipo": "resultados_nao_cancelados_dos_itens_filtrados",
                 "periodo_base": [base["periodo_inicio"], base["periodo_fim"]],
                 "homologacao_inicio": filters.homologacao_inicio,
                 "homologacao_fim": filters.homologacao_fim,
                 "data_sem_filtro": "incluída em valores; grupo sem_data na evolução",
                 "prioridade_validada": False,
-                "selecao_modelo": "automatico_por_grupo_IF_preferencial_AE_se_IF_nao_estavel"
+                "selecao_modelo": "automatico_por_grupo_somente_IF"
                 if automatic
                 else "modelo_explicito",
                 "valor": (
@@ -306,8 +311,8 @@ class ViewRepository:
         months = defaultdict(lambda: Counter())
         reasons = Counter()
         for row in rows:
-            if row["indice_experimental"] is not None:
-                buckets[min(9, int(row["indice_experimental"] // 10))] += 1
+            if row["medida_if"] is not None:
+                buckets[min(9, max(0, int(row["medida_if"] * 10)))] += 1
             when = max(
                 (r["data_resultado"] for r in row["resultados"] if r["data_resultado"]),
                 default=None,
@@ -318,7 +323,7 @@ class ViewRepository:
             {
                 **context,
                 "distribuicao": [
-                    {"inicio": i * 10, "fim": 100 if i == 9 else (i + 1) * 10, "itens": n}
+                    {"inicio": Decimal(i) / 10, "fim": Decimal(i + 1) / 10, "itens": n}
                     for i, n in enumerate(buckets)
                 ],
                 "evolucao": [
@@ -335,7 +340,7 @@ class ViewRepository:
             }
         )
 
-    def page(self, rows, filters, score_key="indice_experimental"):
+    def page(self, rows, filters, score_key="medida_if"):
         if filters.ordenacao == "descricao_asc":
             rows = sorted(
                 rows, key=lambda r: (r.get("descricao", r.get("nome", "")).casefold(), str(r["id"]))
@@ -380,7 +385,7 @@ class ViewRepository:
                 supplier["organs"].add(item["processo"]["orgao_id"])
                 supplier["events"].append(event)
                 supplier["scores"].extend(
-                    r["score_normalizado"]
+                    r["score_bruto"]
                     for r in item["scores"]
                     if r["resultado_item_id"] == event["id"]
                 )
@@ -393,7 +398,7 @@ class ViewRepository:
                 "orgaos": len(s["organs"]),
                 "resultados": len(s["events"]),
                 "contratos_vinculados": sum(c["fornecedor_id"] == uid for c in contracts),
-                "indice_experimental": max(s["scores"], default=None),
+                "medida_if": max(s["scores"], default=None),
                 **amounts(s["events"]),
             }
             for uid, s in grouped.items()
@@ -418,7 +423,7 @@ class ViewRepository:
             own = [r for r in item["resultados"] if r["fornecedor_id"] == supplier_id]
             if own:
                 indices = [
-                    s["score_normalizado"]
+                    s["score_bruto"]
                     for s in item["scores"]
                     if any(s["resultado_item_id"] == e["id"] for e in own)
                 ]
@@ -434,7 +439,7 @@ class ViewRepository:
                         if len(indices) == len(own)
                         else "parcial",
                         "motivos": {} if indices else {"SEM_SCORE_DESTE_FORNECEDOR": 1},
-                        "indice_experimental": max(indices, default=None),
+                        "medida_if": max(indices, default=None),
                         **amounts(own),
                     }
                 )

@@ -215,7 +215,7 @@ def test_sql_atomic_replay_and_published_api(settings, sql_case, loaded, dataset
         )
         assert response.status_code == 200, response.text
         item = response.json()["dados"][0]
-        assert item["status"] == "analisado_experimental" and item["score_processo"] is None
+        assert item["status"] == "analisado_experimental" and item["medida_if_processo"] is None
         assert len(item["resultados"]) == 2
     with Session(admin) as session:
         repository = AnalysisRepository(session)

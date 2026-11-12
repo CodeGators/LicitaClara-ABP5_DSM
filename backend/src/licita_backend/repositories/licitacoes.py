@@ -52,13 +52,11 @@ def group_purchases(processes, items, filters):
             continue
         if filters.valor_maximo is not None and (total is None or total > filters.valor_maximo):
             continue
-        scores = [
-            i["indice_experimental"] for i in selected if i["indice_experimental"] is not None
-        ]
+        scores = [i["medida_if"] for i in selected if i["medida_if"] is not None]
         with localcontext() as ctx:
             ctx.prec = 60
             mean = (
-                (sum(scores, Decimal(0)) / len(scores)).quantize(Decimal("0.001"))
+                (sum(scores, Decimal(0)) / len(scores)).quantize(Decimal("0.000000000001"))
                 if scores
                 else None
             )
@@ -75,13 +73,13 @@ def group_purchases(processes, items, filters):
                 "id": process["id"],
                 "processo": process,
                 "descricao": process["objeto"],
-                "score_medio": mean,
-                "maior_score": max(scores, default=None),
+                "medida_if_media": mean,
+                "maior_medida_if": max(scores, default=None),
                 "itens_importados": len(selected),
-                "itens_com_score": len(scores),
+                "itens_com_medida_if": len(scores),
                 "itens_analise_completa": complete,
                 "itens_analise_parcial": sum(i["status_analise"] == "parcial" for i in selected),
-                "itens_sem_score": len(selected) - len(scores),
+                "itens_sem_medida_if": len(selected) - len(scores),
                 "itens_oficiais": None,
                 "status_analise": status,
                 "valor_homologado": total,
@@ -118,14 +116,14 @@ class TenderRepository:
         rows = group_purchases(processes, items, filters)
         context["resumo"] = {
             "licitacoes": len(rows),
-            "com_score": sum(r["score_medio"] is not None for r in rows),
+            "com_medida_if": sum(r["medida_if_media"] is not None for r in rows),
             "itens_importados": sum(r["itens_importados"] for r in rows),
-            "itens_com_score": sum(r["itens_com_score"] for r in rows),
+            "itens_com_medida_if": sum(r["itens_com_medida_if"] for r in rows),
         }
         context["universo"] = {
             "tipo": "todos_os_itens_importados_das_compras_selecionadas",
             "selecao_modelo": context["universo"]["selecao_modelo"],
-            "media": "media_simples_dos_maximos_por_item_com_score_arredondada_3_casas",
+            "media": "media_simples_dos_maximos_por_item_com_score_precisao_12_casas",
             "peso": "igual_por_item_sem_ponderacao_por_preco_ou_quantidade",
             "ausencias": "excluidas_da_media_nao_recebem_zero",
             "cobertura": "itens_importados_na_base_nao_confirma_total_oficial",
@@ -137,7 +135,7 @@ class TenderRepository:
 
     def listing(self, filters):
         context, rows, _ = self.dataset(filters)
-        return wire({**context, **self.view.page(rows, filters, score_key="score_medio")})
+        return wire({**context, **self.view.page(rows, filters, score_key="medida_if_media")})
 
     def detail(self, filters, process_id):
         # Detail always keeps the full imported purchase regardless of list filters.

@@ -12,14 +12,14 @@ async function setup(page) {
     if (path === '/analises/publicacao') return done({ execucao_id: EXEC, status: 'publicada_experimental' })
     if (path === '/analises/execucoes') return done({ dados: [run], total_paginas: 1 })
     if (path === `/analises/execucoes/${EXEC}`) return done(run)
-    if (path === `/analises/execucoes/${EXEC}/itens/${ITEM}`) return done({ dados: [{ cobertura: [], resultados: [{ id: 'score-1', modelo_id: MODEL, algoritmo: 'isolation_forest', resultado_item_id: item.resultados[0].id, indice_experimental: '100' }] }] })
+    if (path === `/analises/execucoes/${EXEC}/itens/${ITEM}`) return done({ dados: [{ cobertura: [], resultados: [{ id: 'score-1', modelo_id: MODEL, algoritmo: 'isolation_forest', resultado_item_id: item.resultados[0].id, medida_if: '0.691' }] }] })
     if (!path.startsWith('/visao/licitacoes')) return false
     if (state.fail) { await error('Consulta temporariamente indisponível.'); return true }
     const rows = [
-      { id: PROCESS, processo: item.processo, descricao: item.processo.objeto, valor_homologado: '100000.00000001', score_medio: '100.000', maior_score: '100.000', itens_com_score: 1, itens_importados: 2, itens_analise_parcial: 0, status_analise: 'parcial', valores_itens_importados: { valor_homologado: '0.10000001', resultados_sem_total: 0 } },
-      { id: OTHER, processo: { ...item.processo, id: OTHER, numero_compra: '00002', objeto: 'Computadores' }, descricao: 'Computadores', valor_homologado: null, score_medio: null, maior_score: null, itens_com_score: 0, itens_importados: 0, itens_analise_parcial: 0, status_analise: 'nao_analisados', valores_itens_importados: { valor_homologado: null, resultados_sem_total: 0 } },
+      { id: PROCESS, processo: item.processo, descricao: item.processo.objeto, valor_homologado: '100000.00000001', medida_if_media: '0.691', maior_medida_if: '0.691', itens_com_medida_if: 1, itens_importados: 2, itens_analise_parcial: 0, status_analise: 'parcial', valores_itens_importados: { valor_homologado: '0.10000001', resultados_sem_total: 0 } },
+      { id: OTHER, processo: { ...item.processo, id: OTHER, numero_compra: '00002', objeto: 'Computadores' }, descricao: 'Computadores', valor_homologado: null, medida_if_media: null, maior_medida_if: null, itens_com_medida_if: 0, itens_importados: 0, itens_analise_parcial: 0, status_analise: 'nao_analisados', valores_itens_importados: { valor_homologado: null, resultados_sem_total: 0 } },
     ]
-    const context = { base_id: BASE, execucao_id: EXEC, modelo_id: null, resumo: { licitacoes: 2, com_score: 1, itens_importados: 2, itens_com_score: 1 } }
+    const context = { base_id: BASE, execucao_id: EXEC, modelo_id: null, resumo: { licitacoes: 2, com_medida_if: 1, itens_importados: 2, itens_com_medida_if: 1 } }
     const paginate = entries => {
       const page = Number(url.searchParams.get('pagina') || 1), size = Number(url.searchParams.get('tamanho_pagina') || 20)
       return { dados: entries.slice((page-1)*size,page*size), pagina: page, tamanho_pagina: size, total: entries.length, total_paginas: Math.ceil(entries.length/size) }
@@ -27,7 +27,7 @@ async function setup(page) {
     if (path === '/visao/licitacoes') return done({ ...context, ...paginate(rows.filter(r => r.descricao.toLowerCase().includes((url.searchParams.get('busca') || '').toLowerCase()))) })
     const row = rows.find(r => path.endsWith('/'+r.id))
     if (!row) { await error('Licitação não encontrada nesta base.',404); return true }
-    const items = [item, otherItem].map((r,i) => ({ ...r, resultados: r.resultados.filter(e=>!e.cancelado), valor_homologado: r.valor_homologado_item, resultados_sem_total: 0, indice_experimental: i === 0 ? '100' : null, status_analise: i === 0 ? 'analisados' : 'nao_analisados', resultados_analisados: i === 0 ? 1 : 0, motivos: {} }))
+    const items = [item, otherItem].map((r,i) => ({ ...r, resultados: r.resultados.filter(e=>!e.cancelado), valor_homologado: r.valor_homologado_item, resultados_sem_total: 0, medida_if: i === 0 ? '0.691' : null, status_analise: i === 0 ? 'analisados' : 'nao_analisados', resultados_analisados: i === 0 ? 1 : 0, motivos: {} }))
     return done({ ...context, licitacao: row, itens: paginate(row.id === PROCESS ? items : []) })
   } })
   return state
@@ -38,14 +38,14 @@ test('licitações mostram média, maior score, cobertura e abrem itens e análi
   await page.goto('/licitacoes')
   await expect(page.getByRole('heading', { name: 'Licitações Sinalizadas', exact: true })).toBeVisible()
   await expect(page.getByRole('cell', { name: '1 de 2 itens importados', exact: false })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: 'Score médio', exact: true })).toBeVisible()
-  await expect(page.getByRole('cell', { name: 'Sem Score', exact: true })).toHaveCount(2)
+  await expect(page.getByRole('columnheader', { name: 'Medida IF média', exact: true })).toBeVisible()
+  await expect(page.getByRole('cell', { name: 'Sem medida IF', exact: true })).toHaveCount(2)
   await page.getByRole('link', { name: 'Ver itens da compra 00001' }).click()
   await expect(page.getByRole('heading', { name: 'Compra 00001', exact: true })).toBeVisible()
   await expect(page.getByText('R$ 100.000,00', { exact: true })).toBeVisible()
   await expect(page.getByText('R$ 0,10', { exact: true }).first()).toBeVisible()
   await page.getByRole('link', { name: item.descricao, exact: true }).click()
-  await expect(page.locator('.detail-score-number')).toContainText('100')
+  await expect(page.locator('.detail-score-number')).toContainText('0,6910')
   await page.getByRole('link', { name: 'Voltar à consulta', exact: true }).click()
   await expect(page).toHaveURL(new RegExp(`/licitacoes/${PROCESS}`))
   expect(new URL(page.url()).searchParams.get('execucao_id')).toBe(EXEC)
@@ -76,7 +76,7 @@ test('licitações são acessíveis no celular e indicam compra sem itens', asyn
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto(`/licitacoes/${OTHER}?base_id=${BASE}&execucao_id=${EXEC}`)
   await expect(page.getByText('Nenhum item importado nesta compra.', { exact: true })).toBeVisible()
-  await expect(page.getByText('Sem Score', { exact: true })).toHaveCount(2)
+  await expect(page.getByText('Sem medida IF', { exact: true })).toHaveCount(2)
   await page.getByRole('button', { name: 'Ativar modo escuro' }).click()
   const { default: AxeBuilder } = await import('@axe-core/playwright')
   expect((await new AxeBuilder({ page }).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations).toEqual([])

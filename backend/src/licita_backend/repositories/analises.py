@@ -211,8 +211,15 @@ class AnalysisRepository:
                     "algoritmo": row["algoritmo"],
                     "resultado_item_id": row["resultado_item_id"],
                     "score_bruto": row["score_bruto"],
-                    "indice_experimental": row["score_normalizado"],
-                    "normalizacao": row["versao_normalizacao"],
+                    "medida_if": row["score_bruto"]
+                    if row["algoritmo"] == "isolation_forest"
+                    else None,
+                    "erro_reconstrucao": row["score_bruto"]
+                    if row["algoritmo"] == "autoencoder"
+                    else None,
+                    "normalizacao": "if-bruto-v1"
+                    if row["algoritmo"] == "isolation_forest"
+                    else "erro-reconstrucao-bruto-v1",
                     "atributos": {
                         **row["atributos"],
                         "comparacao": {
@@ -229,10 +236,27 @@ class AnalysisRepository:
                     },
                 }
             )
+        if_models = {
+            str(uid)
+            for uid in self.session.scalars(
+                sa.select(a.versoes_modelo.c.id)
+                .join(a.execucoes_modelos, a.execucoes_modelos.c.modelo_id == a.versoes_modelo.c.id)
+                .where(
+                    a.execucoes_modelos.c.execucao_id == execution_id,
+                    a.versoes_modelo.c.algoritmo == "isolation_forest",
+                )
+            )
+        }
         output = []
         for row in rows:
             known = coverage[str(row["id"])]
-            complete = known and all(r["status"] == "analisado_experimental" for r in known)
+            known_if = [r for r in known if r["modelo_id"] in if_models]
+            observed_if = [r for r in by_item[row["id"]] if r["algoritmo"] == "isolation_forest"]
+            complete = (
+                observed_if
+                and known_if
+                and all(r["status"] == "analisado_experimental" for r in known_if)
+            )
             output.append(
                 {
                     "id": row["item_id"],
@@ -241,7 +265,7 @@ class AnalysisRepository:
                     "status": "analisado_experimental"
                     if complete
                     else "parcial"
-                    if by_item[row["id"]]
+                    if observed_if
                     else "nao_analisado",
                     "cobertura": known,
                     "resultados": by_item[row["id"]],

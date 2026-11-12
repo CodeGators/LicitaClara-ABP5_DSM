@@ -29,13 +29,13 @@ def display(value):
     return "Não informado" if value is None or value == "" else str(value)
 
 
-def number(value, minimum=0):
+def number(value, minimum=0, maximum=2):
     if value is None or value == "":
         return "Não informado"
     original = Decimal(str(value))
     with localcontext() as ctx:
         ctx.prec = max(28, len(original.as_tuple().digits) + abs(original.adjusted()) + 8)
-        rounded = original.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        rounded = original.quantize(Decimal(1).scaleb(-maximum), rounding=ROUND_HALF_UP)
     shown = original if original != 0 and rounded == 0 else rounded
     integer, _, fraction = format(shown, "f").partition(".")
     fraction = fraction.rstrip("0").ljust(minimum, "0")
@@ -148,12 +148,14 @@ def pdf_file(data):
         if not item["scores"]:
             content.append(para("Sem análise disponível para este item na seleção."))
         for score in item["scores"]:
+            metric = (
+                "Medida IF " + number(score["medida_if"], 4, 4)
+                if score["algoritmo"] == "isolation_forest"
+                else "Erro de reconstrução (outra escala) "
+                + number(score["erro_reconstrucao"], 4, 4)
+            )
             content += [
-                para(
-                    f"{score['algoritmo']}"
-                    f" · índice {number(score['indice'])} / 100"
-                    f" · resultado {score['resultado_item_id']}"
-                ),
+                para(f"{score['algoritmo']} · {metric} · resultado {score['resultado_item_id']}"),
                 para(
                     f"Mediana do treino: {money(score['mediana_treino'])}"
                     f" · Preço/mediana: {number(score['razao_preco_mediana'])}"

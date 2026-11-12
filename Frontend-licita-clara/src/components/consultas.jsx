@@ -20,7 +20,7 @@ export function NoAnalysis() {
   const { search } = useLocation()
   const execution = new URLSearchParams(search).get('execucao_id')
   const selected = execution && execution !== 'nenhuma'
-  return <div className="note"><b>{selected ? 'Análise selecionada' : 'Sem análise selecionada'}</b>{selected ? 'Abra o detalhe de um item para consultar os índices ou os motivos de ausência na execução escolhida.' : 'Esta consulta mostra os dados importados. No painel ou ranking, selecione uma execução para consultar os índices disponíveis.'} Ausência de índice não representa conclusão sobre regularidade.</div>
+  return <div className="note"><b>{selected ? 'Análise selecionada' : 'Sem análise selecionada'}</b>{selected ? 'Abra o detalhe de um item para consultar os medidas IF ou os motivos de ausência na execução escolhida.' : 'Esta consulta mostra os dados importados. No painel ou ranking, selecione uma execução para consultar os medidas IF disponíveis.'} Ausência de medida IF não representa conclusão sobre regularidade.</div>
 }
 
 export function LookupFilter({ kind, title, value, onChange, baseId, compact = false }) {

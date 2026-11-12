@@ -1,5 +1,32 @@
 # Backend — FastAPI
 
+## Medida original do Isolation Forest
+
+A aplicação usa **`-score_samples`**, já persistido em `score_bruto`, como
+`medida_if`: valores de 0 a 1, com valores maiores indicando maior anomalia.
+A apresentação usa quatro casas decimais; rankings e cálculos usam a precisão
+persistida. Não é uma probabilidade, nem uma multiplicação por 100.
+
+Painel, itens, fornecedores, licitações, detalhe e relatórios usam essa medida.
+O modo automático seleciona somente IF; não substitui sua ausência pelo erro
+do Autoencoder. O erro de reconstrução continua separado nos relatórios e na API,
+em outra escala, sem entrar no ranking IF.
+A média por licitação é apenas descritiva: modelos de grupos diferentes não
+possuem calibração comum de gravidade e a média não é uma análise própria da compra.
+
+Não é necessário retreinar, reimportar ou migrar o banco. Os percentis antigos
+permanecem no armazenamento histórico para compatibilidade, mas não alimentam
+os valores, a ordenação, o histograma ou as exportações da aplicação.
+Novas execuções de ML ainda preservam o campo legado para o contrato de armazenamento;
+a leitura operacional utiliza o valor bruto tanto para execuções antigas quanto novas.
+
+A API pública passa a usar `medida_if`, `medida_if_media`, `maior_medida_if`,
+`itens_com_medida_if` e `itens_sem_medida_if`. O histograma tem intervalos de 0,1
+entre 0 e 1. Resultados sem IF ficam sem medida, sem zero imputado.
+O parâmetro de URL `ordenacao=indice_desc` é mantido e agora ordena pela medida bruta.
+As páginas `/demonstracao/*` continuam como protótipo fictício, separado dos dados reais.
+
+
 API FastAPI com consultas versionadas de processos, itens e documentos,
 análises experimentais e relatórios PDF/CSV. Para uma instalação nova e os
 scripts de dados/treinamento, siga o [guia da equipe](../scripts/README.md).
@@ -140,8 +167,8 @@ uv run --locked --all-packages --extra validation pytest backend/tests/test_repo
 
 `GET /api/v1/visao/licitacoes` recebe os mesmos parâmetros de base, execução,
 modelo, filtros e paginação da visão de itens. Agrupa todos os itens importados
-por compra, incluindo compras importadas sem itens. O Score médio é a média
-aritmética dos índices disponíveis por item, arredondada a três casas decimais;
+por compra, incluindo compras importadas sem itens. A medida IF média é a média
+aritmética das medidas brutas disponíveis por item, com precisão de 12 casas;
 o índice do item é o máximo dos resultados não cancelados no modelo escolhido
 ou no modelo preferencial de seu grupo. Algoritmos não são somados e itens sem
 índice não entram no denominador. Um índice real igual a zero entra na média.
@@ -149,8 +176,8 @@ ou no modelo preferencial de seu grupo. Algoritmos não são somados e itens sem
 Busca, fornecedor, período e valores selecionam compras inteiras: não reduzem
 os itens usados no cálculo. O filtro de valor usa o total global homologado na
 origem. `valor_homologado` e `valores_itens_importados` são medidas distintas.
-`itens_com_score`, `itens_importados`, cobertura parcial dos resultados e
-`maior_score` acompanham a média; `itens_oficiais` fica nulo porque a integridade
+`itens_com_medida_if`, `itens_importados`, cobertura parcial dos resultados e
+`maior_medida_if` acompanham a média; `itens_oficiais` fica nulo porque a integridade
 da importação não foi confirmada. A média é descritiva, sem prioridade validada.
 
 `GET /api/v1/visao/licitacoes/{process_id}` retorna `licitacao` e `itens`

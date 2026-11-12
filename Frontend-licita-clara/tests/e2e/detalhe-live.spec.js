@@ -25,7 +25,7 @@ for (const theme of ['light', 'dark']) for (const width of [1280, 1062, 390]) {
     expect(response.ok()).toBe(true)
     const scores = (await response.json()).dados[0].resultados
     const score = scores.find(s => s.algoritmo === 'isolation_forest') || scores[0]
-    await expect(page.locator('.detail-score-number')).toContainText(Number(score.indice_experimental).toLocaleString('pt-BR', { maximumFractionDigits: 8 }))
+    await expect(page.locator('.detail-score-number')).toContainText(Number(score.medida_if).toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 }))
     await expect(page.locator('.detail-comparison')).toContainText(`${score.atributos.comparacao.n_treino.toLocaleString('pt-BR')} observações no treino`)
     const violations = (await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations
     expect(violations).toEqual([])
@@ -35,6 +35,6 @@ for (const theme of ['light', 'dark']) for (const width of [1280, 1062, 390]) {
     const output = process.env.LICITA_DETAIL_OUTPUT || '../data/diagnostico/detalhe_figma'
     mkdirSync(output, { recursive: true })
     await page.screenshot({ path: `${output}/${theme}-${width}.png`, fullPage: true })
-    writeFileSync(`${output}/${theme}-${width}.json`, JSON.stringify({ route: page.url(), score: score.indice_experimental, violations, overflow, errors }, null, 2))
+    writeFileSync(`${output}/${theme}-${width}.json`, JSON.stringify({ route: page.url(), score: score.medida_if, violations, overflow, errors }, null, 2))
   })
 }

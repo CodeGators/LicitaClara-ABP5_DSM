@@ -96,3 +96,6 @@ export const reportLink = (processId, source) => {
   for (const key of ['base_id', 'execucao_id']) if (previous.has(key)) params.set(key, previous.get(key))
   return `/relatorios?${params}`
 }
+
+// Medida original do IF: quatro casas apenas na apresentação; cálculo preservado.
+export const ifMeasure = value => value == null ? "Indisponível" : decimal(value, 4, 4)

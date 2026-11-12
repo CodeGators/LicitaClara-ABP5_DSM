@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { useBase } from '../BaseContext.jsx'
 import { AnalysisGate, AnalysisSelector, selectionLink, useAnalysis, viewFields } from '../AnalysisContext.jsx'
-import { decimal, money, reportLink } from '../api.mjs'
+import { ifMeasure, decimal, money, reportLink } from '../api.mjs'
 import { Pager, QueryState } from '../components/consultas.jsx'
 import { FileOutput, Building2, Landmark, ScanSearch } from 'lucide-react'
 import { Head, Aviso } from '../components/ui.jsx'
@@ -10,7 +10,7 @@ import useApi from '../useApi.js'
 import PainelGeral from './PainelGeral.jsx'
 import ItemFilters from '../components/ItemFilters.jsx'
 
-export const indexText = value => value == null ? 'Indisponível' : decimal(value)
+export const indexText = value => value == null ? 'Indisponível' : ifMeasure(value)
 const read = params => Object.fromEntries(viewFields.map(key => [key, params.get(key) || (key === 'analise' ? 'todos' : key === 'ordenacao' ? 'indice_desc' : key === 'tamanho_pagina' ? '20' : '')]))
 
 export function Filters({ purchases = false, suppliers = false }) {
@@ -38,7 +38,7 @@ export function Filters({ purchases = false, suppliers = false }) {
 
 
 function Notice() {
-  return <div className="note"><b>Análise experimental · utilidade não validada</b>O índice é uma posição em relação ao treino do modelo, não probabilidade de fraude ou prioridade de auditoria. Sem faixas de risco validadas. Ausência de índice não representa regularidade.</div>
+  return <div className="note"><b>Análise experimental · utilidade não validada</b>A medida original do Isolation Forest vai de 0 a 1: maior indica maior anomalia. Não é probabilidade nem percentil. Modelos de grupos diferentes não têm gravidade calibrada em comum. Ausência de medida não representa regularidade.</div>
 }
 
 function Cards({ summary }) {
@@ -47,8 +47,8 @@ function Cards({ summary }) {
       ['Itens no recorte', summary.itens, `${summary.processos} compras · ${summary.contratos_vinculados} contratos vinculados`],
       ['Total homologado no recorte', money(summary.valor_homologado), summary.resultados_sem_total ? `${summary.resultados_sem_total} resultado(s) sem total; soma conhecida: ${money(summary.soma_valores_conhecidos)}` : `${summary.resultados} resultados não cancelados; não é valor pago`],
       ['Fornecedores exibidos', summary.fornecedores, `${summary.orgaos} órgãos · ${summary.fornecedores_no_denominador} fornecedores no universo de concentração`],
-      ['Analisados integralmente', summary.analisados, 'Todos os resultados selecionados do item têm índice'],
-      ['Parcialmente analisados', summary.parcial, 'Há resultados sem score; cobertura não é completada com zero'],
+      ['Analisados integralmente', summary.analisados, 'Todos os resultados selecionados do item têm medida IF'],
+      ['Parcialmente analisados', summary.parcial, 'Há resultados sem medida IF; cobertura não é completada com zero'],
       ['Não analisados', summary.nao_analisados, 'Motivo disponível na consulta; sem conclusão de auditoria'],
     ].map(([label, value, text]) => <div className="card kpi" key={label}><span>{label}</span><strong>{value}</strong><small>{text}</small></div>)}
   </div>
@@ -63,19 +63,19 @@ export function useView(path) {
   return { query, params: s.params, changePage }
 }
 
-export function ItemRows({ rows, params, scoreLabel = 'Índice experimental' }) {
+export function ItemRows({ rows, params, scoreLabel = 'Medida IF' }) {
   const location = useLocation()
   return <div className="table-scroll" role="region" aria-label="Itens e resultados do recorte; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Item / compra</th><th scope="col">Órgão / fornecedores</th><th scope="col">Total homologado no recorte</th><th scope="col">{scoreLabel}</th><th scope="col">Cobertura</th></tr></thead><tbody>{rows.map(r => <tr key={r.id}>
     <td><Link className="link-a" to={selectionLink(`/ranking/${r.id}`, params)} state={{ from: location.pathname + location.search }}>{r.descricao}</Link><small>Item {r.numero_item} · Compra {r.processo.numero_compra}</small></td>
     <td>{r.processo.orgao_nome}<small>{[...new Set(r.resultados.map(e => e.fornecedor_nome))].join('; ') || 'Nenhum resultado conhecido'}</small></td>
     <td>{money(r.valor_homologado)}{r.resultados_sem_total > 0 && <small>Total incompleto na fonte</small>}</td>
-    <td>{indexText(r.indice_experimental)}{r.indice_experimental != null && <small>Máximo dos resultados analisados do item</small>}</td>
+    <td>{indexText(r.medida_if)}{r.medida_if != null && <small>Máximo dos resultados analisados do item</small>}</td>
     <td>{r.status_analise === 'analisados' ? 'Integral' : r.status_analise === 'parcial' ? 'Parcial' : 'Não analisado'}<small>{r.resultados_analisados}/{r.resultados_ativos} resultados</small>{Object.keys(r.motivos).map(reason => <small key={reason}>{reason.replaceAll('_', ' ').toLocaleLowerCase('pt-BR')}</small>)}</td>
   </tr>)}</tbody></table></div>
 }
 
 function Shell({ title, summary, children }) {
-  return <><Head kicker="Dados oficiais / Recorte selecionado" title={title} sub={title === 'Itens Sinalizados' ? 'Consulte os itens importados e seus Scores. Use a busca ou refine a seleção em Mais filtros.' : 'Consultas reais, com base e análise versionadas. Filtros compartilhados entre painel, ranking e fornecedores.'} />{summary && <Cards summary={summary} />}<AnalysisSelector /><Notice /><Filters suppliers={title !== 'Itens Sinalizados'} />{children}</>
+  return <><Head kicker="Dados oficiais / Recorte selecionado" title={title} sub={title === 'Itens Sinalizados' ? 'Consulte os itens importados e suas medidas IF. Use a busca ou refine a seleção em Mais filtros.' : 'Consultas reais, com base e análise versionadas. Filtros compartilhados entre painel, ranking e fornecedores.'} />{summary && <Cards summary={summary} />}<AnalysisSelector /><Notice /><Filters suppliers={title !== 'Itens Sinalizados'} />{children}</>
 }
 
 function DashboardContent() {
@@ -93,7 +93,7 @@ function DashboardContent() {
 function RankingContent() {
   const { query, params, changePage } = useView('/visao/ranking')
   const data = query.data
-  return <Shell title="Itens Sinalizados" summary={data?.resumo}><QueryState query={query} />{data && <><section className="card"><h2>{data.total} item(ns) no ranking</h2><p className="sub">Índices disponíveis primeiro; ausências ficam ao final, sem receber zero. Não é uma fila de risco validado.</p>{data.dados.length ? <ItemRows rows={data.dados} params={params} /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section></>}</Shell>
+  return <Shell title="Itens Sinalizados" summary={data?.resumo}><QueryState query={query} />{data && <><section className="card"><h2>{data.total} item(ns) no ranking</h2><p className="sub">Medidas IF disponíveis primeiro; ausências ficam ao final, sem receber zero. Não é uma fila de risco validado.</p>{data.dados.length ? <ItemRows rows={data.dados} params={params} /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section></>}</Shell>
 }
 
 function SuppliersContent() {
@@ -131,11 +131,11 @@ function SuppliersContent() {
     <details className="supplier-analysis"><summary>Versão da análise</summary><AnalysisSelector /></details>
     <div className="supplier-columns">
       <section className="card supplier-ranking">
-        <h2>Ranking de fornecedores</h2><p className="sub">Maior Score disponível entre os resultados do fornecedor. Ordenação ajustável nos filtros.</p>
+        <h2>Ranking de fornecedores</h2><p className="sub">Maior medida IF disponível entre os resultados do fornecedor. Ordenação ajustável nos filtros.</p>
         <Filters suppliers />
         <QueryState query={query} />
-        {data && <>{data.dados.length ? <div className="table-scroll" role="region" aria-label="Ranking de fornecedores; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Compras</th><th scope="col">Homologado</th><th scope="col">Maior Score</th></tr></thead><tbody>{data.dados.map(r => <tr key={r.id} className={r.id === selectedId ? 'sel' : ''}>
-          <td><Link className="link-a" to={selectLink(r.id)} aria-current={r.id === selectedId ? 'true' : undefined}>{r.nome}</Link><small>{r.orgaos} órgãos · {r.itens} itens</small></td><td>{r.compras_com_resultado}<small>{r.contratos_vinculados} contratos vinculados</small></td><td>{money(r.valor_homologado)}{r.resultados_sem_total > 0 && <small>Total incompleto</small>}</td><td>{indexText(r.indice_experimental)}</td>
+        {data && <>{data.dados.length ? <div className="table-scroll" role="region" aria-label="Ranking de fornecedores; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Compras</th><th scope="col">Homologado</th><th scope="col">Maior medida IF</th></tr></thead><tbody>{data.dados.map(r => <tr key={r.id} className={r.id === selectedId ? 'sel' : ''}>
+          <td><Link className="link-a" to={selectLink(r.id)} aria-current={r.id === selectedId ? 'true' : undefined}>{r.nome}</Link><small>{r.orgaos} órgãos · {r.itens} itens</small></td><td>{r.compras_com_resultado}<small>{r.contratos_vinculados} contratos vinculados</small></td><td>{money(r.valor_homologado)}{r.resultados_sem_total > 0 && <small>Total incompleto</small>}</td><td>{indexText(r.medida_if)}</td>
         </tr>)}</tbody></table></div> : <p>Nenhum fornecedor encontrado neste recorte.</p>}<Pager meta={data} onChange={changePage} /></>}
       </section>
       <div className="grid supplier-summary" aria-label="Fornecedor selecionado">
@@ -143,7 +143,7 @@ function SuppliersContent() {
         {supplier && <><section className="card">
           <div className="mini"><h2>{supplier.nome}</h2><span className="pill ana">Selecionado</span></div><p className="sub">Fornecedor selecionado · dados oficiais do recorte</p>
           <div className="stats supplier-stats"><div><strong>{supplier.compras_com_resultado}</strong><small>compras com resultado</small></div><div><strong>{money(supplier.valor_homologado)}</strong><small>homologado</small></div><div><strong>{supplier.orgaos}</strong><small>órgãos</small></div></div>
-          <p className="hint">Maior Score: {indexText(supplier.indice_experimental)} · {supplier.contratos_vinculados} contratos vinculados conhecidos</p>
+          <p className="hint">Maior medida IF: {indexText(supplier.medida_if)} · {supplier.contratos_vinculados} contratos vinculados conhecidos</p>
           {supplier.resultados_sem_total > 0 && <p className="hint">Total incompleto na fonte.</p>}
         </section>
         <section className="card"><h2>Participação no gasto por órgão</h2><p className="sub">Valor deste fornecedor ÷ total dos resultados no recorte de cada órgão.</p>
@@ -159,8 +159,8 @@ function SuppliersContent() {
         {!selectedId && data && <section className="card"><h2>Selecione um fornecedor</h2><p>Os vínculos e a participação aparecem aqui.</p></section>}
       </div>
     </div>
-    {selected && <section className="card supplier-related"><h2>Itens relacionados a {supplier.nome}</h2><p className="sub">Valores e Scores consideram somente os resultados deste fornecedor; o detalhe do item apresenta todos os vencedores.</p>
-      {selected.itens.dados.length ? <ItemRows rows={selected.itens.dados} params={params} scoreLabel="Score" /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={selected.itens} onChange={relatedPage} />
+    {selected && <section className="card supplier-related"><h2>Itens relacionados a {supplier.nome}</h2><p className="sub">Valores e medidas IF consideram somente os resultados deste fornecedor; o detalhe do item apresenta todos os vencedores.</p>
+      {selected.itens.dados.length ? <ItemRows rows={selected.itens.dados} params={params} scoreLabel="Medida IF" /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={selected.itens} onChange={relatedPage} />
     </section>}
     <Aviso detalhe />
   </div>

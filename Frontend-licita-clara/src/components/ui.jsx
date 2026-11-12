@@ -15,7 +15,7 @@ export const Aviso = ({ detalhe }) => (
     <Info size={18} />
     <div>
       Anomalia estatística não é prova de irregularidade. Os sinais indicam prioridade de análise e exigem revisão humana.
-      {detalhe && <small>Limitações: possíveis falsos positivos, itens raros, qualidade variável de descrições e ausência de rótulos. O score não representa probabilidade de fraude.</small>}
+      {detalhe && <small>Limitações: possíveis falsos positivos, itens raros, qualidade variável de descrições e ausência de rótulos. A medida do modelo não representa probabilidade de irregularidade.</small>}
     </div>
   </div>
 )

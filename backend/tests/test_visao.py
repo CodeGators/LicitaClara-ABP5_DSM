@@ -123,7 +123,7 @@ def test_model_selection_published_execution_and_partial_coverage(query_client):
             a.versoes_modelo.insert().values(
                 id=model,
                 base_treino_id=base,
-                algoritmo="controle",
+                algoritmo="isolation_forest",
                 versao="teste",
                 versao_codigo="fixture",
                 chave_artefato="teste",
@@ -180,9 +180,9 @@ def test_model_selection_published_execution_and_partial_coverage(query_client):
     tenders = client.get("/api/v1/visao/licitacoes", params=params)
     assert tenders.status_code == 200, tenders.text
     purchase = tenders.json()["dados"][0]
-    assert purchase["score_medio"] == "88.125"
-    assert purchase["maior_score"] == "88.125"
-    assert purchase["itens_com_score"] == 1 and purchase["itens_importados"] == 2
+    assert purchase["medida_if_media"] == "0.200000000000"
+    assert purchase["maior_medida_if"] == "0.200000000000"
+    assert purchase["itens_com_medida_if"] == 1 and purchase["itens_importados"] == 2
     assert purchase["status_analise"] == "parcial"
     detail = client.get(
         "/api/v1/visao/licitacoes/" + purchase["id"],
@@ -214,7 +214,7 @@ def test_model_selection_published_execution_and_partial_coverage(query_client):
         "dados"
     ][0]
     assert (
-        row["indice_experimental"] == "88.125"
+        row["medida_if"] == "0.200000000000"
         and row["resultados_analisados"] == 1
         and row["resultados_ativos"] == 2
     )
@@ -233,6 +233,79 @@ def test_model_selection_published_execution_and_partial_coverage(query_client):
     assert (
         client.get("/api/v1/visao/ranking", params={**params, "base_id": data["old"]}).status_code
         == 404
+    )
+
+    # Same percentile for different raw observations: ranking must preserve raw order.
+    ae = uuid4()
+    with data["engine"].begin() as cn:
+        cn.execute(
+            a.resultados_modelo.update()
+            .where(a.resultados_modelo.c.execucao_id == uid)
+            .values(score_normalizado=100)
+        )
+        second = (
+            cn.execute(
+                sa.select(p.resultados_itens).where(
+                    p.resultados_itens.c.base_id == base,
+                    p.resultados_itens.c.item_versao_id != event["item_versao_id"],
+                    p.resultados_itens.c.cancelado.is_(False),
+                )
+            )
+            .mappings()
+            .first()
+        )
+        cn.execute(
+            a.resultados_modelo.insert().values(
+                base_id=base,
+                execucao_id=uid,
+                modelo_id=model,
+                processo_versao_id=process,
+                item_versao_id=second["item_versao_id"],
+                resultado_item_id=second["id"],
+                tipo_alvo="resultado",
+                score_bruto=Decimal("0.7"),
+                score_normalizado=100,
+                versao_normalizacao="cdf-treino-v1",
+            )
+        )
+        cn.execute(
+            a.versoes_modelo.insert().values(
+                id=ae,
+                base_treino_id=base,
+                algoritmo="autoencoder",
+                versao="teste",
+                versao_codigo="fixture",
+                chave_artefato="ae",
+                sha256_artefato="b" * 64,
+            )
+        )
+        cn.execute(a.execucoes_modelos.insert().values(execucao_id=uid, modelo_id=ae))
+        cn.execute(
+            a.resultados_modelo.insert().values(
+                base_id=base,
+                execucao_id=uid,
+                modelo_id=ae,
+                processo_versao_id=process,
+                item_versao_id=event["item_versao_id"],
+                resultado_item_id=event["id"],
+                tipo_alvo="resultado",
+                score_bruto=500,
+                score_normalizado=100,
+                versao_normalizacao="cdf-treino-v1",
+            )
+        )
+    automatic = {"base_id": str(base), "execucao_id": str(uid)}
+    ranking = client.get("/api/v1/visao/ranking", params=automatic).json()
+    assert [Decimal(r["medida_if"]) for r in ranking["dados"]] == [Decimal("0.7"), Decimal("0.2")]
+    assert all("indice_experimental" not in r for r in ranking["dados"])
+    buckets = client.get("/api/v1/visao/painel", params=automatic).json()["distribuicao"]
+    assert buckets[2]["itens"] == buckets[7]["itens"] == 1
+    assert Decimal(buckets[0]["inicio"]) == 0 and Decimal(buckets[-1]["fim"]) == 1
+    tender = client.get("/api/v1/visao/licitacoes", params=automatic).json()["dados"][0]
+    assert Decimal(tender["medida_if_media"]) == Decimal("0.45")
+    assert (
+        client.get("/api/v1/visao/ranking", params={**automatic, "modelo_id": str(ae)}).status_code
+        == 422
     )
 
 

@@ -1,5 +1,32 @@
 # Licita Clara — Frontend
 
+## Medida original do Isolation Forest
+
+A aplicação usa **`-score_samples`**, já persistido em `score_bruto`, como
+`medida_if`: valores de 0 a 1, com valores maiores indicando maior anomalia.
+A apresentação usa quatro casas decimais; rankings e cálculos usam a precisão
+persistida. Não é uma probabilidade, nem uma multiplicação por 100.
+
+Painel, itens, fornecedores, licitações, detalhe e relatórios usam essa medida.
+O modo automático seleciona somente IF; não substitui sua ausência pelo erro
+do Autoencoder. O erro de reconstrução continua separado nos relatórios e na API,
+em outra escala, sem entrar no ranking IF.
+A média por licitação é apenas descritiva: modelos de grupos diferentes não
+possuem calibração comum de gravidade e a média não é uma análise própria da compra.
+
+Não é necessário retreinar, reimportar ou migrar o banco. Os percentis antigos
+permanecem no armazenamento histórico para compatibilidade, mas não alimentam
+os valores, a ordenação, o histograma ou as exportações da aplicação.
+Novas execuções de ML ainda preservam o campo legado para o contrato de armazenamento;
+a leitura operacional utiliza o valor bruto tanto para execuções antigas quanto novas.
+
+A API pública passa a usar `medida_if`, `medida_if_media`, `maior_medida_if`,
+`itens_com_medida_if` e `itens_sem_medida_if`. O histograma tem intervalos de 0,1
+entre 0 e 1. Resultados sem IF ficam sem medida, sem zero imputado.
+O parâmetro de URL `ordenacao=indice_desc` é mantido e agora ordena pela medida bruta.
+As páginas `/demonstracao/*` continuam como protótipo fictício, separado dos dados reais.
+
+
 Vite + React 18 + React Router + lucide-react. Consulta real de itens, detalhe, processo e documentos integrada à API. Painel, fornecedores, revisão e relatório demonstrativos permanecem separados e identificados; as demonstrações usam `src/data.js`.
 
 Usar Node.js 20.19+ da linha 20 e npm. A partir desta pasta:
