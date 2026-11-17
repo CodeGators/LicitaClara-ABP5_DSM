@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { LayoutGrid, ListFilter, Building2, FileText, Layers, ScanSearch, CircleHelp, Menu, X, Sun, Moon } from 'lucide-react'
+import { LayoutGrid, ListFilter, Building2, FileText, Layers, CircleHelp, Menu, X, Sun, Moon } from 'lucide-react'
 import Logo from './Logo.jsx'
 import AjudaModal from './AjudaModal.jsx'
 import useTheme from '../useTheme.js'
@@ -16,7 +16,7 @@ const nav = [
   { to: '/fornecedores', label: 'Fornecedores', icon: Building2 },
   { to: '/relatorios', label: 'Relatórios', icon: FileText },
 ]
-const names = { itens: 'Consultar itens', processos: 'Processo da compra', demonstracao: 'Demonstração', painel: 'Painel Geral', ranking: 'Itens Sinalizados', licitacoes: 'Licitações Sinalizadas', fornecedores: 'Fornecedores', relatorios: 'Relatórios' }
+const names = { itens: 'Consultar itens', processos: 'Compra', demonstracao: 'Demonstração', painel: 'Painel Geral', ranking: 'Itens Sinalizados', licitacoes: 'Licitações Sinalizadas', fornecedores: 'Fornecedores', relatorios: 'Relatórios' }
 const readSeen = () => { try { return localStorage.getItem('lc_ajuda_vista') } catch { return null } }
 
 export default function Layout() {
@@ -57,47 +57,44 @@ export default function Layout() {
       <aside ref={sideRef} id="menu-principal" className={`side ${menu ? 'open' : ''}`} inert={ajuda || (mobile && !menu) ? '' : undefined} aria-hidden={ajuda || (mobile && !menu) ? true : undefined} role={mobile && menu ? 'dialog' : undefined} aria-modal={mobile && menu ? true : undefined} aria-label="Menu principal" tabIndex={-1}>
         <div className="side-heading"><Logo /><button className="icon-btn close-menu" onClick={() => setMenu(false)} aria-label="Fechar menu"><X size={20} /></button></div>
         <div>
-          <div className="eyebrow">Espaço de análise</div>
+          <div className="eyebrow">Análises</div>
           <nav className="nav" aria-label="Navegação principal">
             {nav.map(({ to, label, icon: I, end }) => (
               <NavLink key={to} to={real && base.baseId && !to.startsWith('/demonstracao') ? selectionLink(to, search) : to} end={end} className={({ isActive }) => (isActive || (to === '/ranking' && /^\/(itens|processos)(\/|$)/.test(pathname)) ? 'active' : '')}>
-                <I size={18} /> {label}
+                <I size={20} aria-hidden="true" /> {label}
               </NavLink>
             ))}
           </nav>
         </div>
         <div className="recorte">
-          <small>{real ? 'Base selecionada' : 'Recorte demonstrativo'}</small>
+          <small>{real ? 'Base em uso' : 'Dados de demonstração'}</small>
           <strong>Compras públicas</strong>
-          <span style={{ fontSize: 12 }}>{real ? base.data?.base ? <>{date(base.data.base.periodo_inicio)} – {date(base.data.base.periodo_fim)}<br />{base.data.cobertura.itens} itens · {base.data.cobertura.processos} processos</> : 'Consultando disponibilidade…' : <>Jan–Jun 2026<br />Órgãos e empresas fictícios</>}</span>
+          <span>{real ? base.data?.base ? <>{date(base.data.base.periodo_inicio)} a {date(base.data.base.periodo_fim)}<br />{base.data.cobertura.itens} itens · {base.data.cobertura.processos} compras</> : 'Consultando…' : <>Jan–Jun 2026<br />Órgãos e empresas fictícios</>}</span>
         </div>
         <div className="side-foot">
-          <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}><ScanSearch size={16} /> Auditoria cidadã e compliance</span>
-          <hr />
-          <span>FATEC Jacareí<br />Governança e Compliance</span>
-          <span style={{ textTransform: 'uppercase' }}>Protótipo acadêmico · v0.1</span>
+          <span>FATEC Jacareí · Governança e Compliance</span>
+          <span>Protótipo acadêmico · v0.1</span>
         </div>
       </aside>
       <div ref={mainRef} className="main" inert={ajuda || (mobile && menu) ? '' : undefined}>
         <header className="top">
           <div className="crumb">
-            <button className="icon-btn menu-btn" onClick={() => setMenu(true)} aria-label="Abrir menu" aria-controls="menu-principal" aria-expanded={menu}><Menu size={20} /></button>
-            <Layers size={18} className="hide-sm" />
-            <span><span className="hide-sm">Auditoria cidadã / </span>{parts[0] === 'ranking' && parts[1] ? 'Ranking' : names[parts[0] || '']}</span>
+            <button className="icon-btn menu-btn" onClick={() => setMenu(true)} aria-label="Abrir menu" aria-controls="menu-principal" aria-expanded={menu}><Menu size={22} /></button>
+            <span>{parts[0] === 'ranking' && parts[1] ? 'Detalhe do item' : names[parts[0] || ''] || 'Licita Clara'}</span>
           </div>
           <div className="chips">
-            <span className="demo">{real ? (new URLSearchParams(search).get('execucao_id') && new URLSearchParams(search).get('execucao_id') !== 'nenhuma' ? 'Dados oficiais · análise experimental' : 'Dados oficiais · consulta de dados') : 'Demonstração · dados simulados'}</span>
-            <button className="help-btn" onClick={() => { setMenu(false); setAjuda(true) }} aria-label="Como funciona"><CircleHelp size={16} /><span className="hide-sm">Como funciona</span></button>
+            <span className={`demo${real ? '' : ' warn'}`}>{real ? 'Dados oficiais' : 'Demonstração'}<span className="hide-sm">{real ? (new URLSearchParams(search).get('execucao_id') && new URLSearchParams(search).get('execucao_id') !== 'nenhuma' ? ' · análise experimental' : ' · sem análise') : ' · dados simulados'}</span></span>
+            <button className="help-btn" onClick={() => { setMenu(false); setAjuda(true) }} aria-label="Como funciona"><CircleHelp size={18} /><span className="hide-sm">Como funciona</span></button>
             <button className="help-btn" onClick={alternar} aria-label={tema === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'} title={tema === 'dark' ? 'Modo claro' : 'Modo escuro'}>
-              {tema === 'dark' ? <Sun size={16} /> : <Moon size={16} />}<span className="hide-sm">{tema === 'dark' ? 'Claro' : 'Escuro'}</span>
+              {tema === 'dark' ? <Sun size={18} /> : <Moon size={18} />}<span className="hide-sm">{tema === 'dark' ? 'Claro' : 'Escuro'}</span>
             </button>
           </div>
         </header>
         <main ref={contentRef} id="conteudo" className="content" tabIndex={-1}>
-          {!real && <div className="note"><b>Esta tela é demonstrativa e usa dados fictícios.</b>Os números, scores e controles desta demonstração não representam a base real. <Link className="link-a" to="/itens">Consultar dados oficiais →</Link></div>}
+          {!real && <div className="note"><b>Esta tela é uma demonstração com dados fictícios.</b>Os números não representam a base real. <Link className="link-a" to="/itens">Ver dados oficiais</Link></div>}
           <Outlet />
           <div className="foot">
-            <span>{real ? 'Fonte: Compras.gov.br e complemento PNCP · Cobertura limitada ao recorte importado.' : 'Demonstração acadêmica · Revisões e exportações ainda não integradas.'}</span>
+            <span>{real ? 'Fonte: Compras.gov.br e PNCP. Cobertura limitada ao recorte importado.' : 'Demonstração acadêmica. Revisões e exportações ainda não integradas.'}</span>
             <span>Licita Clara / 2026</span>
           </div>
         </main>

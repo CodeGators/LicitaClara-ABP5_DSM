@@ -168,3 +168,10 @@ mantêm as casas necessárias; HHI usa até quatro casas. Preços unitários e
 medianas têm o valor original no tooltip. Banco, cálculos, respostas da API,
 filtros numéricos e exportação CSV conservam a precisão original. O PDF usa o
 mesmo arredondamento visual e informa também preços unitários e medianas originais.
+
+## Interface e responsividade (revisão de UX)
+
+- **Escala automática:** todo o CSS usa `rem`. Acima de 1500 px de largura o tamanho-base da página cresce (1500, 1800, 2200 e 2800 px), então a interface ocupa bem monitores grandes e projetores sem ficar com letra pequena. O conteúdo tem largura máxima e fica centralizado.
+- **Pontos de quebra:** 1200 px (colunas empilham), 900 px (menu vira gaveta), 820 px (KPIs em 2 colunas) e 720 px (tabelas viram cartões com rótulos, via `tbl-stack` e `data-label`).
+- **Menos ruído:** o seletor de versão da análise é uma linha que abre em “Alterar”; filtros mostram só busca e ordenação, e o resto fica em “Mais filtros”; o aviso de limitações é uma linha com “Ver limitações”.
+- **Pop-up “Como funciona”:** três passos com atalhos, aviso de que anomalia não é prova, glossário e créditos. Textos em `src/data.js` (`passos`, `glossario`).

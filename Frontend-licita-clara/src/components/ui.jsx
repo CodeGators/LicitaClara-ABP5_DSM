@@ -1,9 +1,10 @@
 import { Info, CircleHelp } from 'lucide-react'
 import { nivel, nivelNome } from '../data.js'
 
-export const Head = ({ kicker, title, sub, action }) => (
+// O título e uma frase explicam a tela. O parâmetro `kicker` é aceito por compatibilidade, mas não é exibido.
+export const Head = ({ title, sub, action }) => (
   <div className="head">
-    <div><div className="kicker">{kicker}</div><h1>{title}</h1><p className="sub">{sub}</p></div>
+    <div><h1>{title}</h1>{sub && <p className="sub">{sub}</p>}</div>
     {action}
   </div>
 )
@@ -12,10 +13,13 @@ export const Prioridade = ({ v }) => <span className={`pill ${nivel(v)}`}>{nivel
 export const Revisao = ({ v }) => <span className={`pill ${v === 'Em análise' ? 'ana' : 'rev'}`}>{v}</span>
 export const Aviso = ({ detalhe }) => (
   <div className="aviso">
-    <Info size={18} />
+    <Info size={18} aria-hidden="true" />
     <div>
-      Anomalia estatística não é prova de irregularidade. Os sinais indicam prioridade de análise e exigem revisão humana.
-      {detalhe && <small>Limitações: possíveis falsos positivos, itens raros, qualidade variável de descrições e ausência de rótulos. O score não representa probabilidade de fraude.</small>}
+      Anomalia estatística não é prova de irregularidade: o índice indica onde conferir primeiro e exige revisão humana.
+      {detalhe && <details>
+        <summary>Ver limitações</summary>
+        <p>Há possíveis falsos positivos, itens raros, descrições de qualidade variável e ausência de rótulos. O índice não representa probabilidade de fraude.</p>
+      </details>}
     </div>
   </div>
 )
@@ -23,5 +27,5 @@ export const Progress = ({ pct, cor = 'var(--petroleo)', max = 100 }) => (
   <div className="bar"><i style={{ width: `${(pct / max) * 100}%`, background: cor }} /></div>
 )
 export const Tip = ({ text, children }) => (
-  <span className="tip" tabIndex={0} data-tip={text}>{children}<CircleHelp size={12} /></span>
+  <span className="tip" tabIndex={0} data-tip={text}>{children}<CircleHelp size={14} /></span>
 )

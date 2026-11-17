@@ -15,11 +15,11 @@ export default function SinteseProcesso({ processId }) {
   if (!enabled) return <NoAnalysis />
   const process = query.data?.dados[0]
   return <section className="card">
-    <h2>Síntese experimental da licitação</h2>
-    {!process?.cobertura_agrupada && <p className="sub">O score integral exige análise de todos os itens e resultados do universo oficial consultado. A média dos sinais disponíveis descreve apenas a parte analisada. Não representa probabilidade de fraude ou prioridade validada.</p>}
+    <h2>Síntese da licitação</h2>
+    {!process?.cobertura_agrupada && <p className="sub">O score integral exige análise de todos os itens da licitação. A média dos sinais descreve só a parte analisada e não é probabilidade de fraude.</p>}
     <QueryState query={query} loading="Consultando a cobertura da licitação…" />
     {process?.cobertura_agrupada && <>
-      <p className="sub">Cada item é comparado com seu próprio grupo de produtos. Índices de grupos diferentes não são somados em um score da licitação.</p>
+      <p className="sub">Cada item é comparado com o seu próprio grupo de produtos. Índices de grupos diferentes não são somados.</p>
       <div className="stats">
         <Info label="Itens com análise / importados">{process.cobertura_agrupada.itens_com_analise} / {process.cobertura_agrupada.itens_importados}</Info>
         <Info label="Resultados com análise / ativos importados">{process.cobertura_agrupada.resultados_com_analise} / {process.cobertura_agrupada.resultados_ativos_importados}</Info>
