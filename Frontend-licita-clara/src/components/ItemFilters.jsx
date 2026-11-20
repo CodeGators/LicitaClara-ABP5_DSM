@@ -8,13 +8,13 @@ export default function ItemFilters({ draft, change, apply, clear, baseId, param
   const [lookupReset, setLookupReset] = useState(0)
   const count = [...advancedKeys, 'processo_id'].filter(key => params.get(key)).length
   const orders = official ? [['publicacao_desc', 'Publicação mais recente'], ['publicacao_asc', 'Publicação mais antiga'], ['valor_desc', 'Maior total do item'], ['valor_asc', 'Menor total do item'], ['descricao_asc', 'Descrição do item']] : [['indice_desc', purchases ? 'Maior Score médio primeiro' : 'Maior Score primeiro'], ['descricao_asc', purchases ? 'Objeto da licitação' : suppliers ? 'Nome do fornecedor' : 'Nome do item'], ['valor_desc', 'Maior valor homologado']]
-  return <FilterPanel title={purchases ? 'Filtrar licitações' : suppliers ? 'Filtrar fornecedores' : 'Filtrar itens'} ariaLabel={official ? 'Filtros dos itens' : 'Filtros do recorte'} apply={apply} clear={() => { setLookupReset(n => n + 1); clear() }} appliedCount={count} twoColumns={official} primary={<>
+  return <FilterPanel title={purchases ? 'Filtrar licitações' : suppliers ? 'Filtrar fornecedores' : 'Filtrar itens'} ariaLabel={official ? 'Filtros dos itens' : 'Filtros do recorte'} apply={apply} clear={() => { setLookupReset(n => n + 1); clear() }} appliedCount={count} primary={<>
 
       <Field label={purchases ? 'Buscar licitação, item ou fornecedor' : 'Buscar item, compra ou fornecedor'}><input className="input" type="search" placeholder={purchases ? 'Número, objeto, item ou fornecedor' : 'Digite o nome do item, compra ou fornecedor'} maxLength={200} value={draft.busca} onChange={e => change('busca', e.target.value)} /></Field>
       {!official && <Field label="Estado da análise"><select className="select" value={draft.analise} onChange={e => change('analise', e.target.value)}><option value="todos">{purchases ? 'Todas as licitações' : 'Todos os itens'}</option><option value="analisados">{purchases ? 'Todos os itens importados com análise completa' : 'Com análise completa'}</option><option value="parcial">{purchases ? 'Parte dos itens/resultados com análise' : 'Com análise parcial'}</option><option value="nao_analisados">Sem análise</option></select></Field>}
       <Field label="Ordenação"><select className="select" value={draft.ordenacao} onChange={e => change('ordenacao', e.target.value)}>{orders.map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></Field>
     </>} advanced={<>
-<p className="hint">Use apenas os campos necessários. Para localizar um órgão ou fornecedor, digite parte do nome e selecione o resultado.</p>
+<p className="hint">Preencha só o que precisar. Para achar um órgão ou fornecedor, digite parte do nome e escolha na lista.</p>
         <div className="item-filters-lookups">
           <LookupFilter key={`orgao-${lookupReset}`} compact kind="/orgaos" title="Órgão" baseId={baseId} value={draft.orgao_id} onChange={v => change('orgao_id', v)} />
           <LookupFilter key={`fornecedor-${lookupReset}`} compact kind="/fornecedores/opcoes" title="Fornecedor" baseId={baseId} value={draft.fornecedor_id} onChange={v => change('fornecedor_id', v)} />

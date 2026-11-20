@@ -8,7 +8,7 @@ test('entrada abre dados reais, fixa base e pagina sem fabricar scores', async (
   await expect(page).toHaveURL(new RegExp(`/itens\\?base_id=${BASE}`))
   await expect(page.getByRole('heading', { name: '2 item(ns) encontrado(s)' })).toBeVisible()
   await expect(page.getByText('Sem análise selecionada', { exact: true })).toBeVisible()
-  await expect(page.getByText('Dados oficiais · consulta de dados')).toBeVisible()
+  await expect(page.getByText('Dados oficiais · sem análise')).toBeVisible()
   await expect(page.getByText('Nexo Suprimentos Ltda.', { exact: true })).toHaveCount(0)
   await page.getByText('Mais filtros', { exact: true }).click()
   await page.getByLabel('Itens por página', { exact: true }).selectOption('5')
@@ -142,7 +142,7 @@ test('respostas antigas não substituem resultados de uma busca nova', async ({ 
 test('demonstração separada e relatório real não caem em exemplos fictícios', async ({ page }) => {
   await mockApi(page)
   await page.goto('/demonstracao/painel')
-  await expect(page.getByText('Esta tela é demonstrativa e usa dados fictícios.')).toBeVisible()
+  await expect(page.getByText('Esta tela é uma demonstração com dados fictícios.')).toBeVisible()
   await page.goto(`/relatorios?item=${ITEM}&base_id=${BASE}`)
   await expect(page.getByRole('heading', { name: 'Relatório indisponível' })).toBeVisible()
   await expect(page.getByText('Nexo Suprimentos Ltda.', { exact: true })).toHaveCount(0)

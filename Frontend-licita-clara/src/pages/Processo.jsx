@@ -15,17 +15,17 @@ export default function Processo() {
   useEffect(() => setPage(1), [baseId, id])
   const query = useApi(`/processos/${encodeURIComponent(id)}`, { base_id: baseId }, !!baseId)
   const items = useApi(`/processos/${encodeURIComponent(id)}/itens`, { base_id: baseId, pagina: page, tamanho_pagina: 10 }, !!query.data)
-  if (!query.data) return <><Link className="link-a" to={baseLink('/itens', baseId)}>← Consultar itens</Link><QueryState query={query} loading="Carregando processo…" /></>
+  if (!query.data) return <><Link className="link-a back-link" to={baseLink('/itens', baseId)}>← Consultar itens</Link><QueryState query={query} loading="Carregando processo…" /></>
   const process = query.data.processo
   return <>
-    <Link className="link-a" to={baseLink('/itens', baseId)}>← Consultar itens</Link>
-    <Head kicker="Consulta / Processo da compra" title={`Compra ${process.numero_compra}`} sub={process.objeto} action={<Link className="btn primary" to={reportLink(id, location.search)}>Preparar relatório</Link>} />
+    <Link className="link-a back-link" to={baseLink('/itens', baseId)}>← Consultar itens</Link>
+    <Head title={`Compra ${process.numero_compra}`} sub={process.objeto} action={<Link className="btn primary" to={reportLink(id, location.search)}>Preparar relatório</Link>} />
     <div className="card stats">
       <Info label="Órgão">{process.orgao_nome}</Info><Info label="Modalidade">{process.modalidade_nome || 'Não informada'}</Info><Info label="Número do processo">{process.numero_processo || 'Não informado'}</Info>
       <Info label="Publicação">{date(process.data_publicacao)}</Info><Info label="Estimado global da compra">{money(process.valor_estimado_processo)}</Info><Info label="Homologado global da compra">{money(process.valor_homologado_processo)}</Info>
       <Info label="Homologado dos itens do recorte">{money(process.valor_homologado_itens_recorte)}</Info><Info label="Situação na origem">{process.situacao}</Info><Info label="Itens no recorte">{process.quantidade_itens_recorte}</Info>
     </div>
-    <p className="note">O recorte pode conter apenas parte da compra. O valor global e o total dos itens do recorte são medidas distintas e não devem ser somados.</p>
+    <p className="note">O recorte pode ter só parte da compra. O valor global e o total dos itens do recorte são medidas diferentes: não some um com o outro.</p>
     <SinteseProcesso processId={id} />
     <section className="card"><h2>Itens deste processo</h2><QueryState query={items} loading="Carregando itens do processo…" />
       {items.data && <>{items.data.dados.length ? <ul className="document-list">{items.data.dados.map(item => <li key={item.id}><Link className="link-a" to={selectionLink(`/itens/${item.id}`, location.search)}>Item {item.numero_item} · {item.descricao}</Link></li>)}</ul> : <p className="sub">Nenhum item conhecido neste recorte.</p>}<Pager meta={items.data.meta} onChange={setPage} /></>}

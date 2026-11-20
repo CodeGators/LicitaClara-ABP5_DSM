@@ -49,20 +49,16 @@ export const desenvolvedores = [
   { nome: 'Rodrigo Augusto', papel: 'Desenvolvedor', user: 'rodrigoaslima' },
 ]
 export const passos = [
-  { t: 'Consulte os itens', to: '/itens', d: 'Explore os dados oficiais importados. Filtre por descrição, órgão, fornecedor, período e valor; abra um item para consultar os resultados e documentos da compra.' },
-  { t: 'Veja o Painel', to: '/painel', d: 'Confira a cobertura da análise, a distribuição dos índices e a evolução dos itens no recorte selecionado. Ausência de análise permanece identificada.' },
-  { t: 'Explore o Ranking experimental', to: '/ranking', d: 'Consulte os itens ordenados pelos índices disponíveis e abra o detalhe. Cada item é comparado com seu próprio grupo; o índice não é um score da licitação inteira.' },
-  { t: 'Confira os resultados do item', to: '/itens', d: 'No detalhe do item, compare preços e veja os resultados de cada fornecedor e modelo separadamente. Abra o processo para consultar sua cobertura e os documentos conhecidos.' },
-  { t: 'Explore os Fornecedores', to: '/fornecedores', d: 'Consulte compras com resultado, contratos vinculados e participação no gasto dos itens filtrados. Abra um fornecedor para ver suas relações por órgão.' },
-  { t: 'Prepare o Relatório', to: '/relatorios', d: 'Selecione uma compra, confira a prévia, escolha PDF ou CSV e exporte. Os arquivos reais incluem valores, análises disponíveis, fontes e limitações; não exigem login.' },
+  { t: 'Veja o panorama', to: '/painel', cta: 'Abrir o Painel geral', d: 'O Painel mostra quantos itens foram analisados e quais têm os maiores índices. É o melhor ponto de partida.' },
+  { t: 'Abra um item sinalizado', to: '/ranking', cta: 'Ver itens sinalizados', d: 'Compare o preço pago com a mediana de itens parecidos e entenda de onde vem o índice.' },
+  { t: 'Leve o relatório', to: '/relatorios', cta: 'Preparar relatório', d: 'Escolha uma compra e baixe em PDF ou CSV, com valores, fontes e limitações. Não precisa de login.' },
 ]
 export const glossario = [
-  ['Score', 'Índice de anomalia relativo ao treino do modelo e ao grupo do item. Não mede probabilidade de irregularidade; não some índices de grupos diferentes.'],
-  ['Prioridade', 'As faixas baixa, média e alta aparecem apenas nas demonstrações. A consulta real não atribui prioridade validada de auditoria.'],
-  ['Mediana', 'Valor central do grupo usado no treino. Exige especificação, unidade e embalagem comparáveis; não é uma cotação atual.'],
-  ['Preço / mediana', 'Quantas vezes o preço do item é maior que a mediana dos similares. 1,60× significa 60% acima.'],
-  ['HHI', 'Índice de concentração de 0 a 1 no universo filtrado. Valores maiores indicam concentração entre os fornecedores observados, sem representar todo o órgão.'],
-  ['Homologado', 'Valor aprovado na contratação; não comprova pagamento ou entrega.'],
-  ['Isolation Forest e Autoencoder', 'Modelos não supervisionados que identificam comportamentos atípicos. Nas telas reais, os modelos treinados analisam os grupos compatíveis e seus resultados ficam disponíveis por versão.'],
-  ['Falso positivo', 'Item sinalizado que, após revisão, está correto. Por isso toda conclusão exige revisão humana.'],
+  ['Índice (ou score)', 'Número de 0 a 100 que mostra o quanto o preço e a quantidade de um item fogem do padrão de itens parecidos. Não é probabilidade de fraude e não deve ser somado entre grupos.'],
+  ['Mediana', 'O valor do meio entre os preços de itens parecidos usados no treino do modelo. Serve de referência; não é cotação atual.'],
+  ['Preço ÷ mediana', 'Quantas vezes o preço pago passa da mediana. 1,6× quer dizer 60% acima.'],
+  ['Homologado', 'Valor aprovado na contratação. Não prova pagamento nem entrega.'],
+  ['Modelo', 'Método automático que procura comportamentos atípicos. Usamos o Isolation Forest e o Autoencoder, sempre separados.'],
+  ['HHI', 'Mede a concentração de fornecedores num órgão, de 0 a 1. Quanto maior, mais concentrado. Concentração sozinha não indica irregularidade.'],
+  ['Falso positivo', 'Item sinalizado que, depois de conferido, estava correto. Por isso toda conclusão depende de revisão humana.'],
 ]

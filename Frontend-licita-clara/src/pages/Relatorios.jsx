@@ -49,10 +49,10 @@ export default function Relatorios() {
   }
   const process = data?.processo
   return <>
-    <Head kicker="Exportação / Anomalias em compras públicas" title="Relatórios" sub="Selecione o processo, confira a prévia e baixe os dados reais."
+    <Head title="Relatórios" sub="Escolha uma compra, confira a prévia e baixe em PDF ou CSV."
       action={<button className="btn primary" onClick={download} disabled={!data || busy || titulo !== appliedTitle}><Download size={16} />{busy ? 'Gerando arquivo…' : `Exportar ${format.toUpperCase()}`}</button>} />
     <AnalysisSelector allModels />
-    <FilterPanel title="Selecionar licitação" ariaLabel="Filtros do relatório" twoColumns apply={e => { e.preventDefault(); setSearch(busca.trim()) }} applyLabel="Buscar" clear={() => { setBusca(''); setSearch(''); setProcess('') }} primary={<>
+    <FilterPanel title="Selecionar licitação" ariaLabel="Filtros do relatório" apply={e => { e.preventDefault(); setSearch(busca.trim()) }} applyLabel="Buscar" clear={() => { setBusca(''); setSearch(''); setProcess('') }} primary={<>
       <Field label="Buscar processo"><input className="input" type="search" value={busca} maxLength={200} onChange={e => setBusca(e.target.value)} /></Field>
       <Field label="Processo selecionado"><select className="select" value={processId} onChange={e => setProcess(e.target.value)}>
         <option value="">Selecione um processo</option>
@@ -65,7 +65,7 @@ export default function Relatorios() {
     </FilterPanel>
     <div className="grid stack-md report-grid">
       <div className="grid report-config">
-        <section className="card"><h2>Configurar exportação</h2>
+        <section className="card"><h2>Configurar</h2>
           <form onSubmit={e => { e.preventDefault(); setAppliedTitle(titulo.trim()); setTitulo(titulo.trim()); setError('') }}>
             <Field label="Título do relatório"><input className="input" required maxLength={120} value={titulo} onChange={e => setTitulo(e.target.value)} /></Field>
             <button className="btn" type="submit" disabled={!titulo.trim()}>Atualizar prévia</button>
@@ -73,9 +73,9 @@ export default function Relatorios() {
           <Field label="Formato"><div className="radio">{['pdf', 'csv'].map(f => <button key={f} type="button" aria-pressed={format === f} className={format === f ? 'on' : ''} onClick={() => setFormat(f)}>{f.toUpperCase()}</button>)}</div></Field>
           <p className="hint">Período da base: {date(data?.base.periodo_inicio)} – {date(data?.base.periodo_fim)}</p>
           <hr />
-          <h3>O relatório inclui</h3>
+          <h3>O arquivo inclui</h3>
           {['Síntese e valores do processo', 'Itens, resultados e índices dos modelos', 'Comparações disponíveis, fontes e limitações'].map(text => <p className="check-fixo" key={text}><Check size={16} />{text}</p>)}
-          <p className="hint">Até 200 itens por processo. O PDF pode ter várias páginas. O CSV tem uma linha por resultado/modelo; não some valores repetidos entre modelos.</p>
+          <p className="hint">Até 200 itens por compra. O CSV tem uma linha por resultado e modelo: não some valores repetidos entre modelos.</p>
         </section>
         {data && <div className="dark-card"><FileCheck size={22} /><b>Prévia pronta para revisão</b><p>{data.resumo.itens} itens importados · {data.resumo.itens_analisados} com análise<br />{data.resumo.scores} pontuações, mantendo os algoritmos separados.</p></div>}
       </div>
@@ -84,10 +84,10 @@ export default function Relatorios() {
         {!processId ? <section className="card"><h2>{params.has('item') ? 'Relatório indisponível' : 'Selecione um processo'}</h2><p>Escolha uma compra na configuração ou abra o relatório pelo detalhe do processo.</p></section> : <QueryState query={preview} loading="Preparando a prévia…" />}
         {data && <div className="preview report-preview"><div className="mini"><b>Prévia do relatório</b><span className="hint">{data.resumo.itens} itens no recorte</span></div>
           <article className="paper">
-            <div className="mini"><div className="mono-row"><Mark size={34} /><span><b>Licita</b> Clara</span></div><small>ANÁLISE DE ANOMALIAS</small></div>
+            <div className="mini"><div className="mono-row"><Mark size={34} /><span><b>Licita</b> Clara</span></div><small>Análise de anomalias</small></div>
             <hr className="report-rule" /><h2>{data.titulo}</h2>
             <p className="sub">Compra {process.numero_compra} · {process.orgao_nome}</p>
-            <span className="demo">Dados oficiais · {data.analise ? 'análise experimental' : 'sem análise selecionada'}</span>
+            <span className="demo">Dados oficiais · {data.analise ? 'análise experimental' : 'sem análise'}</span>
             <h3>01 / Síntese do processo</h3><p>{process.objeto}</p>
             <div className="stats"><div><small>Estimado global</small><strong>{money(process.valor_estimado_processo)}</strong></div><div><small>Homologado global</small><strong>{money(process.valor_homologado_processo)}</strong></div><div><small>Homologado no recorte</small><strong>{money(process.valor_homologado_itens_recorte)}</strong></div></div>
             <p className="hint">Valores globais e do recorte são medidas distintas. O recorte pode conter somente parte da compra.</p>
@@ -100,7 +100,7 @@ export default function Relatorios() {
             <h3>03 / Método e limites de interpretação</h3><div className="note">{data.limites.map(text => <p key={text}>{text}</p>)}</div>
             <h3>Fonte e rastreabilidade</h3><p>{data.fonte}</p>
             <p className="hint">Base: {data.base.id} · versão {data.base.versao}<br />Manifesto da base: {data.base.manifesto_sha256}<br />Execução: {data.analise?.id || 'Sem análise selecionada'}<br />Manifesto da análise: {data.analise?.manifesto_sha256 || 'Não disponível'}<br />Snapshot: {data.snapshot_sha256}</p>
-            <Link className="link-a" to={`/processos/${process.id}?${new URLSearchParams({ base_id: baseId, ...(data.analise ? { execucao_id: data.analise.id } : {}) })}`}>Ver processo da compra →</Link>
+            <Link className="link-a" to={`/processos/${process.id}?${new URLSearchParams({ base_id: baseId, ...(data.analise ? { execucao_id: data.analise.id } : {}) })}`}>Ver a compra</Link>
           </article>
         </div>}
       </div>
