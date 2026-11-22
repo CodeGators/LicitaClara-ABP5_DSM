@@ -16,7 +16,7 @@ import ItemFilters from '../components/ItemFilters.jsx'
 export const indexText = value => value == null ? 'Indisponível' : ifMeasure(value)
 const read = params => Object.fromEntries(viewFields.map(key => [key, params.get(key) || (key === 'analise' ? 'todos' : key === 'ordenacao' ? 'indice_desc' : key === 'tamanho_pagina' ? '20' : '')]))
 
-export function Filters({ purchases = false, suppliers = false }) {
+export function Filters({ purchases = false, suppliers = false, products = false }) {
   const { params, setParams } = useAnalysis()
   const { baseId } = useBase()
   const [draft, setDraft] = useState(() => read(params))
@@ -34,7 +34,7 @@ export function Filters({ purchases = false, suppliers = false }) {
   const clear = () => { setDraft(read(new URLSearchParams())); setParams(previous => {
     const next = new URLSearchParams(previous); for (const key of [...viewFields, 'pagina', 'pagina_itens']) next.delete(key); return next
   }) }
-  return <ItemFilters draft={draft} change={change} apply={apply} clear={clear} baseId={baseId} params={params} purchases={purchases} suppliers={suppliers}>
+  return <ItemFilters draft={draft} change={change} apply={apply} clear={clear} baseId={baseId} params={params} purchases={purchases} suppliers={suppliers} products={products}>
     {suppliers && <p className="hint">Filtrar por fornecedor seleciona os itens em que ele tem resultado. Valores e concentração incluem os demais vencedores desses itens.</p>}
   </ItemFilters>
 }
@@ -61,7 +61,7 @@ export function ItemRows({ rows, params, scoreLabel = 'Medida IF' }) {
 }
 
 function Shell({ title, children }) {
-  return <><Head title={title} /><AnalysisSelector /><Filters suppliers={title !== 'Itens Sinalizados'} />{children}<Aviso detalhe /></>
+  return <><Head title={title} /><AnalysisSelector /><Filters products={title === 'Itens Sinalizados'} suppliers={title !== 'Itens Sinalizados'} />{children}<Aviso detalhe /></>
 }
 
 function DashboardContent() {
@@ -77,9 +77,9 @@ function DashboardContent() {
 }
 
 function RankingContent() {
-  const { query, params, changePage } = useView('/visao/ranking')
+  const { query, params, changePage } = useView('/visao/produtos')
   const data = query.data
-  return <Shell title="Itens Sinalizados"><QueryState query={query} />{data && <><section className="card"><h2>{data.total} item(ns) no ranking</h2><p className="sub">Quem tem medida IF aparece primeiro; quem não tem fica no fim, sem receber zero. Não é uma fila de risco validada.</p>{data.dados.length ? <ItemPriceTable rows={data.dados} params={params} /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section></>}</Shell>
+  return <Shell title="Itens Sinalizados"><QueryState query={query} />{data && <><section className="card"><h2>{data.total} {data.total === 1 ? 'produto' : 'produtos'}</h2><p className="sub">Preços unitários dos produtos da base atual, separados por especificação e unidade de fornecimento.</p>{data.dados.length ? <ItemPriceTable rows={data.dados} params={params} /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section></>}</Shell>
 }
 
 function SuppliersContent() {

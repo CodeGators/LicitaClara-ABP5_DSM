@@ -399,6 +399,7 @@ class QueryRepository:
                 IV.c.valor_unitario_estimado,
                 IV.c.orcamento_sigiloso,
                 p.itens_catalogo.c.catalogo,
+                p.itens_catalogo.c.descricao.label("descricao_catalogo"),
                 p.itens_catalogo.c.codigo.label("codigo_catalogo"),
                 totals.c.valor_homologado_item,
                 sa.func.coalesce(totals.c.resultados_ativos, 0).label("resultados_ativos"),

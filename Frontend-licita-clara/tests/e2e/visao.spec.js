@@ -44,6 +44,15 @@ async function mockView(page, overrides = {}) {
     }
     if (path === '/visao/painel') return done({ ...context, distribuicao: Array.from({ length: 10 }, (_,i) => ({ inicio: i/10, fim: (i+1)/10, itens: i === 8 ? context.resumo.analisados : 0 })), evolucao: rows.length ? [{ mes: '2026-09', itens: rows.length, analisados: context.resumo.analisados, parcial: 0, nao_analisados: context.resumo.nao_analisados }] : [], motivos_indisponibilidade: context.resumo.nao_analisados ? { SEM_REFERENCIA_EXATA: context.resumo.nao_analisados } : {} })
     if (path === '/visao/ranking') return done({ ...context, ...pageOf(rows) })
+    if (path === '/visao/produtos') return done({ ...context, ...pageOf(rows.map(r => ({
+      id: r.id, descricao: r.descricao, catalogo: r.catalogo, codigo_catalogo: r.codigo_catalogo,
+      unidade_medida: r.unidade_medida, preco_minimo: r.resultados[0]?.valor_unitario_homologado ?? null,
+      preco_maximo: r.resultados[0]?.valor_unitario_homologado ?? null,
+      mediana: state.extremePrice ? '0.01' : r.resultados[0]?.valor_unitario_homologado ?? null,
+      quantidade_registros: r.resultados.length, requer_validacao: !!state.extremePrice,
+      itens: [{ id: r.id, numero_item: r.numero_item, numero_compra: r.processo.numero_compra }],
+    }))) })
+
     const supplier = { id: SUPPLIER, nome: 'Fornecedor do recorte', compras_com_resultado: 1, contratos_vinculados: 0, itens: 1, orgaos: 1, valor_homologado: '0.10000001', resultados_sem_total: 0, medida_if: hasScore ? '0.514' : null }
     if (path === '/visao/fornecedores') return done({ ...context, ...pageOf(rows.length ? (state.twoSuppliers ? [supplier, { ...supplier, id: OTHER_SUPPLIER, nome: 'Segundo fornecedor' }] : [supplier]) : []) })
     if (state.twoSuppliers && path === `/visao/fornecedores/${OTHER_SUPPLIER}`) return done({ ...context, fornecedor: { ...supplier, id: OTHER_SUPPLIER, nome: 'Segundo fornecedor' }, relacoes: [], itens: pageOf(rows) })
@@ -69,9 +78,9 @@ test('painel fixa versão/modelo, conserva filtros entre telas e distingue índi
   await expect(page.getByRole('heading', { name: 'Compra 00001 · Item 00001' })).toBeVisible()
   await expect(page.locator('.detail-score-number')).toContainText('0,5140')
   await page.getByRole('link', { name: 'Itens Sinalizados', exact: true }).click()
-  await page.getByLabel('Buscar item, compra ou fornecedor').fill('Borracha')
+  await page.getByLabel('Buscar item ou código de catálogo').fill('Borracha')
   await page.getByRole('button', { name: 'Aplicar filtros' }).click()
-  await expect(page.getByRole('heading', { name: '1 item(ns) no ranking' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '1 produto' })).toBeVisible()
   expect(new URL(page.url()).searchParams.get('busca')).toBe('Borracha')
   state.active = NEW_EXEC
   await page.getByRole('link', { name: 'Borracha do recorte', exact: true }).click()
@@ -79,7 +88,7 @@ test('painel fixa versão/modelo, conserva filtros entre telas e distingue índi
   await expect(page.locator('.detail-score-number')).toContainText('0,5140')
   expect(new URL(page.url()).searchParams.get('execucao_id')).toBe(EXEC)
   await page.getByRole('link', { name: 'Voltar à consulta' }).click()
-  await expect(page.getByRole('heading', { name: '1 item(ns) no ranking' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '1 produto' })).toBeVisible()
   expect(errors).toEqual([])
 })
 
@@ -89,8 +98,8 @@ test('ausência de scores e publicação não vira zero nem bloqueia consultas r
   await expect(page.getByText('Nenhum item analisado disponível neste recorte.')).toBeVisible()
   await expect(page).toHaveURL(/execucao_id=nenhuma/)
   await page.getByRole('link', { name: 'Itens Sinalizados', exact: true }).click()
-  await expect(page.getByRole('heading', { name: '2 item(ns) no ranking' })).toBeVisible()
-  await expect(page.getByRole('cell', { name: 'Indisponível', exact: true })).toHaveCount(2)
+  await expect(page.getByRole('heading', { name: '2 produtos' })).toBeVisible()
+  await expect(page.getByRole('cell', { name: 'Indisponível', exact: true })).toHaveCount(3)
   await page.getByLabel('Estado da análise').selectOption('analisados')
   await page.getByRole('button', { name: 'Aplicar filtros' }).click()
   await expect(page.getByText('Nenhum item encontrado nesta página.')).toBeVisible()
@@ -123,7 +132,7 @@ test('troca de modelo, paginação, erro e retentativa mantêm seleção explíc
   await expect(page.getByRole('heading', { name: 'Consulta indisponível' })).toBeVisible()
   state.viewOffline = false
   await page.getByRole('button', { name: 'Tentar novamente' }).click()
-  await expect(page.getByRole('heading', { name: '2 item(ns) no ranking' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '2 produtos' })).toBeVisible()
   expect(new URL(page.url()).searchParams.get('modelo_id')).toBe(MODEL)
 })
 
@@ -134,7 +143,7 @@ test('execução inexistente não troca silenciosamente para a ativa e permite e
   await expect(page.getByRole('link', { name: 'Borracha do recorte', exact: true })).toHaveCount(0)
   await abrirAnalise(page)
   await page.getByLabel('Execução publicada').selectOption(EXEC)
-  await expect(page.getByRole('heading', { name: '2 item(ns) no ranking' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '2 produtos' })).toBeVisible()
   await page.goto(`/itens/${ITEM}?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=00000000-0000-4000-8000-000000000000`)
   await expect(page.getByRole('heading', { name: 'Modelo fora da execução selecionada' })).toBeVisible()
   await expect(page.getByRole('cell', { name: '0,5140', exact: true })).toHaveCount(0)
@@ -158,7 +167,7 @@ test('modelo automático preserva roteamento por item e cobertura sem média ent
   await expect(page.getByLabel('Modelo experimental')).toHaveCount(0)
   expect(new URL(page.url()).searchParams.get('modelo_id')).toBeNull()
   await page.getByRole('link', { name: 'Itens Sinalizados', exact: true }).click()
-  await expect(page.getByRole('heading', { name: '2 item(ns) no ranking' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '2 produtos' })).toBeVisible()
   await page.getByRole('link', { name: 'Borracha do recorte', exact: true }).click()
   await expect(page.locator('.detail-score-number')).toContainText('0,5140')
   expect(new URL(page.url()).searchParams.get('modelo_id')).toBeNull()
@@ -306,7 +315,7 @@ test('filtros de itens separam busca simples, listas paginadas e refinamentos', 
   await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
   await expect.poll(() => new URL(page.url()).searchParams.get('pagina')).toBeNull()
   expect(new URL(page.url()).searchParams.get('orgao_id')).toBe('org-2')
-  await expect.poll(() => state.calls.filter(url => url.pathname.endsWith('/visao/ranking')).at(-1)?.searchParams.get('valor_minimo')).toBe('0.00000001')
+  await expect.poll(() => state.calls.filter(url => url.pathname.endsWith('/visao/produtos')).at(-1)?.searchParams.get('valor_minimo')).toBe('0.00000001')
   await expect(page.locator('.item-filters-advanced summary')).toContainText('3 aplicado(s)')
   await page.getByRole('button', { name: 'Limpar filtros', exact: true }).click()
   await expect(page.getByLabel('Buscar órgão', { exact: true })).toHaveValue('')
@@ -392,7 +401,7 @@ test('selecionar fornecedor atualiza o painel e pagina itens sem paginar o ranki
   await reading.getByText('Ver diferença registrada', { exact: true }).click()
   await expect(reading.getByText('900,00% acima', { exact: true })).toBeVisible()
   await page.getByRole('link', { name: 'Itens Sinalizados', exact: true }).click()
-  await expect(page.getByRole('heading', { name: '2 item(ns) no ranking' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '2 produtos' })).toBeVisible()
   await expect(page.locator('tbody')).toContainText('Requer validação')
 })
 
@@ -416,19 +425,29 @@ test('selecionar fornecedor atualiza o painel e pagina itens sem paginar o ranki
   await expect(reading).not.toContainText('Fornecedor da caneta')
 })
 
- test('itens sinalizados mostra preços e mediana vinculada ao fornecedor', async ({ page }) => {
-  await mockView(page, { separateResults: true, extremePrice: true })
+ test('itens sinalizados mostra menor preço, maior preço e mediana sem órgão ou fornecedor', async ({ page }) => {
+  await mockView(page)
   await page.goto('/ranking')
-  await expect(page.getByRole('columnheader', { name: 'Valor unitário', exact: true })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: 'Total do item', exact: true })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: 'Mediana histórica', exact: true })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: 'Medida IF', exact: true })).toHaveCount(0)
+  for (const name of ['Menor valor unitário', 'Maior valor unitário', 'Mediana da base atual']) await expect(page.getByRole('columnheader', { name, exact: true })).toBeVisible()
+  for (const name of ['Medida IF', 'Órgão / fornecedor', 'Total do item']) await expect(page.getByRole('columnheader', { name, exact: true })).toHaveCount(0)
   const row = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'Borracha do recorte', exact: true }) })
-  await expect(row).toContainText('Requer validação')
-  await expect(row.locator('[data-label="Valor unitário"]')).toContainText('Fornecedor do recorte')
-  const median = row.locator('[data-label="Mediana histórica"]')
-  await expect(median.locator('.item-price-result').first()).toContainText('R$ 0,01')
-  await expect(median.locator('.item-price-result').first()).toContainText('por UN')
-  await expect(median.locator('.item-price-result').nth(1)).toContainText('Indisponível')
-  await expect(median.locator('.item-price-result').nth(1)).toContainText('Outro fornecedor do item')
+  await expect(row.locator('[data-label="Mediana da base atual"]')).toContainText('R$ 0,10')
+  await expect(row).not.toContainText('Fornecedor do recorte')
+})
+
+ test('produto agrupa compras e mantém acesso às análises de cada ocorrência', async ({ page }) => {
+  await mockView(page)
+  await page.route('**/api/v1/visao/produtos?*', route => route.fulfill({ json: {
+    dados: [{ id: 'agua-copo', descricao: 'Água mineral sem gás', catalogo: 'CATMAT', codigo_catalogo: '445484', unidade_medida: 'Copo 200 ML', preco_minimo: '0.60', preco_maximo: '30185.20', mediana: '0.80', quantidade_registros: 4, requer_validacao: true, itens: [{ id: ITEM, numero_item: '1', numero_compra: '5' }, { id: 'outra-compra', numero_item: '2', numero_compra: '10' }] }],
+    total: 1, pagina: 1, tamanho_pagina: 20, total_paginas: 1,
+  } }))
+  await page.goto('/ranking')
+  await expect(page.locator('tbody tr')).toHaveCount(1)
+  await expect(page.getByRole('cell', { name: 'R$ 0,60', exact: true })).toBeVisible()
+  await expect(page.getByRole('cell', { name: 'R$ 30.185,20', exact: true })).toBeVisible()
+  await expect(page.getByRole('cell', { name: 'R$ 0,80', exact: true })).toBeVisible()
+  await expect(page.locator('tbody')).toContainText('Requer validação')
+  await page.locator('.product-purchases summary').click()
+  await expect(page.getByRole('link', { name: 'Compra 5 · item 1', exact: true })).toHaveAttribute('href', new RegExp(`/ranking/${ITEM}`))
+  await expect(page.getByRole('link', { name: 'Compra 10 · item 2', exact: true })).toBeVisible()
 })

@@ -189,3 +189,19 @@ A consulta da análise de um item também informa
 `atributos.comparacao.unidade_preco`, obtido da assinatura do modelo. Para modelos
 históricos sem esse campo, a unidade de preço é exposta a partir da assinatura
 armazenada, sem assumir a unidade do item atual ou modificar seus scores.
+
+### Preços por produto na base operacional
+
+`GET /api/v1/visao/produtos?base_id=...` reúne itens de compras diferentes com o
+mesmo catálogo, especificação e unidade/embalagem. A ordem de atributos nomeados
+não separa produtos equivalentes. Grupos sem catálogo ou unidade identificados
+permanecem separados por item.
+
+Menor preço, maior preço e mediana são calculados com os preços unitários dos
+resultados não cancelados da base consultada, antes da paginação. Cada resultado
+conta uma vez; as quantidades compradas não ponderam a mediana. Valores ausentes
+não viram zero, e extremos continuam nos cálculos. Essa mediana não é a referência
+de treino do IF. O limite provisório `maior preço > 6 × mediana da base atual`
+marca o produto como `requer_validacao` quando a mediana é positiva, sem confirmar
+erro ou remover registros.
+A resposta inclui as ocorrências para abrir as análises individuais.

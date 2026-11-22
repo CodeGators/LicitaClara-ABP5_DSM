@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from licita_backend.db.session import get_session
 from licita_backend.repositories.licitacoes import TenderRepository
+from licita_backend.repositories.produtos import ProductRepository
 from licita_backend.repositories.visao import ViewRepository
 from licita_backend.schemas.consultas import ErrorResponse
 from licita_backend.schemas.visao import (
@@ -33,6 +34,11 @@ def dashboard(session: DB, params: Annotated[ViewFilters, Query()]):
 @router.get("/ranking", response_model=ViewPage)
 def ranking(session: DB, params: Annotated[ViewFilters, Query()]):
     return ViewRepository(session).ranking(params)
+
+
+@router.get("/produtos", response_model=ViewPage)
+def products(session: DB, params: Annotated[ViewFilters, Query()]):
+    return ProductRepository(session).listing(params)
 
 
 @router.get("/fornecedores", response_model=ViewPage)

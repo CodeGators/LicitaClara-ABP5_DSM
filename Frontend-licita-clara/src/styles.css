@@ -491,3 +491,6 @@ input.input[type=search]{appearance:none}
 .price-review .pill{white-space:normal}
 .validation-heading{color:var(--alta);font-weight:700}
 .item-price-result + .item-price-result{border-top:1px solid var(--divisoria);margin-top:.7rem;padding-top:.7rem}
+.product-purchases summary{cursor:pointer;color:var(--petroleo);font-weight:600}
+.product-purchases ul{margin:.7rem 0;padding-left:1.1rem}
+.product-purchases li + li{margin-top:.4rem}
