@@ -34,7 +34,6 @@ function Detail({ item }) {
   const { baseId } = useBase()
   const selection = useAnalysis()
   const location = useLocation()
-  const [tab, setTab] = useState('sinais')
   const [origin] = useState(location.state?.from || '')
   const [chosenResult, setResult] = useState('')
   const process = item.processo
@@ -88,13 +87,10 @@ function Detail({ item }) {
         {controls}
       </div>
     </section>
-    <nav className="tabs" aria-label="Seções da análise">{[['sinais', 'Preço e sinais'], ['revisao', 'Revisão']].map(([key, label]) => <button key={key} className={tab === key ? 'on' : ''} aria-pressed={tab === key} onClick={() => setTab(key)}>{label}</button>)}</nav>
     <QueryState query={analysis} loading="Consultando análise do item…" />
     {invalidModel && <p className="note" role="alert">Modelo fora da execução selecionada. Nenhum score de outro modelo será usado.</p>}
-    {tab === 'sinais' && <>
       {!activeScore && !analysis.loading && !analysis.error && <p className="note">Nenhuma medida IF disponível para este resultado no modelo selecionado. {[...new Set((data?.cobertura || []).filter(c => (!selection.modelId || c.modelo_id === selection.modelId) && (!c.resultado_item_id || c.resultado_item_id === result?.id)).map(c => c.motivo?.replaceAll('_', ' ').toLowerCase()).filter(Boolean))].join('; ')}. Ausência de medida IF não representa regularidade.</p>}
-      <Comparison item={item} result={result} score={activeScore} /></>}
-    {tab === 'revisao' && <section className="card"><h2>Revisão humana</h2><p className="sub">Nenhuma revisão humana registrada. O registro de pareceres ainda não está disponível nesta versão.</p></section>}
+    <Comparison item={item} result={result} score={activeScore} />
     <div className="detail-footer"><Link className="link-a" to={selectionLink(`/processos/${process.id}`, location.search)}>Ver todos os itens da compra</Link></div>
   </div>
 }
