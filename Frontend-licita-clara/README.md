@@ -190,6 +190,9 @@ seletores de versão e opções avançadas ficam fora dessas listagens.
 itens analisados no formato “3 de 14 analisados”. As cores usam o maior IF dos
 resultados do próprio fornecedor. A marcação de preço extremo também pertence ao
 resultado vencedor, sem ser propagada aos covencedores com preço regular.
+O clique no nome expande a linha com animação e lista as compras por órgão, com
+o total homologado exclusivamente para esse fornecedor em cada compra, sem IF.
+A lista expandida inclui todas as compras, independentemente da paginação dos itens.
 A lupa abre `/fornecedores/:id`, com resumo, participação por órgão e itens
 paginados. A busca seleciona fornecedores inteiros, sem reduzir seus totais.
 

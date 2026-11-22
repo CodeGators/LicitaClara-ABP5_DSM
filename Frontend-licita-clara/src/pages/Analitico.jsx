@@ -1,4 +1,4 @@
-import { ifBand, ifBandLabels } from '../ifBands.mjs'
+import SupplierListRow from '../components/SupplierListRow.jsx'
 import ItemPriceTable from '../components/ItemPriceTable.jsx'
 import PriceReview from '../components/PriceReview.jsx'
 import { itemRequiresPriceReview } from '../priceValidation.mjs'
@@ -8,7 +8,7 @@ import { useBase } from '../BaseContext.jsx'
 import { AnalysisGate, selectionLink, useAnalysis, viewFields } from '../AnalysisContext.jsx'
 import { ifMeasure, decimal, money } from '../api.mjs'
 import { Pager, QueryState } from '../components/consultas.jsx'
-import { Search, ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { Head } from '../components/ui.jsx'
 import useApi from '../useApi.js'
 import PainelGeral from './PainelGeral.jsx'
@@ -133,16 +133,7 @@ function SuppliersContent() {
       {data && <section className="card supplier-ranking"><h2>{data.total} {data.total === 1 ? 'fornecedor' : 'fornecedores'}</h2>
         {data.dados.length ? <div className="table-scroll" role="region" aria-label="Fornecedores sinalizados; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl tbl-stack product-table supplier-table"><thead><tr>
           <th scope="col">Fornecedor</th><th scope="col">Compras</th><th scope="col">Total homologado</th><th scope="col">Itens analisados</th><th scope="col"><span className="sr-only">Detalhes</span></th>
-        </tr></thead><tbody>{data.dados.map(row => {
-          const band = ifBand(row)
-          return <tr key={row.id} className={band ? `if-band-${band}` : undefined} data-if-band={band || undefined} title={ifBandLabels[band]}>
-            <td>{band && <span className="sr-only">{ifBandLabels[band]}. </span>}<Link className="link-a" to={selectLink(row.id)} state={{ from: listLink }}>{row.nome}</Link><small>{row.orgaos} {row.orgaos === 1 ? 'órgão' : 'órgãos'}</small>{row.requer_validacao && <PriceReview />}</td>
-            <td data-label="Compras">{row.compras_com_resultado}</td>
-            <td className="numeric" data-label="Total homologado">{money(row.valor_homologado)}{row.resultados_sem_total > 0 && <small>Total incompleto</small>}</td>
-            <td data-label="Itens analisados">{supplierCoverage(row)}</td>
-            <td><Link className="dashboard-analysis-link" title="Ver fornecedor" aria-label={`Ver fornecedor ${row.nome}`} to={selectLink(row.id)} state={{ from: listLink }}><Search size={17} aria-hidden="true" /></Link></td>
-          </tr>
-        })}</tbody></table></div> : <p>Nenhum fornecedor encontrado neste recorte.</p>}
+        </tr></thead><tbody>{data.dados.map(row => <SupplierListRow key={row.id} row={row} detailLink={selectLink(row.id)} listLink={listLink} />)}</tbody></table></div> : <p>Nenhum fornecedor encontrado neste recorte.</p>}
         <Pager meta={data} onChange={changePage} />
       </section>}
     </>}

@@ -61,8 +61,9 @@ async function mockView(page, overrides = {}) {
       const suppliers = (state.twoSuppliers ? [supplier, { ...supplier, id: OTHER_SUPPLIER, nome: 'Segundo fornecedor' }] : [supplier]).filter(r => r.nome.toLowerCase().includes((url.searchParams.get('busca') || '').toLowerCase()) && (!selected.length || selected.includes(r.sinalizacao)))
       return done({ ...context, ...pageOf(suppliers) })
     }
-    if (state.twoSuppliers && path === `/visao/fornecedores/${OTHER_SUPPLIER}`) return done({ ...context, fornecedor: { ...supplier, id: OTHER_SUPPLIER, nome: 'Segundo fornecedor' }, relacoes: [], itens: pageOf(rows) })
-    if (path === `/visao/fornecedores/${SUPPLIER}`) return done({ ...context, fornecedor: supplier, relacoes: [{ orgao_id: 'org', orgao_nome: 'Órgão do recorte', compras_com_resultado: 1, valor_fornecedor: null, valor_homologado: null, participacao: null, hhi: null, motivo: 'TOTAIS_INCOMPLETOS' }], itens: pageOf(rows.slice(0,1)) })
+    const purchases = [{ id: PROCESS, orgao_id: 'org', orgao_nome: 'Órgão do recorte', numero_compra: '00001', itens: 1, resultados: 1, valor_homologado: '0.10000001', resultados_sem_total: 0 }]
+    if (state.twoSuppliers && path === `/visao/fornecedores/${OTHER_SUPPLIER}`) return done({ ...context, fornecedor: { ...supplier, id: OTHER_SUPPLIER, nome: 'Segundo fornecedor' }, compras: purchases, relacoes: [], itens: pageOf(rows) })
+    if (path === `/visao/fornecedores/${SUPPLIER}`) return done({ ...context, fornecedor: supplier, compras: purchases, relacoes: [{ orgao_id: 'org', orgao_nome: 'Órgão do recorte', compras_com_resultado: 1, valor_fornecedor: null, valor_homologado: null, participacao: null, hhi: null, motivo: 'TOTAIS_INCOMPLETOS' }], itens: pageOf(rows.slice(0,1)) })
     return bad('Fornecedor não encontrado neste recorte.', 404)
   } })
   return state
@@ -115,7 +116,7 @@ test('ausência de scores e publicação não vira zero nem bloqueia consultas r
 test('fornecedor mostra compras e contratos separados e concentração desconhecida', async ({ page }) => {
   await mockView(page)
   await page.goto('/fornecedores')
-  await page.getByRole('link', { name: 'Fornecedor do recorte', exact: true }).click()
+  await page.getByRole('link', { name: 'Ver fornecedor Fornecedor do recorte', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Fornecedor do recorte', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Participação no gasto por órgão' })).toBeVisible()
   await expect(page.getByLabel('Fornecedor selecionado').getByText('Indisponível', { exact: true })).toBeVisible()
@@ -340,7 +341,7 @@ test('fornecedores usa lista simplificada e abre resumo e relações pela lupa',
   await expect(page.locator('.kpis')).toHaveCount(0)
   await expect(page.getByText('Mais filtros', { exact: true })).toHaveCount(0)
   await expect(page.getByRole('columnheader', { name: 'Maior medida IF', exact: true })).toHaveCount(0)
-  await expect(page.getByRole('row').filter({ has: page.getByRole('link', { name: 'Fornecedor do recorte', exact: true }) })).toHaveAttribute('data-if-band', 'yellow')
+  await expect(page.getByRole('row').filter({ has: page.getByRole('button', { name: 'Fornecedor do recorte', exact: true }) })).toHaveAttribute('data-if-band', 'yellow')
   await page.getByRole('link', { name: 'Ver fornecedor Fornecedor do recorte', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Fornecedor do recorte', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Itens relacionados a Fornecedor do recorte' })).toBeVisible()
@@ -356,9 +357,9 @@ test('paginação dos itens do fornecedor mantém retorno à página da lista', 
   await mockView(page, { twoSuppliers: true })
   await page.goto(`/fornecedores?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=${MODEL}&tamanho_pagina=1`)
   const ranking = page.locator('.supplier-ranking')
-  await expect(ranking.getByRole('link', { name: 'Fornecedor do recorte', exact: true })).toBeVisible()
+  await expect(ranking.getByRole('button', { name: 'Fornecedor do recorte', exact: true })).toBeVisible()
   await ranking.getByRole('button', { name: 'Próxima', exact: true }).click()
-  await ranking.getByRole('link', { name: 'Segundo fornecedor', exact: true }).click()
+  await ranking.getByRole('link', { name: 'Ver fornecedor Segundo fornecedor', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Segundo fornecedor', exact: true })).toBeVisible()
   await expect(page.getByText('Sem relações disponíveis neste recorte.')).toBeVisible()
   const related = page.locator('.supplier-related')
@@ -587,7 +588,7 @@ for (const width of [1280, 390]) {
     await expect(page.locator('td[data-label="Itens analisados"]')).toHaveText('1 de 1 analisado')
     state.supplierReview = true
     await page.reload()
-    const row = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'Fornecedor do recorte', exact: true }) })
+    const row = page.getByRole('row').filter({ has: page.getByRole('button', { name: 'Fornecedor do recorte', exact: true }) })
     await expect(row).toContainText('Requer validação')
     await expect(row).not.toHaveAttribute('data-if-band')
     await group.locator('summary').click()
@@ -599,5 +600,51 @@ for (const width of [1280, 390]) {
     await page.getByRole('button', { name: 'Limpar filtros', exact: true }).click()
     await expect(page.getByLabel('Buscar fornecedor', { exact: true })).toHaveValue('')
     expect(new URL(page.url()).searchParams.getAll('sinalizacao')).toEqual([])
+  })
+}
+
+for (const width of [1280, 390]) {
+  test(`nome do fornecedor expande compras com animação, retentativa e sem IF ${width}`, async ({ page }) => {
+    await mockView(page)
+    await page.setViewportSize({ width, height: 900 })
+    const purchases = [
+      { id: 'purchase-1', orgao_nome: 'CONSELHO DA ESCOLA DE 1 E 2 GRAUS MARIO DE OLIVEIRA CHA', numero_compra: '3', itens: 2, valor_homologado: '7818.10', resultados_sem_total: 0 },
+      { id: 'purchase-2', orgao_nome: 'Outro conselho escolar', numero_compra: '4', itens: 1, valor_homologado: null, resultados_sem_total: 1 },
+    ]
+    let calls = 0, fail = true
+    await page.route(`**/api/v1/visao/fornecedores/${SUPPLIER}?*`, route => {
+      calls += 1
+      return route.fulfill(fail ? { status: 503, json: { erro: { mensagem: 'Compras indisponíveis.', codigo: 'temporario' } } } : { json: { compras: purchases } })
+    })
+    await page.goto('/fornecedores')
+    await expect(page.getByRole('heading', { name: '1 fornecedor', exact: true })).toBeVisible()
+    const originalUrl = page.url()
+    const button = page.getByRole('button', { name: 'Fornecedor do recorte', exact: true })
+    expect(calls).toBe(0)
+    await expect(button).toHaveAttribute('aria-expanded', 'false')
+    await button.focus()
+    await page.keyboard.press('Enter')
+    await expect(button).toHaveAttribute('aria-expanded', 'true')
+    const panel = page.getByRole('region', { name: 'Licitações de Fornecedor do recorte', exact: true })
+    await expect(panel.getByRole('heading', { name: 'Consulta indisponível', exact: true })).toBeVisible()
+    fail = false
+    await panel.getByRole('button', { name: 'Tentar novamente', exact: true }).click()
+    await expect(panel.getByText(purchases[0].orgao_nome, { exact: true })).toBeVisible()
+    await expect(panel.getByText('R$ 7.818,10', { exact: true })).toBeVisible()
+    await expect(panel.getByText('Total incompleto na fonte', { exact: true })).toBeVisible()
+    await expect(panel.getByText('Não informado', { exact: true })).toBeVisible()
+    await expect(panel.getByText(/Medida IF|Isolation Forest|Score/)).toHaveCount(0)
+    expect(page.url()).toBe(originalUrl)
+    expect(calls).toBe(2)
+    expect((await new AxeBuilder({ page }).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations).toEqual([])
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false)
+    await button.click()
+    await expect(button).toHaveAttribute('aria-expanded', 'false')
+    const grid = page.locator('.supplier-expansion-grid').first()
+    await expect.poll(() => grid.evaluate(el => el.getBoundingClientRect().height)).toBe(0)
+    await expect(grid).toHaveAttribute('inert', '')
+    await button.click()
+    await expect(panel.getByText('R$ 7.818,10', { exact: true })).toBeVisible()
+    expect(calls).toBe(2)
   })
 }

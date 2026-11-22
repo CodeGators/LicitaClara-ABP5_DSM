@@ -68,6 +68,7 @@ class ViewPage(ViewContext):
 
 class SupplierView(ViewContext):
     fornecedor: dict[str, Any]
+    compras: list[dict[str, Any]]
     relacoes: list[dict[str, Any]]
     itens: dict[str, Any]
 

@@ -68,6 +68,47 @@ def concentration(events, supplier_id):
         }
 
 
+def supplier_purchases(items, supplier_id):
+    """One row per purchase, summing only this supplier's non-cancelled results."""
+    groups = {}
+    for item in items:
+        own = [
+            event
+            for event in item["resultados"]
+            if event["fornecedor_id"] == supplier_id and not event["cancelado"]
+        ]
+        if not own:
+            continue
+        process = item["processo"]
+        group = groups.setdefault(
+            process["id"],
+            {
+                "processo": {
+                    "id": process["id"],
+                    "numero_compra": process["numero_compra"],
+                    "orgao_id": process["orgao_id"],
+                    "orgao_nome": process["orgao_nome"],
+                },
+                "items": set(),
+                "events": {},
+            },
+        )
+        group["items"].add(item["id"])
+        group["events"].update({event["id"]: event for event in own})
+    return sorted(
+        [
+            {
+                **group["processo"],
+                "itens": len(group["items"]),
+                "resultados": len(group["events"]),
+                **amounts(list(group["events"].values())),
+            }
+            for group in groups.values()
+        ],
+        key=lambda row: (row["orgao_nome"].casefold(), str(row["numero_compra"]), str(row["id"])),
+    )
+
+
 class ViewRepository:
     def __init__(self, session):
         self.session = session
@@ -523,6 +564,7 @@ class ViewRepository:
             {
                 **context,
                 "fornecedor": found,
+                "compras": supplier_purchases(rows, supplier_id),
                 "relacoes": relations,
                 "itens": self.page(related, filters),
             }

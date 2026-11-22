@@ -99,6 +99,11 @@ def test_name_and_signal_select_full_suppliers_before_pagination(monkeypatch):
     assert shared["requer_validacao"] is False
     assert len(shared["scores"]) == 1
     assert shared["scores"][0]["resultado_item_id"] == str(items[-1]["resultados"][-1]["id"])
+    paged = repository.supplier(params.model_copy(update={"tamanho_pagina": 1}), a)
+    assert paged["itens"]["total"] == 3
+    assert len(paged["itens"]["dados"]) == 1
+    assert len(paged["compras"]) == 3
+    assert sum(Decimal(p["valor_homologado"]) for p in paged["compras"]) == 3
 
 
 def test_supplier_api_filters_name_and_signals_and_keeps_detail_independent(query_client):
@@ -122,4 +127,47 @@ def test_supplier_api_filters_name_and_signals_and_keeps_detail_independent(quer
             "/api/v1/visao/fornecedores", params={**params, "sinalizacao": "invalido"}
         ).status_code
         == 422
+    )
+
+
+def test_supplier_purchases_group_by_purchase_not_organ_and_exclude_other_winners():
+    from licita_backend.repositories.visao import supplier_purchases
+
+    a, _, items = supplier_sample()
+    # Two items of the same purchase; a third purchase of the same organ stays separate.
+    items[1]["processo"] = dict(items[0]["processo"])
+    purchases = supplier_purchases(items, a)
+    assert len(purchases) == 2
+    assert sorted(p["valor_homologado"] for p in purchases) == [Decimal(1), Decimal(2)]
+    assert sum(p["valor_homologado"] for p in purchases) == Decimal(3)
+    assert sorted(p["itens"] for p in purchases) == [1, 2]
+    assert all("medida_if" not in p and "sinalizacao" not in p for p in purchases)
+    # A cancelled result does not enter the total.
+    items[0]["resultados"].append(
+        {
+            **items[0]["resultados"][0],
+            "id": uuid4(),
+            "cancelado": True,
+            "valor_total_homologado": Decimal(999),
+        }
+    )
+    assert sum(p["valor_homologado"] for p in supplier_purchases(items, a)) == Decimal(3)
+    items[0]["resultados"][0]["valor_total_homologado"] = None
+    incomplete = next(p for p in supplier_purchases(items, a) if p["itens"] == 2)
+    assert incomplete["valor_homologado"] is None
+    assert incomplete["soma_valores_conhecidos"] == 1
+    assert incomplete["resultados_sem_total"] == 1
+
+
+def test_supplier_api_includes_purchase_totals(query_client):
+    client, data = query_client
+    params = {"base_id": data["base"]}
+    listing = client.get("/api/v1/visao/fornecedores", params=params).json()
+    supplier = max(listing["dados"], key=lambda row: row["itens"])
+    detail = client.get(
+        "/api/v1/visao/fornecedores/" + supplier["id"], params={**params, "tamanho_pagina": 1}
+    ).json()
+    assert len(detail["compras"]) == supplier["compras_com_resultado"]
+    assert sum(Decimal(row["valor_homologado"]) for row in detail["compras"]) == Decimal(
+        supplier["valor_homologado"]
     )
