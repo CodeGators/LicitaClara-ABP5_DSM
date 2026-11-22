@@ -21,10 +21,9 @@ function Comparison({ item, result, score }) {
   const estimate = numeric(item.valor_unitario_estimado)
   const bars = [[`Mediana de itens parecidos${basis ? ` (R$/${basis})` : ''}`, median, 'var(--petroleo)'], ['Estimado para o item', estimate, 'var(--secundario)'], ['Homologado neste resultado', price, 'var(--alta)']]
   const max = Math.max(1, ...bars.map(([, value]) => value || 0)) * 1.1
-  return <section className="card detail-comparison"><h2>Preço pago e referência</h2><p className="sub">Preço por unidade, comparado com a mediana de itens parecidos.</p>
+  return <section className="card detail-comparison"><h2>Preço pago e referência</h2><p className="sub">Preço por unidade.</p>
     <p className="detail-unit-basis"><strong>Unidade da mediana: {basis || 'Não informada'}</strong><br />Unidade registrada no item: {item.unidade_medida || 'Não informada'}</p>
     <p className="detail-item-description">{item.descricao}</p><p className="hint">{item.catalogo || 'Catálogo não informado'} {item.codigo_catalogo} · {item.unidade_medida || 'Unidade não informada'} · Quantidade: {decimal(result?.quantidade_homologada ?? item.quantidade)}</p>
-    {comparison ? <p className="hint">{comparison.n_treino != null ? `${Number(comparison.n_treino).toLocaleString('pt-BR')} observações no treino` : 'Quantidade do treino não informada'}</p> : <p className="hint">Referência de treino indisponível para este resultado.</p>}
     <div className="detail-bars">{bars.map(([label, value, color]) => <div key={label}><div className="mini"><span>{label}</span><strong title={value == null ? undefined : `Valor original: ${exactDecimal(value)}`} style={{ color }}>{value == null ? 'Não informado' : money(value)}</strong></div>{value != null && <Progress pct={value} max={max} cor={color} />}</div>)}</div>
     <p className="hint">Confira especificações, embalagem e condições de entrega nos documentos antes de concluir qualquer coisa.</p>
     <details className="detail-result-data"><summary>Ver resultados e dados do item</summary><Results results={item.resultados} /><div className="stats"><Info label="Total homologado do item">{money(item.valor_homologado_item)}</Info><Info label="Quantidade do item">{decimal(item.quantidade)}</Info><Info label="Unidade">{item.unidade_medida || 'Não informada'}</Info></div></details>
