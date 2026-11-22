@@ -19,14 +19,13 @@ export default function SignalFilter({ value = [], onChange }) {
   }, [])
   const toggle = key => {
     const next = value.includes(key) ? value.filter(v => v !== key) : [...value, key]
-    onChange(next.length === options.length ? [] : next)
+    onChange(next)
   }
   const selected = options.find(([key]) => value.length === 1 && value[0] === key)
   return <fieldset className="field signal-filter"><legend>Sinalização do item</legend>
     <details ref={ref} onKeyDown={e => { if (e.key === 'Escape') { e.preventDefault(); ref.current.open = false; ref.current.querySelector('summary').focus() } }}>
-      <summary className="select">{selected ? <><span className={`signal-dot ${selected[2]}`} aria-hidden="true" />{selected[1]}</> : value.length ? `${value.length} opções selecionadas` : 'Todos os itens'}</summary>
+      <summary className="select">{selected ? <><span className={`signal-dot ${selected[2]}`} aria-hidden="true" />{selected[1]}</> : value.length ? `${value.length} opções selecionadas` : 'Todas as sinalizações'}</summary>
       <div className="signal-options">
-        <label><input type="checkbox" checked={!value.length} onChange={() => onChange([])} />Todos os itens</label>
         {options.map(([key, label, color]) => <label key={key}><input type="checkbox" checked={value.includes(key)} onChange={() => toggle(key)} /><span className={`signal-dot ${color}`} aria-hidden="true" />{label}</label>)}
       </div>
     </details>
