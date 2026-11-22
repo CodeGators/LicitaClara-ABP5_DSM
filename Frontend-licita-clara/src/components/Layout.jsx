@@ -83,7 +83,7 @@ export default function Layout() {
             <span>{parts[0] === 'ranking' && parts[1] ? 'Detalhe do item' : names[parts[0] || ''] || 'Licita Clara'}</span>
           </div>
           <div className="chips">
-            <span className={`demo${real ? '' : ' warn'}`}>{real ? 'Dados oficiais' : 'Demonstração'}<span className="hide-sm">{real ? (new URLSearchParams(search).get('execucao_id') && new URLSearchParams(search).get('execucao_id') !== 'nenhuma' ? ' · análise experimental' : ' · sem análise') : ' · dados simulados'}</span></span>
+            {!real && <span className="demo warn">Demonstração<span className="hide-sm"> · dados simulados</span></span>}
             <button className="help-btn" onClick={() => { setMenu(false); setAjuda(true) }} aria-label="Como funciona"><CircleHelp size={18} /><span className="hide-sm">Como funciona</span></button>
             <button className="help-btn" onClick={alternar} aria-label={tema === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'} title={tema === 'dark' ? 'Modo claro' : 'Modo escuro'}>
               {tema === 'dark' ? <Sun size={18} /> : <Moon size={18} />}<span className="hide-sm">{tema === 'dark' ? 'Claro' : 'Escuro'}</span>

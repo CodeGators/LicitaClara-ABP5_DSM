@@ -1,6 +1,5 @@
 // Presentation rule, not an IF cutoff or proof of a source error.
 export const PRICE_REVIEW_LABEL = 'Requer validação'
-export const PRICE_REVIEW_REASON = 'Possível erro de digitação ou cadastro. Confira preço, quantidade e unidade nos documentos. Não é confirmação de erro ou de sobrepreço.'
 
 export function requiresPriceReview(price, median, basis) {
   if (!basis) return false
