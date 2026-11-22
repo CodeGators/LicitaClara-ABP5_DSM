@@ -20,7 +20,7 @@ export function NoAnalysis() {
   const { search } = useLocation()
   const execution = new URLSearchParams(search).get('execucao_id')
   const selected = execution && execution !== 'nenhuma'
-  return <div className="note"><b>{selected ? 'Análise selecionada' : 'Sem análise selecionada'}</b>{selected ? 'Abra um item para ver o medida IF ou o motivo de ele não existir.' : 'Você está vendo só os dados importados. Escolha uma versão da análise no Painel ou em Itens sinalizados para ver os medidas IF.'} Sem medida IF não significa que a compra esteja regular.</div>
+  return <div className="note"><b>{selected ? 'Análise selecionada' : 'Sem análise selecionada'}</b>{selected ? 'Abra um item para ver a medida IF ou o motivo de ela não existir.' : 'Você está vendo só os dados importados. Escolha uma versão da análise no Painel ou em Itens sinalizados para ver as medidas IF.'} Sem medida IF não significa que a compra esteja regular.</div>
 }
 
 export function LookupFilter({ kind, title, value, onChange, baseId, compact = false }) {

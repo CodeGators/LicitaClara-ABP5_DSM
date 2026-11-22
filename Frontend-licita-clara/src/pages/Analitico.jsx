@@ -128,7 +128,7 @@ function SuppliersContent() {
     <AnalysisSelector />
     <div className="supplier-columns">
       <section className="card supplier-ranking">
-        <h2>Ranking de fornecedores</h2><p className="sub">Mostra o maior medida IF entre os resultados de cada fornecedor.</p>
+        <h2>Ranking de fornecedores</h2><p className="sub">Mostra a maior medida IF entre os resultados de cada fornecedor.</p>
         <Filters suppliers />
         <QueryState query={query} />
         {data && <>{data.dados.length ? <div className="table-scroll" role="region" aria-label="Ranking de fornecedores; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl tbl-stack"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Compras</th><th scope="col">Homologado</th><th scope="col">Maior medida IF</th></tr></thead><tbody>{data.dados.map(r => <tr key={r.id} className={r.id === selectedId ? 'sel' : ''}>

@@ -104,7 +104,7 @@ function Detail({ item }) {
         </div>
         <QueryState query={processQuery} loading="Consultando valores da compra…" />
         {controls}
-        <p className="hint">A medida IF pertence a este resultado do item. Não existe medida IF agregado da licitação.</p>
+        <p className="hint">A medida IF pertence a este resultado do item. Não existe medida IF agregada da licitação.</p>
       </div>
     </section>
     <Aviso />

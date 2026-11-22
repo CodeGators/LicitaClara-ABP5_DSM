@@ -489,3 +489,4 @@ input.input[type=search]{appearance:none}
 .price-review{margin:.6rem 0;white-space:normal;text-align:left}
 .price-review p{font-size:.875rem;line-height:1.6;margin:.5rem 0}
 .price-review .pill{white-space:normal}
+.validation-heading{color:var(--alta);font-weight:700}
