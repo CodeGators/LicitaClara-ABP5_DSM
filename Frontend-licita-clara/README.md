@@ -210,3 +210,12 @@ mesmo arredondamento visual e informa também preços unitários e medianas orig
 - **Pontos de quebra:** 1200 px (colunas empilham), 900 px (menu vira gaveta), 820 px (KPIs em 2 colunas) e 720 px (tabelas viram cartões com rótulos, via `tbl-stack` e `data-label`).
 - **Menos ruído:** o seletor de versão da análise é uma linha que abre em “Alterar”; filtros mostram só busca e ordenação, e o resto fica em “Mais filtros”; o aviso de limitações é uma linha com “Ver limitações”.
 - **Pop-up “Como funciona”:** três passos com atalhos, aviso de que anomalia não é prova, glossário e créditos. Textos em `src/data.js` (`passos`, `glossario`).
+
+
+Na expansão de um produto, cada compra tem sua própria sinalização. Os chips de
+anomalia usam as faixas IF existentes (abaixo de 0,50; de 0,50 a menos de 0,70;
+de 0,70 a 1). A cor do produto segue a faixa com mais ocorrências, com desempate
+pela maior anomalia. Compras que requerem validação e compras sem análise não
+votam; sem votos, a linha fica neutra. Os filtros das três faixas usam essa
+predominância. Os filtros de validação e ausência de análise encontram produtos
+com qualquer compra nessas condições, sem esconder as outras compras do grupo.

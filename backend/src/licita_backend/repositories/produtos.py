@@ -2,7 +2,7 @@
 
 import json
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 from decimal import Decimal, localcontext
 from hashlib import sha256
 
@@ -10,6 +10,8 @@ from licita_backend.repositories.visao import ViewRepository, amounts, wire
 
 
 def product_signal(product):
+    if "sinalizacao_predominante" in product:
+        return product["sinalizacao_predominante"]
     if product["requer_validacao"]:
         return "requer_validacao"
     measure = product["medida_if"]
@@ -107,6 +109,17 @@ def group_products(items):
                         ),
                     }
                 )
+                references[-1]["sinalizacao"] = product_signal(
+                    {
+                        "requer_validacao": references[-1]["requer_validacao"],
+                        "medida_if": measure,
+                    }
+                )
+        priority = ["menor_anomalia", "anomalia_intermediaria", "maior_anomalia"]
+        counts = Counter(reference["sinalizacao"] for reference in references)
+        predominant = max(priority, key=lambda signal: (counts[signal], priority.index(signal)))
+        if not counts[predominant]:
+            predominant = "requer_validacao" if review else "sem_analise"
         analyzed = sum(r["status_analise"] == "analisados" for r in members)
         status = (
             "analisados"
@@ -129,6 +142,7 @@ def group_products(items):
                 "registros_sem_preco": len(events) - len(prices),
                 "requer_validacao": review,
                 "status_analise": status,
+                "sinalizacao_predominante": predominant,
                 "medida_if": max(
                     (r["medida_if"] for r in members if r["medida_if"] is not None), default=None
                 ),
@@ -199,7 +213,16 @@ class ProductRepository(ViewRepository):
             row["sinalizacao"] = product_signal(row)
         if filters.sinalizacao:
             selected = set(filters.sinalizacao)
-            rows = [r for r in rows if r["sinalizacao"] in selected]
+            rows = [
+                r
+                for r in rows
+                if r["sinalizacao"] in selected
+                or ("requer_validacao" in selected and r["requer_validacao"])
+                or (
+                    "sem_analise" in selected
+                    and any(not entry["analise_disponivel"] for entry in r["itens"])
+                )
+            ]
         return wire(
             {
                 **context,

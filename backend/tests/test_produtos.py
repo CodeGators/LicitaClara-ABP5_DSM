@@ -165,9 +165,14 @@ def test_multi_signal_filter_is_union_before_pagination_and_keeps_full_group_pri
     )
     first = repository.listing(filters)
     second = repository.listing(filters.model_copy(update={"pagina": 2}))
-    assert first["total"] == second["total"] == 2
-    assert first["total_paginas"] == 2
-    assert {first["dados"][0]["sinalizacao"], second["dados"][0]["sinalizacao"]} == {
+    assert first["total"] == second["total"] == 3
+    assert first["total_paginas"] == 3
+    third = repository.listing(filters.model_copy(update={"pagina": 3}))
+    assert {
+        first["dados"][0]["sinalizacao"],
+        second["dados"][0]["sinalizacao"],
+        third["dados"][0]["sinalizacao"],
+    } == {
         "menor_anomalia",
         "maior_anomalia",
     }
@@ -227,3 +232,27 @@ def test_purchase_flags_belong_to_each_occurrence_not_the_whole_product():
         False,
         True,
     ]
+
+
+def test_product_background_uses_majority_of_comparable_anomaly_chips():
+    from licita_backend.repositories.produtos import product_signal
+
+    rows = [item("1") for _ in range(7)]
+    for row, measure in zip(rows, ["0.40", "0.49", "0.50", "0.80", "0.99", None, "0.90"]):
+        row["medida_if"] = Decimal(measure) if measure else None
+    rows[-1]["resultados"][0]["valor_unitario_homologado"] = Decimal("100")
+    group = group_products(rows)[0]
+    # Two green, one yellow, two red: tie resolves to red. Extreme and missing do not vote.
+    assert product_signal(group) == "maior_anomalia"
+    entries = {entry["id"]: entry for entry in group["itens"]}
+    assert entries[rows[-1]["id"]]["sinalizacao"] == "requer_validacao"
+    assert entries[rows[-2]["id"]]["sinalizacao"] == "sem_analise"
+    rows[4]["medida_if"] = Decimal("0.4")
+    assert product_signal(group_products(rows)[0]) == "menor_anomalia"
+    rows[0]["medida_if"] = rows[1]["medida_if"] = rows[4]["medida_if"] = Decimal("0.6")
+    assert product_signal(group_products(rows)[0]) == "anomalia_intermediaria"
+    for row in rows:
+        row["medida_if"] = None
+    assert product_signal(group_products(rows)[0]) == "requer_validacao"
+    rows[-1]["resultados"][0]["valor_unitario_homologado"] = Decimal("1")
+    assert product_signal(group_products(rows)[0]) == "sem_analise"

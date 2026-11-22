@@ -50,7 +50,7 @@ async function mockView(page, overrides = {}) {
           preco_maximo: r.resultados[0]?.valor_unitario_homologado ?? null,
           mediana: state.extremePrice ? '0.01' : r.resultados[0]?.valor_unitario_homologado ?? null,
           quantidade_registros: r.resultados.length, requer_validacao: review, medida_if: r.medida_if,
-          sinalizacao: signal, itens: [{ id: r.id, numero_item: r.numero_item, numero_compra: r.processo.numero_compra, requer_validacao: review, analise_disponivel: r.medida_if != null }],
+          sinalizacao: signal, itens: [{ id: r.id, numero_item: r.numero_item, numero_compra: r.processo.numero_compra, requer_validacao: review, analise_disponivel: r.medida_if != null, sinalizacao: signal }],
         }
       }).filter(r => !selected.length || selected.includes(r.sinalizacao))
       return done({ ...context, ...pageOf(products) })
@@ -693,4 +693,25 @@ test('chips da lista expandida identificam somente a compra que requer validaç�
   await expect(purchases.nth(2).getByText('Sem análise disponível', { exact: true })).toBeVisible()
   await expect(purchases.nth(2).getByText('Requer validação', { exact: true })).toHaveCount(0)
   await expect(purchases.nth(0).getByRole('link')).toHaveAttribute('href', new RegExp(`/ranking/${ITEM}`))
+})
+
+
+test('compras mostram níveis e fundo segue sinalização predominante mesmo com preço que requer validação', async ({ page }) => {
+  await mockView(page)
+  await page.route('**/api/v1/visao/produtos?*', route => route.fulfill({ json: {
+    dados: [{ id: 'grupo', descricao: 'Produto com várias compras', catalogo: 'CATMAT', codigo_catalogo: '123', unidade_medida: 'UN', preco_minimo: '1', preco_maximo: '100', mediana: '1', quantidade_registros: 6, requer_validacao: true, sinalizacao: 'menor_anomalia', sinalizacao_predominante: 'menor_anomalia', itens: [
+      ...['menor_anomalia', 'menor_anomalia', 'anomalia_intermediaria', 'maior_anomalia'].map((signal, i) => ({ id: `item-${i}`, numero_compra: String(i), numero_item: '1', requer_validacao: false, analise_disponivel: true, sinalizacao: signal })),
+      { id: 'extremo', numero_compra: '5', numero_item: '1', requer_validacao: true, analise_disponivel: true, sinalizacao: 'requer_validacao' },
+      { id: 'ausente', numero_compra: '6', numero_item: '1', requer_validacao: false, analise_disponivel: false, sinalizacao: 'sem_analise' },
+    ] }], total: 1, pagina: 1, tamanho_pagina: 20, total_paginas: 1,
+  } }))
+  await page.goto('/ranking')
+  await page.locator('.product-purchases summary').click()
+  await expect(page.locator('tbody tr')).toHaveAttribute('data-if-band', 'green')
+  for (const [label, count] of [['Menor anomalia', 2], ['Anomalia intermediária', 1], ['Maior anomalia', 1], ['Requer validação', 1], ['Sem análise disponível', 1]]) {
+    await expect(page.locator('.product-purchases .pill').filter({ hasText: label })).toHaveCount(count)
+  }
+  await page.setViewportSize({ width: 390, height: 844 })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()).violations).toEqual([])
 })
