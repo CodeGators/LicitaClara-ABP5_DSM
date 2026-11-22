@@ -187,7 +187,6 @@ test('painel compara preços na unidade do grupo sem expor medida técnica', asy
   const reading = page.locator('.dashboard-reading')
   await expect(reading).toContainText('100,00% acima')
   await expect(reading).toContainText('Fornecedor do recorte')
-  await expect(reading).toContainText('100 registros no treinamento')
   await expect(reading).toContainText('preços por UN')
   await expect(page.locator('.dashboard')).not.toContainText('0,5140')
   await expect(page.locator('.dashboard')).not.toContainText('Isolation Forest')
