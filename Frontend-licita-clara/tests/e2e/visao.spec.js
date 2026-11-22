@@ -50,7 +50,7 @@ async function mockView(page, overrides = {}) {
           preco_maximo: r.resultados[0]?.valor_unitario_homologado ?? null,
           mediana: state.extremePrice ? '0.01' : r.resultados[0]?.valor_unitario_homologado ?? null,
           quantidade_registros: r.resultados.length, requer_validacao: review, medida_if: r.medida_if,
-          sinalizacao: signal, itens: [{ id: r.id, numero_item: r.numero_item, numero_compra: r.processo.numero_compra }],
+          sinalizacao: signal, itens: [{ id: r.id, numero_item: r.numero_item, numero_compra: r.processo.numero_compra, requer_validacao: review, analise_disponivel: r.medida_if != null }],
         }
       }).filter(r => !selected.length || selected.includes(r.sinalizacao))
       return done({ ...context, ...pageOf(products) })
@@ -430,7 +430,7 @@ test('paginação dos itens do fornecedor mantém retorno à página da lista', 
  test('produto agrupa compras e mantém acesso às análises de cada ocorrência', async ({ page }) => {
   await mockView(page)
   await page.route('**/api/v1/visao/produtos?*', route => route.fulfill({ json: {
-    dados: [{ id: 'agua-copo', descricao: 'Água mineral sem gás', catalogo: 'CATMAT', codigo_catalogo: '445484', unidade_medida: 'Copo 200 ML', preco_minimo: '0.60', preco_maximo: '30185.20', mediana: '0.80', quantidade_registros: 4, requer_validacao: true, itens: [{ id: ITEM, numero_item: '1', numero_compra: '5' }, { id: 'outra-compra', numero_item: '2', numero_compra: '10' }] }],
+    dados: [{ id: 'agua-copo', descricao: 'Água mineral sem gás', catalogo: 'CATMAT', codigo_catalogo: '445484', unidade_medida: 'Copo 200 ML', preco_minimo: '0.60', preco_maximo: '30185.20', mediana: '0.80', quantidade_registros: 4, requer_validacao: true, itens: [{ id: ITEM, numero_item: '1', numero_compra: '5', requer_validacao: true, analise_disponivel: true }, { id: 'outra-compra', numero_item: '2', numero_compra: '10', requer_validacao: false, analise_disponivel: false }] }],
     total: 1, pagina: 1, tamanho_pagina: 20, total_paginas: 1,
   } }))
   await page.goto('/ranking')
@@ -438,8 +438,8 @@ test('paginação dos itens do fornecedor mantém retorno à página da lista', 
   await expect(page.getByRole('cell', { name: 'R$ 0,60', exact: true })).toBeVisible()
   await expect(page.getByRole('cell', { name: 'R$ 30.185,20', exact: true })).toBeVisible()
   await expect(page.getByRole('cell', { name: 'R$ 0,80', exact: true })).toBeVisible()
-  await expect(page.locator('tbody')).toContainText('Requer validação')
   await page.locator('.product-purchases summary').click()
+  await expect(page.locator('tbody')).toContainText('Requer validação')
   await expect(page.getByRole('link', { name: 'Compra 5 · item 1', exact: true })).toHaveAttribute('href', new RegExp(`/ranking/${ITEM}`))
   await expect(page.getByRole('link', { name: 'Compra 10 · item 2', exact: true })).toBeVisible()
 })
@@ -673,4 +673,24 @@ test('compra e endereço antigo abrem detalhe único e retornam aos itens sinali
   await expect(page).toHaveURL(new RegExp(`/ranking/${ITEM}\\?`))
   await page.getByRole('link', { name: 'Voltar à consulta' }).click()
   await expect(page.getByRole('heading', { name: 'Itens Sinalizados', exact: true })).toBeVisible()
+})
+
+
+test('chips da lista expandida identificam somente a compra que requer validação ou não tem análise', async ({ page }) => {
+  await mockView(page)
+  await page.route('**/api/v1/visao/produtos?*', route => route.fulfill({ json: {
+    dados: [{ id: 'agua', descricao: 'Água mineral', catalogo: 'CATMAT', codigo_catalogo: '445484', unidade_medida: 'Copo 200 ML', preco_minimo: '0.70', preco_maximo: '30185.20', mediana: '0.79', quantidade_registros: 3, requer_validacao: true, itens: [
+      { id: ITEM, numero_compra: '5', numero_item: '1', requer_validacao: true, analise_disponivel: true },
+      { id: 'regular', numero_compra: '221', numero_item: '3', requer_validacao: false, analise_disponivel: true },
+      { id: 'sem-analise', numero_compra: '26', numero_item: '1', requer_validacao: false, analise_disponivel: false },
+    ] }], total: 1, pagina: 1, tamanho_pagina: 20, total_paginas: 1,
+  } }))
+  await page.goto('/ranking')
+  await page.locator('.product-purchases summary').click()
+  const purchases = page.locator('.product-purchases li')
+  await expect(purchases.nth(0).getByText('Requer validação', { exact: true })).toBeVisible()
+  await expect(purchases.nth(1).locator('.pill')).toHaveCount(0)
+  await expect(purchases.nth(2).getByText('Sem análise disponível', { exact: true })).toBeVisible()
+  await expect(purchases.nth(2).getByText('Requer validação', { exact: true })).toHaveCount(0)
+  await expect(purchases.nth(0).getByRole('link')).toHaveAttribute('href', new RegExp(`/ranking/${ITEM}`))
 })

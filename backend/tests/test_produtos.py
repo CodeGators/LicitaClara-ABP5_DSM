@@ -202,3 +202,28 @@ def test_review_marks_only_the_occurrence_with_extreme_price():
 
     regular_a, regular_b, extreme = item("1"), item("1"), item("10")
     assert price_review_item_ids([regular_a, regular_b, extreme]) == {extreme["id"]}
+
+
+def test_purchase_flags_belong_to_each_occurrence_not_the_whole_product():
+    rows = [item(price) for price in ["0.70", "0.79", "0.80", "30185.20"]]
+    rows[0]["medida_if"] = Decimal("0.40")
+    rows[0]["status_analise"] = "analisados"
+    rows[-1]["medida_if"] = Decimal("0.84")
+    rows[-1]["status_analise"] = "analisados"
+    # Cancelled expensive results must not flag an otherwise regular occurrence.
+    rows[0]["resultados"].append({**rows[-1]["resultados"][0], "id": uuid4(), "cancelado": True})
+    group = group_products(rows)[0]
+    references = {entry["id"]: entry for entry in group["itens"]}
+    assert group["requer_validacao"] is True
+    assert [references[row["id"]]["requer_validacao"] for row in rows] == [
+        False,
+        False,
+        False,
+        True,
+    ]
+    assert [references[row["id"]]["analise_disponivel"] for row in rows] == [
+        True,
+        False,
+        False,
+        True,
+    ]

@@ -1,7 +1,11 @@
 import { ifBand, ifBandLabels } from '../ifBands.mjs'
 import { Link, useLocation } from 'react-router-dom'
 import { money, selectionLink } from '../api.mjs'
-import PriceReview from './PriceReview.jsx'
+
+const PurchaseChips = ({ item }) => <>
+  {item.requer_validacao && <span className="pill media purchase-chip">Requer validação</span>}
+  {item.analise_disponivel === false && <span className="pill rev purchase-chip">Sem análise disponível</span>}
+</>
 
 const price = value => value == null ? 'Indisponível' : money(value)
 
@@ -15,10 +19,10 @@ export default function ItemPriceTable({ rows, params }) {
     </tr></thead><tbody>{rows.map(product => {
       const band = ifBand(product)
       return <tr key={product.id} className={band ? `if-band-${band}` : undefined} data-if-band={band || undefined} title={ifBandLabels[band]}>
-      <td>{band && <span className="sr-only">{ifBandLabels[band]}. </span>}{product.itens.length === 1 ? <Link className="link-a" to={itemLink(product.itens[0])} state={origin}>{product.descricao}</Link> : <details className="product-purchases"><summary>{product.descricao}</summary><ul>{product.itens.map(item => <li key={item.id}><Link className="link-a" to={itemLink(item)} state={origin}>Compra {item.numero_compra} · item {item.numero_item}</Link></li>)}</ul></details>}
+      <td>{band && <span className="sr-only">{ifBandLabels[band]}. </span>}{product.itens.length === 1 ? <Link className="link-a" to={itemLink(product.itens[0])} state={origin}>{product.descricao}</Link> : <details className="product-purchases"><summary>{product.descricao}</summary><ul>{product.itens.map(item => <li key={item.id}><Link className="link-a" to={itemLink(item)} state={origin}>Compra {item.numero_compra} · item {item.numero_item}</Link><PurchaseChips item={item} /></li>)}</ul></details>}
         <small>{product.catalogo} {product.codigo_catalogo} · {product.unidade_medida || 'Unidade não informada'}</small>
         <small>{product.quantidade_registros} {product.quantidade_registros === 1 ? 'registro com preço' : 'registros com preço'}</small>
-        {product.requer_validacao && <PriceReview />}
+        {product.itens.length === 1 && <><PurchaseChips item={product.itens[0]} /></>}
       </td>
       <td className="numeric" data-label="Menor valor unitário">{price(product.preco_minimo)}</td>
       <td className="numeric" data-label="Maior valor unitário">{price(product.preco_maximo)}</td>

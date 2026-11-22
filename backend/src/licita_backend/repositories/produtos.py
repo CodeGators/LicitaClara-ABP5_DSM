@@ -82,6 +82,31 @@ def group_products(items):
             n = len(prices)
             median = ((prices[(n - 1) // 2] + prices[n // 2]) / 2) if n else None
             review = bool(median is not None and median > 0 and prices[-1] > 6 * median)
+            references = []
+            for member in members:
+                measure = member["medida_if"]
+                references.append(
+                    {
+                        "id": member["id"],
+                        "numero_item": member["numero_item"],
+                        "numero_compra": member["processo"]["numero_compra"],
+                        "requer_validacao": bool(
+                            median is not None
+                            and median > 0
+                            and any(
+                                not event["cancelado"]
+                                and event["valor_unitario_homologado"] is not None
+                                and event["valor_unitario_homologado"] > 6 * median
+                                for event in member["resultados"]
+                            )
+                        ),
+                        "analise_disponivel": bool(
+                            measure is not None
+                            and measure.is_finite()
+                            and Decimal(0) <= measure <= Decimal(1)
+                        ),
+                    }
+                )
         analyzed = sum(r["status_analise"] == "analisados" for r in members)
         status = (
             "analisados"
@@ -108,14 +133,7 @@ def group_products(items):
                     (r["medida_if"] for r in members if r["medida_if"] is not None), default=None
                 ),
                 **amounts(list(events.values())),
-                "itens": [
-                    {
-                        "id": r["id"],
-                        "numero_item": r["numero_item"],
-                        "numero_compra": r["processo"]["numero_compra"],
-                    }
-                    for r in members
-                ],
+                "itens": references,
             }
         )
     return output
