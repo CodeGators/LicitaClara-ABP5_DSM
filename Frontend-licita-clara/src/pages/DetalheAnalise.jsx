@@ -83,17 +83,10 @@ function Detail({ item }) {
   const ratio = median > 0 && price != null ? price / median : null
   const difference = ratio == null ? null : (ratio - 1) * 100
   const fmt = v => v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  const idx = activeScore ? Math.max(0, Math.min(1, Number(activeScore.medida_if) || 0)) : null
   return <div className="analysis-detail">
     <Link className="link-a back-link" to={back}><ArrowLeft size={16} />Voltar à consulta</Link>
     <Head title={`Compra ${process.numero_compra} · Item ${item.numero_item}`} sub={`${item.descricao} · ${process.orgao_nome}`} action={<Link className="btn primary" to={reportLink(process.id, location.search)}><FilePlus2 size={16} />Incluir no relatório</Link>} />
     <section className="card detail-hero" aria-label="Resumo do item">
-      <div className="detail-score">
-        <span className="pill">Medida IF do item</span>
-        <div className="detail-score-number">{activeScore ? ifMeasure(activeScore.medida_if) : '—'}</div>
-        {idx != null && <><div className="score-ruler" aria-hidden="true"><i style={{ width: `${idx * 100}%` }} /><b style={{ left: `${idx * 100}%` }} /></div><div className="score-scale" aria-hidden="true"><span>0</span><span>1</span></div></>}
-        <p className="hint">{activeScore ? algorithm(activeScore.algoritmo) : 'Sem medida IF disponível'}{!invalidModel && scores.filter(s => s !== activeScore).length > 0 && ` · ${scores.filter(s => s !== activeScore).map(s => `${algorithm(s.algoritmo)}: ${ifMeasure(s.medida_if)}`).join(' · ')}`}</p>
-      </div>
       <div className="detail-body">
         <div>{requiresPriceReview(result?.valor_unitario_homologado, comparison?.mediana, comparison?.unidade_preco?.unidade_preco) && <PriceReview />}</div>
         <p className="detail-headline">{ratio != null ? <>O preço unitário homologado foi <span className="pill ana">{difference === 0 ? 'igual à mediana' : `${fmt(Math.abs(difference))}% ${difference > 0 ? 'acima' : 'abaixo'} da mediana`}</span> de itens parecidos ({money(median)}).</> : 'Não há referência de preço suficiente para comparar este resultado.'}</p>

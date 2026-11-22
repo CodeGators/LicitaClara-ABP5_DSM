@@ -307,7 +307,7 @@ input.input[type=search]{appearance:none}
 
 /* Detalhe do item */
 .analysis-detail{display:grid;gap:var(--gap)}
-.card.detail-hero{display:grid;grid-template-columns:minmax(14rem,19rem) minmax(0,1fr);gap:0;padding:0;overflow:hidden}
+.card.detail-hero{display:grid;grid-template-columns:minmax(0,1fr);gap:0;padding:0;overflow:hidden}
 .detail-score{background:var(--azul);color:#fff;padding:1.5rem;display:flex;flex-direction:column;gap:.5rem}
 .detail-score .pill{align-self:flex-start;background:rgba(255,255,255,.12);color:#fff}
 .detail-score-number{font-size:clamp(3rem,5vw,4rem);font-weight:650;letter-spacing:-.04em;line-height:1;margin:.5rem 0 .25rem;font-variant-numeric:tabular-nums}
