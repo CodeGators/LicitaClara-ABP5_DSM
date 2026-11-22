@@ -490,3 +490,4 @@ input.input[type=search]{appearance:none}
 .price-review p{font-size:.875rem;line-height:1.6;margin:.5rem 0}
 .price-review .pill{white-space:normal}
 .validation-heading{color:var(--alta);font-weight:700}
+.item-price-result + .item-price-result{border-top:1px solid var(--divisoria);margin-top:.7rem;padding-top:.7rem}

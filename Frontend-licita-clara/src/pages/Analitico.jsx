@@ -1,3 +1,4 @@
+import ItemPriceTable from '../components/ItemPriceTable.jsx'
 import PriceReview from '../components/PriceReview.jsx'
 import { itemRequiresPriceReview } from '../priceValidation.mjs'
 import { useEffect, useState } from 'react'
@@ -78,7 +79,7 @@ function DashboardContent() {
 function RankingContent() {
   const { query, params, changePage } = useView('/visao/ranking')
   const data = query.data
-  return <Shell title="Itens Sinalizados"><QueryState query={query} />{data && <><section className="card"><h2>{data.total} item(ns) no ranking</h2><p className="sub">Quem tem medida IF aparece primeiro; quem não tem fica no fim, sem receber zero. Não é uma fila de risco validada.</p>{data.dados.length ? <ItemRows rows={data.dados} params={params} /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section></>}</Shell>
+  return <Shell title="Itens Sinalizados"><QueryState query={query} />{data && <><section className="card"><h2>{data.total} item(ns) no ranking</h2><p className="sub">Quem tem medida IF aparece primeiro; quem não tem fica no fim, sem receber zero. Não é uma fila de risco validada.</p>{data.dados.length ? <ItemPriceTable rows={data.dados} params={params} /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section></>}</Shell>
 }
 
 function SuppliersContent() {
