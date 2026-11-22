@@ -1,3 +1,4 @@
+import { Search } from 'lucide-react'
 import { ifBand, ifBandLabels } from '../ifBands.mjs'
 import { Link, useLocation } from 'react-router-dom'
 import { money, selectionLink } from '../api.mjs'
@@ -11,7 +12,7 @@ export default function ItemPriceTable({ rows, params }) {
   const origin = { from: location.pathname + location.search }
   return <div className="table-scroll" role="region" aria-label="Preços por produto e unidade na base atual; use as setas para rolar na horizontal" tabIndex={0}>
     <table className="tbl tbl-stack product-table"><thead><tr>
-      <th scope="col">Item</th><th scope="col">Menor valor unitário</th><th scope="col">Maior valor unitário</th><th scope="col">Mediana da base atual</th>
+      <th scope="col">Item</th><th scope="col">Menor valor unitário</th><th scope="col">Maior valor unitário</th><th scope="col">Mediana da base atual</th><th scope="col"><span className="sr-only">Detalhes</span></th>
     </tr></thead><tbody>{rows.map(product => {
       const band = ifBand(product)
       return <tr key={product.id} className={band ? `if-band-${band}` : undefined} data-if-band={band || undefined} title={ifBandLabels[band]}>
@@ -23,6 +24,11 @@ export default function ItemPriceTable({ rows, params }) {
       <td className="numeric" data-label="Menor valor unitário">{price(product.preco_minimo)}</td>
       <td className="numeric" data-label="Maior valor unitário">{price(product.preco_maximo)}</td>
       <td className="numeric" data-label="Mediana da base atual">{price(product.mediana)}</td>
+      <td>{product.itens.length === 1 ? <Link className="dashboard-analysis-link" title="Ver detalhe do item" aria-label={`Ver detalhe de ${product.descricao}`} to={itemLink(product.itens[0])} state={origin}><Search size={17} aria-hidden="true" /></Link> : <button type="button" className="dashboard-analysis-link" title="Escolher compra para ver detalhe do item" aria-label={`Ver detalhes de ${product.descricao}`} onClick={event => {
+        const details = event.currentTarget.closest('tr').querySelector('.product-purchases')
+        details.open = !details.open
+        if (details.open) details.querySelector('a')?.focus()
+      }}><Search size={17} aria-hidden="true" /></button>}</td>
     </tr>})}</tbody></table>
   </div>
 }
