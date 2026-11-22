@@ -14,6 +14,7 @@ import PainelGeral from './PainelGeral.jsx'
 import ItemFilters from '../components/ItemFilters.jsx'
 
 export const indexText = value => value == null ? 'Indisponível' : ifMeasure(value)
+const productFields = ['busca', 'analise', 'ordenacao', 'tamanho_pagina']
 const read = params => Object.fromEntries(viewFields.map(key => [key, params.get(key) || (key === 'analise' ? 'todos' : key === 'ordenacao' ? 'indice_desc' : key === 'tamanho_pagina' ? '20' : '')]))
 
 export function Filters({ purchases = false, suppliers = false, products = false }) {
@@ -21,13 +22,22 @@ export function Filters({ purchases = false, suppliers = false, products = false
   const { baseId } = useBase()
   const [draft, setDraft] = useState(() => read(params))
   useEffect(() => setDraft(read(params)), [params])
+  useEffect(() => {
+    if (!products || !viewFields.some(key => !productFields.includes(key) && params.has(key))) return
+    setParams(previous => {
+      const next = new URLSearchParams(previous)
+      for (const key of viewFields) if (!productFields.includes(key)) next.delete(key)
+      next.delete('pagina')
+      return next
+    }, { replace: true })
+  }, [products, params, setParams])
   const change = (key, value) => setDraft(previous => ({ ...previous, [key]: value }))
   const apply = event => {
     event.preventDefault()
     setParams(previous => {
       const next = new URLSearchParams(previous)
       for (const key of [...viewFields, 'pagina', 'pagina_itens']) next.delete(key)
-      for (const key of viewFields) if (draft[key]) next.set(key, draft[key])
+      for (const key of products ? productFields : viewFields) if (draft[key]) next.set(key, draft[key])
       return next
     })
   }
@@ -43,7 +53,8 @@ export function Filters({ purchases = false, suppliers = false, products = false
 export function useView(path) {
   const { baseId } = useBase()
   const s = useAnalysis()
-  const filters = read(s.params)
+  const allFilters = read(s.params)
+  const filters = path === '/visao/produtos' ? Object.fromEntries(productFields.map(key => [key, allFilters[key]])) : allFilters
   const query = useApi(path, { base_id: baseId, execucao_id: s.executionId, modelo_id: s.modelId, ...filters, pagina: s.params.get('pagina') || '1' }, !!s.ready)
   const changePage = page => s.setParams(previous => { const next = new URLSearchParams(previous); next.set('pagina', String(page)); return next })
   return { query, params: s.params, changePage }

@@ -13,7 +13,7 @@ export default function ItemFilters({ draft, change, apply, clear, baseId, param
       <Field label={products ? 'Buscar item ou código de catálogo' : purchases ? 'Buscar licitação, item ou fornecedor' : 'Buscar item, compra ou fornecedor'}><input className="input" type="search" placeholder={products ? 'Digite o nome do item ou o código de catálogo' : purchases ? 'Número, objeto, item ou fornecedor' : 'Digite o nome do item, compra ou fornecedor'} maxLength={200} value={draft.busca} onChange={e => change('busca', e.target.value)} /></Field>
       {!official && <Field label="Estado da análise"><select className="select" value={draft.analise} onChange={e => change('analise', e.target.value)}><option value="todos">{purchases ? 'Todas as licitações' : 'Todos os itens'}</option><option value="analisados">{purchases ? 'Todos os itens importados com análise completa' : 'Com análise completa'}</option><option value="parcial">{purchases ? 'Parte dos itens/resultados com análise' : 'Com análise parcial'}</option><option value="nao_analisados">Sem análise</option></select></Field>}
       <Field label="Ordenação"><select className="select" value={draft.ordenacao} onChange={e => change('ordenacao', e.target.value)}>{orders.map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></Field>
-    </>} advanced={<>
+    </>} advanced={products ? undefined : <>
 <p className="hint">Preencha só o que precisar. Para achar um órgão ou fornecedor, digite parte do nome e escolha na lista.</p>
         <div className="item-filters-lookups">
           <LookupFilter key={`orgao-${lookupReset}`} compact kind="/orgaos" title="Órgão" baseId={baseId} value={draft.orgao_id} onChange={v => change('orgao_id', v)} />
