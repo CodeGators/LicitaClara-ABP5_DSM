@@ -25,7 +25,6 @@ export default function Processo() {
       <Info label="Publicação">{date(process.data_publicacao)}</Info><Info label="Estimado global da compra">{money(process.valor_estimado_processo)}</Info><Info label="Homologado global da compra">{money(process.valor_homologado_processo)}</Info>
       <Info label="Homologado dos itens do recorte">{money(process.valor_homologado_itens_recorte)}</Info><Info label="Situação na origem">{process.situacao}</Info><Info label="Itens no recorte">{process.quantidade_itens_recorte}</Info>
     </div>
-    <p className="note">O recorte pode ter só parte da compra. O valor global e o total dos itens do recorte são medidas diferentes: não some um com o outro.</p>
     <SinteseProcesso processId={id} />
     <section className="card"><h2>Itens deste processo</h2><QueryState query={items} loading="Carregando itens do processo…" />
       {items.data && <>{items.data.dados.length ? <ul className="document-list">{items.data.dados.map(item => <li key={item.id}><Link className="link-a" to={selectionLink(`/itens/${item.id}`, location.search)}>Item {item.numero_item} · {item.descricao}</Link></li>)}</ul> : <p className="sub">Nenhum item conhecido neste recorte.</p>}<Pager meta={items.data.meta} onChange={setPage} /></>}
