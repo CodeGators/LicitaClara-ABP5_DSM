@@ -1,33 +1,15 @@
 import SignalFilter from './SignalFilter.jsx'
-import { useState } from 'react'
-import { Field, LookupFilter } from './consultas.jsx'
+import { Field } from './consultas.jsx'
 import FilterPanel from './FilterPanel.jsx'
 
-const advancedKeys = ['orgao_id', 'fornecedor_id', 'modalidade_id', 'homologacao_inicio', 'homologacao_fim', 'valor_minimo', 'valor_maximo']
-
-export default function ItemFilters({ draft, change, apply, clear, baseId, params, purchases = false, official = false, suppliers = false, products = false, children }) {
-  const simple = products || purchases || suppliers
-  const [lookupReset, setLookupReset] = useState(0)
-  const count = [...advancedKeys, 'processo_id'].filter(key => params.get(key)).length
-  const orders = products ? [['indice_desc', 'Maior preço unitário primeiro'], ['descricao_asc', 'Nome do item'], ['valor_desc', 'Maior mediana primeiro']] : official ? [['publicacao_desc', 'Publicação mais recente'], ['publicacao_asc', 'Publicação mais antiga'], ['valor_desc', 'Maior total do item'], ['valor_asc', 'Menor total do item'], ['descricao_asc', 'Descrição do item']] : [['indice_desc', purchases || suppliers ? 'Maior anomalia primeiro' : 'Maior medida IF primeiro'], ['descricao_asc', purchases ? 'Objeto da licitação' : suppliers ? 'Nome do fornecedor' : 'Nome do item'], ['valor_desc', 'Maior valor homologado']]
-  return <FilterPanel title={purchases ? 'Filtrar licitações' : suppliers ? 'Filtrar fornecedores' : 'Filtrar itens'} ariaLabel={official ? 'Filtros dos itens' : 'Filtros do recorte'} apply={apply} clear={() => { setLookupReset(n => n + 1); clear() }} appliedCount={count} primary={<>
-
-      <Field label={products ? 'Buscar item ou código de catálogo' : purchases ? 'Buscar licitação' : suppliers ? 'Buscar fornecedor' : 'Buscar item, compra ou fornecedor'}><input className="input" type="search" placeholder={products ? 'Digite o nome do item ou o código de catálogo' : purchases ? 'Número ou descrição da licitação' : suppliers ? 'Digite o nome do fornecedor' : 'Digite o nome do item, compra ou fornecedor'} maxLength={200} value={draft.busca} onChange={e => change('busca', e.target.value)} /></Field>
-      {simple ? <SignalFilter label={purchases ? 'Sinalização da licitação' : suppliers ? 'Sinalização do fornecedor' : 'Sinalização do item'} value={draft.sinalizacao} onChange={value => change('sinalizacao', value)} /> : !official && <Field label="Estado da análise"><select className="select" value={draft.analise} onChange={e => change('analise', e.target.value)}><option value="todos">{purchases ? 'Todas as licitações' : 'Todos os itens'}</option><option value="analisados">{purchases ? 'Todos os itens importados com análise completa' : 'Com análise completa'}</option><option value="parcial">{purchases ? 'Parte dos itens/resultados com análise' : 'Com análise parcial'}</option><option value="nao_analisados">Sem análise</option></select></Field>}
-      <Field label="Ordenação"><select className="select" value={draft.ordenacao} onChange={e => change('ordenacao', e.target.value)}>{orders.map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></Field>
-    </>} advanced={simple ? undefined : <>
-<p className="hint">Preencha só o que precisar. Para achar um órgão ou fornecedor, digite parte do nome e escolha na lista.</p>
-        <div className="item-filters-lookups">
-          <LookupFilter key={`orgao-${lookupReset}`} compact kind="/orgaos" title="Órgão" baseId={baseId} value={draft.orgao_id} onChange={v => change('orgao_id', v)} />
-          <LookupFilter key={`fornecedor-${lookupReset}`} compact kind="/fornecedores/opcoes" title="Fornecedor" baseId={baseId} value={draft.fornecedor_id} onChange={v => change('fornecedor_id', v)} />
-          <LookupFilter key={`modalidade-${lookupReset}`} compact kind="/modalidades" title="Modalidade" baseId={baseId} value={draft.modalidade_id} onChange={v => change('modalidade_id', v)} />
-        </div>
-        <div className="item-filters-ranges">
-          <fieldset><legend>Período de homologação</legend><div className="item-filters-pair"><Field label="Homologação a partir de"><input className="input" type="date" value={draft.homologacao_inicio} onChange={e => change('homologacao_inicio', e.target.value)} /></Field><Field label="Homologação até"><input className="input" type="date" value={draft.homologacao_fim} onChange={e => change('homologacao_fim', e.target.value)} /></Field></div></fieldset>
-          <fieldset><legend>{purchases ? 'Valor global homologado da licitação' : 'Valor homologado no recorte'}</legend><div className="item-filters-pair"><Field label={purchases ? 'Valor global mínimo (R$)' : official ? 'Total homologado mínimo (R$)' : 'Total do recorte mínimo (R$)'}><input className="input" type="number" min="0" step="0.00000001" placeholder="Sem mínimo" value={draft.valor_minimo} onChange={e => change('valor_minimo', e.target.value)} /></Field><Field label={purchases ? 'Valor global máximo (R$)' : official ? 'Total homologado máximo (R$)' : 'Total do recorte máximo (R$)'}><input className="input" type="number" min="0" step="0.00000001" placeholder="Sem máximo" value={draft.valor_maximo} onChange={e => change('valor_maximo', e.target.value)} /></Field></div></fieldset>
-        </div>
-        <div className="item-filters-page-size"><Field label={official ? 'Itens por página' : 'Registros por página'}><select className="select" value={draft.tamanho_pagina} onChange={e => change('tamanho_pagina', e.target.value)}>{[5,10,20,50,100].map(n => <option key={n}>{n}</option>)}</select></Field></div>
-    </>}>
-      {children}
-    </FilterPanel>
+export default function ItemFilters({ draft, change, apply, clear, purchases = false, suppliers = false, products = false }) {
+  const entity = purchases ? 'licitações' : suppliers ? 'fornecedores' : 'itens'
+  const orders = products
+    ? [['indice_desc', 'Maior preço unitário primeiro'], ['descricao_asc', 'Nome do item'], ['valor_desc', 'Maior mediana primeiro']]
+    : [['indice_desc', 'Maior anomalia primeiro'], ['descricao_asc', purchases ? 'Objeto da licitação' : 'Nome do fornecedor'], ['valor_desc', 'Maior valor homologado']]
+  return <FilterPanel title={`Filtrar ${entity}`} apply={apply} clear={clear} primary={<>
+    <Field label={products ? 'Buscar item ou código de catálogo' : purchases ? 'Buscar licitação' : 'Buscar fornecedor'}><input className="input" type="search" placeholder={products ? 'Digite o nome do item ou o código de catálogo' : purchases ? 'Número ou descrição da licitação' : 'Digite o nome do fornecedor'} maxLength={200} value={draft.busca} onChange={e => change('busca', e.target.value)} /></Field>
+    <SignalFilter label={purchases ? 'Sinalização da licitação' : suppliers ? 'Sinalização do fornecedor' : 'Sinalização do item'} value={draft.sinalizacao} onChange={value => change('sinalizacao', value)} />
+    <Field label="Ordenação"><select className="select" value={draft.ordenacao} onChange={e => change('ordenacao', e.target.value)}>{orders.map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></Field>
+  </>} />
 }

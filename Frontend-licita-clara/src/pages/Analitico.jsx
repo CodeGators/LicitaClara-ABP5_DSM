@@ -14,32 +14,30 @@ import useApi from '../useApi.js'
 import PainelGeral from './PainelGeral.jsx'
 import ItemFilters from '../components/ItemFilters.jsx'
 
-export const indexText = value => value == null ? 'Indisponível' : ifMeasure(value)
+const indexText = value => value == null ? 'Indisponível' : ifMeasure(value)
 const productFields = ['busca', 'sinalizacao', 'ordenacao', 'tamanho_pagina']
 const read = (params, products = false) => ({ ...Object.fromEntries(viewFields.map(key => [key, params.get(key) || (key === 'analise' ? 'todos' : key === 'ordenacao' ? 'indice_desc' : key === 'tamanho_pagina' ? '20' : '')])), ...(products ? { sinalizacao: params.getAll('sinalizacao') } : {}) })
 
 export function Filters({ purchases = false, suppliers = false, products = false }) {
-  const simple = products || purchases || suppliers
   const { params, setParams } = useAnalysis()
-  const { baseId } = useBase()
-  const [draft, setDraft] = useState(() => read(params, simple))
-  useEffect(() => setDraft(read(params, simple)), [params, simple])
+  const [draft, setDraft] = useState(() => read(params, true))
+  useEffect(() => setDraft(read(params, true)), [params])
   useEffect(() => {
-    if (!simple || !viewFields.some(key => !productFields.includes(key) && params.has(key))) return
+    if (!viewFields.some(key => !productFields.includes(key) && params.has(key))) return
     setParams(previous => {
       const next = new URLSearchParams(previous)
       for (const key of viewFields) if (!productFields.includes(key)) next.delete(key)
       next.delete('pagina')
       return next
     }, { replace: true })
-  }, [simple, params, setParams])
+  }, [params, setParams])
   const change = (key, value) => setDraft(previous => ({ ...previous, [key]: value }))
   const apply = event => {
     event.preventDefault()
     setParams(previous => {
       const next = new URLSearchParams(previous)
       for (const key of [...viewFields, 'sinalizacao', 'pagina', 'pagina_itens']) next.delete(key)
-      for (const key of simple ? productFields : viewFields) {
+      for (const key of productFields) {
         const value = draft[key]
         if (Array.isArray(value)) value.forEach(entry => next.append(key, entry))
         else if (value) next.set(key, value)
@@ -47,13 +45,11 @@ export function Filters({ purchases = false, suppliers = false, products = false
       return next
     })
   }
-  const clear = () => { setDraft(read(new URLSearchParams(), simple)); setParams(previous => {
+  const clear = () => { setDraft(read(new URLSearchParams(), true)); setParams(previous => {
     const next = new URLSearchParams(previous); for (const key of [...viewFields, 'sinalizacao', 'pagina', 'pagina_itens']) next.delete(key); return next
   }) }
-  return <ItemFilters draft={draft} change={change} apply={apply} clear={clear} baseId={baseId} params={params} purchases={purchases} suppliers={suppliers} products={products}>
-  </ItemFilters>
+  return <ItemFilters draft={draft} change={change} apply={apply} clear={clear} purchases={purchases} suppliers={suppliers} products={products} />
 }
-
 
 export function useView(path, { enabled = true } = {}) {
   const { baseId } = useBase()
@@ -69,7 +65,7 @@ export function useView(path, { enabled = true } = {}) {
 export function ItemRows({ rows, params, scoreLabel = 'Medida IF' }) {
   const location = useLocation()
   return <div className="table-scroll" role="region" aria-label="Itens e resultados do recorte; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl tbl-stack"><thead><tr><th scope="col">Item / compra</th><th scope="col">Órgão / fornecedores</th><th scope="col">Total homologado</th><th scope="col">{scoreLabel}</th><th scope="col">Cobertura</th></tr></thead><tbody>{rows.map(r => <tr key={r.id}>
-    <td><Link className="link-a" to={selectionLink(`/ranking/${r.id}`, params)} state={{ from: location.pathname + location.search }}>{r.descricao}</Link><small>Item {r.numero_item} · Compra {r.processo.numero_compra}</small>{(r.requer_validacao ?? itemRequiresPriceReview(r)) && <PriceReview compact />}</td>
+    <td><Link className="link-a" to={selectionLink(`/ranking/${r.id}`, params)} state={{ from: location.pathname + location.search }}>{r.descricao}</Link><small>Item {r.numero_item} · Compra {r.processo.numero_compra}</small>{(r.requer_validacao ?? itemRequiresPriceReview(r)) && <PriceReview />}</td>
     <td data-label="Órgão">{r.processo.orgao_nome}<small>{[...new Set(r.resultados.map(e => e.fornecedor_nome))].join('; ') || 'Nenhum resultado conhecido'}</small></td>
     <td className="numeric" data-label="Total homologado">{money(r.valor_homologado)}{r.resultados_sem_total > 0 && <small>Total incompleto na fonte</small>}</td>
     <td className="numeric" data-label={scoreLabel}>{indexText(r.medida_if)}</td>

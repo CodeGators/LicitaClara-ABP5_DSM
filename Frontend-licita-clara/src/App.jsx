@@ -1,17 +1,12 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
-import DemoPainel from './pages/DemoPainel.jsx'
 import { PainelReal, RankingReal, FornecedoresReal } from './pages/Analitico.jsx'
 import { AnalysisProvider, AnalysisGate } from './AnalysisContext.jsx'
-import DemoItens from './pages/DemoItens.jsx'
-import Detalhe from './pages/Detalhe.jsx'
 import DetalheAnalise from './pages/DetalheAnalise.jsx'
 import Licitacoes from './pages/Licitacoes.jsx'
 import Processo from './pages/Processo.jsx'
 import { BaseGate, BaseProvider } from './BaseContext.jsx'
-import DemoFornecedores from './pages/DemoFornecedores.jsx'
 import Relatorios from './pages/Relatorios.jsx'
-import DemoRelatorios from './pages/DemoRelatorios.jsx'
 
 function LegacyItemRedirect() {
   const { pathname, search, state } = useLocation()
@@ -37,14 +32,9 @@ export default function App() {
         <Route path="licitacoes/:id" element={<BaseGate><Licitacoes /></BaseGate>} />
         <Route path="ranking/:id" element={<BaseGate><AnalysisGate><DetalheAnalise /></AnalysisGate></BaseGate>} />
         <Route path="ranking" element={<BaseGate><RankingReal /></BaseGate>} />
-        <Route path="demonstracao/painel" element={<DemoPainel />} />
-        <Route path="demonstracao/fornecedores" element={<DemoFornecedores />} />
-        <Route path="demonstracao/itens" element={<DemoItens />} />
-        <Route path="demonstracao/itens/:id" element={<Detalhe />} />
         <Route path="fornecedores" element={<BaseGate><FornecedoresReal /></BaseGate>} />
         <Route path="fornecedores/:id" element={<BaseGate><FornecedoresReal /></BaseGate>} />
         <Route path="relatorios" element={<BaseGate><AnalysisGate><Relatorios /></AnalysisGate></BaseGate>} />
-        <Route path="demonstracao/relatorios" element={<DemoRelatorios />} />
         <Route path="*" element={<div className="card" role="alert"><h1>Página não encontrada</h1><a className="link-a" href="/ranking">Itens Sinalizados</a></div>} />
       </Route>
     </Routes></AnalysisProvider></BaseProvider>

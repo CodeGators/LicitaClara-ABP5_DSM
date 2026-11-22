@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test'
 
 const target = process.env.LICITA_INTERFACE_CONFIG ? JSON.parse(readFileSync(process.env.LICITA_INTERFACE_CONFIG, 'utf8')) : { routes: [] }
 for (const theme of ['light', 'dark']) for (const width of [1280, 390]) for (const [label, path] of target.routes) {
-  test(`interface ${label} ${theme} ${width}`, async ({ page }, info) => {
+  test(`interface ${label} ${theme} ${width}`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })
     await page.addInitScript(theme => { localStorage.setItem('lc_ajuda_vista', '1'); localStorage.setItem('lc_tema', theme) }, theme)
     const errors = []

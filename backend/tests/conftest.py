@@ -13,7 +13,6 @@ from sqlalchemy.engine import make_url
 def settings(tmp_path):
     return Settings(
         _env_file=None,
-        app_env="test",
         database_url="postgresql+psycopg://test:test_password_do_not_leak@127.0.0.1:1/missing",
         db_connect_timeout=1,
         storage_root=tmp_path / "objects",
@@ -28,7 +27,7 @@ def integration_engine():
         pytest.skip("Defina TEST_DATABASE_URL para executar integração PostgreSQL")
     if not make_url(url).database.endswith("_test"):
         pytest.fail("Use banco descartável com nome terminado em _test")
-    engine = build_engine(Settings(_env_file=None, app_env="test", database_url=url))
+    engine = build_engine(Settings(_env_file=None, database_url=url))
     try:
         yield engine
     finally:

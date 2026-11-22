@@ -1,7 +1,13 @@
 # Workflows
 
-`python-ci.yml` valida instalação pelo `uv.lock`, lint, formatação, testes unitários e integração com PostgreSQL descartável. As credenciais no YAML existem apenas durante o job de CI.
+`python-ci.yml` instala pelo `uv.lock`, verifica lint e formatação e executa os
+testes Python com PostgreSQL descartável. As credenciais do YAML valem somente
+para o job de CI. Também verifica os comandos de versão do coletor e da ML.
 
-O workflow está preparado no repositório; sua execução no GitHub depende de publicação/push. Não há workflow de coleta ou implantação nesta etapa.
+`frontend-ci.yml` instala com `npm ci`, executa os testes do cliente HTTP e de
+navegação Playwright com respostas controladas e gera o build Vite em Node.js
+20.19.0. Testes com a API real dependem de uma base populada e são executados
+separadamente com `npm run test:live`.
 
-`frontend-ci.yml` instala o frontend com `npm ci`, executa testes do cliente e navegação Playwright com respostas artificiais e gera o build Vite usando Node.js 20.19.0. É acionado por alterações em `Frontend-licita-clara/` ou no próprio workflow. Instala Chromium e dependências do sistema no runner. O teste com API real (`npm run test:live`) depende de base importada e é executado separadamente no ambiente local. Não publica a aplicação. Execução remota do workflow não foi realizada nesta entrega.
+Os workflows são acionados por alterações nos caminhos listados em cada YAML.
+Não há coleta automática nem publicação da aplicação nesses jobs.

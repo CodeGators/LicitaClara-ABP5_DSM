@@ -1,7 +1,6 @@
 """Conexão lazy e sessões com fechamento/rollback garantidos."""
 
-from collections.abc import Generator, Iterator
-from contextlib import contextmanager
+from collections.abc import Generator
 
 from fastapi import Request
 from sqlalchemy import Engine, create_engine
@@ -32,11 +31,4 @@ def build_session_factory(engine: Engine) -> sessionmaker[Session]:
 def get_session(request: Request) -> Generator[Session, None, None]:
     # Fechar sem commit implícito desfaz transações pendentes.
     with request.app.state.sessions() as session:
-        yield session
-
-
-@contextmanager
-def transaction(factory: sessionmaker[Session]) -> Iterator[Session]:
-    """Usar dentro do serviço: commit no sucesso, rollback em qualquer exceção."""
-    with factory.begin() as session:
         yield session

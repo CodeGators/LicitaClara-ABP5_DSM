@@ -4,7 +4,7 @@ import { X, ShieldAlert, Github } from 'lucide-react'
 import useDialogFocus from '../useDialogFocus.js'
 import { selectionLink } from '../api.mjs'
 import { Mark } from './Logo.jsx'
-import { grupo, githubGrupo, desenvolvedores, passos, glossario } from '../data.js'
+import { grupo, githubGrupo, desenvolvedores, passos, glossario } from '../ajudaData.js'
 
 const iniciais = n => n.split(' ').map(x => x[0]).slice(0, 2).join('')
 const abas = [['como', 'Como usar'], ['gloss', 'Glossário'], ['cred', 'Créditos']]

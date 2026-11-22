@@ -24,7 +24,7 @@ A API pública passa a usar `medida_if`, `medida_if_media`, `maior_medida_if`,
 `itens_com_medida_if` e `itens_sem_medida_if`. O histograma tem intervalos de 0,1
 entre 0 e 1. Resultados sem IF ficam sem medida, sem zero imputado.
 O parâmetro de URL `ordenacao=indice_desc` é mantido e agora ordena pela medida bruta.
-As páginas `/demonstracao/*` continuam como protótipo fictício, separado dos dados reais.
+O frontend usa somente as telas integradas à API; as páginas demonstrativas foram removidas.
 
 
 API FastAPI com consultas versionadas de processos, itens e documentos,
@@ -116,7 +116,7 @@ uv run --locked --all-packages --extra validation uvicorn licita_backend.main:cr
 
 Os scores continuam nulos com análise `nao_publicada`. Valores globais do processo e dos itens do recorte são campos distintos; consultar a documentação antes de usá-los em totais ou filtros.
 
-A inferência/publicação versionada (documentação local) registra treino/modelos, cobertura por resultado e canal experimental explícito; o piloto atual tem zero scores elegíveis.
+A inferência/publicação versionada registra modelos, cobertura por resultado e canal experimental explícito. A cobertura disponível depende da base e da execução selecionadas.
 
 O painel, ranking e fornecedores reais (documentação local) compartilha base/execução/modelo e filtros; leia as definições de universo, valores, HHI e indisponibilidade antes de interpretar os indicadores.
 
@@ -235,3 +235,15 @@ vezes a mediana positiva do seu produto/unidade na base atual completa.
 a busca/sinalização da lista não corresponde a ele. Os itens relacionados expõem
 somente seus resultados, scores, valores e marcações. O denominador da participação
 e do HHI conserva os demais vencedores dos itens do recorte.
+
+
+## Compatibilidade do esquema
+
+As tabelas históricas `usuarios`, `revisoes` e `relatorios` continuam descritas
+no metadata para manter a correspondência com as migrações existentes e seus
+vínculos. A aplicação atual não usa essas tabelas para autenticar, registrar
+revisões ou gerar relatórios: a exportação pública é síncrona. A limpeza da
+interface não altera o esquema nem os dados já importados.
+
+Os módulos de armazenamento do backend encaminham a implementação para
+`licita_shared`; o adaptador local permanece em uso pela inicialização da API.

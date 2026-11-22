@@ -10,7 +10,7 @@ async function wcag(page, include) {
 
 test('ajuda mantém foco, aceita teclado nas abas e devolve foco ao fechar', async ({ page }) => {
   await mockApi(page)
-  await page.goto(`/itens?base_id=${BASE}`)
+  await page.goto(`/ranking?base_id=${BASE}`)
   const trigger = page.getByRole('button', { name: 'Como funciona', exact: true })
   await trigger.click()
   const dialog = page.getByRole('dialog', { name: 'Bem-vindo ao Licita Clara' })
@@ -39,7 +39,7 @@ test('menu móvel fechado fica fora do teclado; aberto isola foco e fecha com Es
   await page.setViewportSize({ width: 390, height: 844 })
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await mockApi(page)
-  await page.goto('/itens')
+  await page.goto('/ranking')
   const trigger = page.getByRole('button', { name: 'Abrir menu' })
   await expect(page.locator('#menu-principal')).toHaveAttribute('inert', '')
   await trigger.focus(); await page.keyboard.press('Enter')
@@ -64,8 +64,8 @@ test('menu móvel fechado fica fora do teclado; aberto isola foco e fecha com Es
 
 test('atalho pula navegação; mudar de tela atualiza título e foco no conteúdo', async ({ page }) => {
   await mockApi(page)
-  await page.goto('/itens')
-  await expect(page.getByRole('heading', { name: 'Consultar itens', exact: true })).toBeVisible()
+  await page.goto('/ranking')
+  await expect(page.getByRole('heading', { name: 'Itens Sinalizados', exact: true })).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('link')).toHaveText(['Painel Geral', 'Itens Sinalizados', 'Licitações Sinalizadas', 'Fornecedores', 'Relatórios'])
   await page.keyboard.press('Tab')
   await expect(page.getByRole('link', { name: 'Pular para o conteúdo' })).toBeFocused()
@@ -79,7 +79,8 @@ test('atalho pula navegação; mudar de tela atualiza título e foco no conteúd
 test('tabelas rolam com teclado sem alargar a página em 320px e tema persiste', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 844 })
   await mockApi(page)
-  await page.goto(`/itens/${ITEM}?base_id=${BASE}`)
+  await page.goto(`/ranking/${ITEM}?base_id=${BASE}`)
+  await page.getByText('Ver resultados e dados do item', { exact: true }).click()
   const table = page.getByRole('region', { name: 'Resultados do item; use as setas para rolar na horizontal' })
   await table.focus()
   await page.keyboard.press('ArrowRight')
@@ -99,7 +100,7 @@ for (const mode of ['empty', 'error', 'loading']) test(`estado ${mode} mantém c
     const pending = new Promise(resolve => { release = resolve })
     await page.route('**/api/v1/base/status**', async route => { await pending; await route.fallback().catch(() => {}) })
   }
-  await page.goto('/itens')
+  await page.goto('/ranking')
   if (mode === 'empty') await expect(page.getByRole('heading', { name: 'Nenhuma base disponível' })).toBeVisible()
   if (mode === 'error') await expect(page.getByRole('alert')).toBeVisible()
   if (mode === 'loading') await expect(page.getByRole('status')).toContainText('Consultando a base de dados')
@@ -109,25 +110,25 @@ for (const mode of ['empty', 'error', 'loading']) test(`estado ${mode} mantém c
   } finally { release?.() }
 })
 
-test('consulta de itens mantém a versão escolhida ao aplicar e limpar filtros', async ({ page }) => {
+test('filtros descartam seleção antiga e mantêm publicação automática', async ({ page }) => {
   await mockApi(page)
-  const execution = '77777777-7777-4777-8777-777777777777'
-  const model = '88888888-8888-4888-8888-888888888888'
-  await page.goto(`/itens?base_id=${BASE}&execucao_id=${execution}&modelo_id=${model}`)
-  await expect(page.getByText('Análise selecionada', { exact: true })).toBeVisible()
-  await page.getByLabel('Buscar item, compra ou fornecedor', { exact: true }).fill('Borracha')
+  await page.goto(`/ranking?base_id=${BASE}&execucao_id=antiga&modelo_id=antigo`)
+  await expect(page.getByRole('heading', { name: '2 produtos' })).toBeVisible()
+  await expect(page.locator('.analysis-bar')).toHaveCount(0)
+  await page.getByLabel('Buscar item ou código de catálogo').fill('Borracha')
   await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
-  expect(new URL(page.url()).searchParams.get('execucao_id')).toBe(execution)
-  expect(new URL(page.url()).searchParams.get('modelo_id')).toBe(model)
+  await expect(page.getByRole('heading', { name: '1 produto' })).toBeVisible()
+  expect(new URL(page.url()).searchParams.get('execucao_id')).toBe('nenhuma')
+  expect(new URL(page.url()).searchParams.get('modelo_id')).toBeNull()
   await page.getByRole('button', { name: 'Limpar filtros', exact: true }).click()
-  expect(new URL(page.url()).searchParams.get('execucao_id')).toBe(execution)
-  expect(new URL(page.url()).searchParams.get('busca')).toBe(null)
+  await expect(page.getByRole('heading', { name: '2 produtos' })).toBeVisible()
+  expect(new URL(page.url()).searchParams.get('busca')).toBeNull()
 })
 
 test('ajuda e menu em tema escuro mantêm contraste e navegação acessível', async ({ page }) => {
   await mockApi(page)
   await page.addInitScript(() => localStorage.setItem('lc_tema', 'dark'))
-  await page.goto('/itens')
+  await page.goto('/ranking')
   await page.getByRole('button', { name: 'Como funciona', exact: true }).click()
   await wcag(page, '[role="dialog"]')
   await page.keyboard.press('Escape')

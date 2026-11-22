@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { ApiError, baseLink, createApiClient, date, decimal, ifMeasure, exactDecimal, money, safeOfficialUrl } from '../src/api.mjs'
+import { ApiError, createApiClient, date, decimal, ifMeasure, exactDecimal, money } from '../src/api.mjs'
 
 test('exibição arredonda sem perder inteiros acima do limite de Number', () => {
   assert.equal(money('9007199254740993.00000001'), 'R$ 9.007.199.254.740.993,00')
@@ -11,13 +11,6 @@ test('exibição arredonda sem perder inteiros acima do limite de Number', () =>
   assert.equal(date('2026-09-01'), '01/09/2026')
 })
 
-test('URLs oficiais aceitam HTTP(S), sem credenciais ou execução de script', () => {
-  assert.equal(safeOfficialUrl('javascript:alert(1)'), null)
-  assert.equal(safeOfficialUrl('https://user:password@example.test'), null)
-  assert.equal(safeOfficialUrl('/arquivo.pdf'), null)
-  assert.equal(safeOfficialUrl('https://pncp.gov.br/arquivo'), 'https://pncp.gov.br/arquivo')
-  assert.equal(baseLink('/itens/0001', 'base-1'), '/itens/0001?base_id=base-1')
-})
 
 test('cliente preserva strings decimais e escapa buscas na URL', async () => {
   let requested

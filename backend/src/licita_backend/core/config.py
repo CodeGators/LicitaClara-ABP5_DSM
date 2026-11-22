@@ -13,7 +13,6 @@ class Settings(BaseSettings):
         env_file=".env", env_file_encoding="utf-8", extra="ignore", hide_input_in_errors=True
     )
 
-    app_env: Literal["local", "test", "production"] = "local"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     database_url: SecretStr
     db_connect_timeout: int = Field(default=3, ge=1, le=30)

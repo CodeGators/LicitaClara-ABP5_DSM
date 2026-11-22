@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { LayoutGrid, ListFilter, Building2, FileText, Layers, CircleHelp, Menu, X, Sun, Moon } from 'lucide-react'
 import Logo from './Logo.jsx'
 import AjudaModal from './AjudaModal.jsx'
@@ -16,7 +16,7 @@ const nav = [
   { to: '/fornecedores', label: 'Fornecedores', icon: Building2 },
   { to: '/relatorios', label: 'Relatórios', icon: FileText },
 ]
-const names = { processos: 'Compra', demonstracao: 'Demonstração', painel: 'Painel Geral', ranking: 'Itens Sinalizados', licitacoes: 'Licitações Sinalizadas', fornecedores: 'Fornecedores', relatorios: 'Relatórios' }
+const names = { processos: 'Compra', painel: 'Painel Geral', ranking: 'Itens Sinalizados', licitacoes: 'Licitações Sinalizadas', fornecedores: 'Fornecedores', relatorios: 'Relatórios' }
 const readSeen = () => { try { return localStorage.getItem('lc_ajuda_vista') } catch { return null } }
 
 export default function Layout() {
@@ -60,16 +60,16 @@ export default function Layout() {
           <div className="eyebrow">Análises</div>
           <nav className="nav" aria-label="Navegação principal">
             {nav.map(({ to, label, icon: I, end }) => (
-              <NavLink key={to} to={real && base.baseId && !to.startsWith('/demonstracao') ? selectionLink(to, search) : to} end={end} className={({ isActive }) => (isActive || (to === '/ranking' && /^\/(itens|processos)(\/|$)/.test(pathname)) ? 'active' : '')}>
+              <NavLink key={to} to={real && base.baseId ? selectionLink(to, search) : to} end={end} className={({ isActive }) => (isActive || (to === '/ranking' && /^\/(itens|processos)(\/|$)/.test(pathname)) ? 'active' : '')}>
                 <I size={20} aria-hidden="true" /> {label}
               </NavLink>
             ))}
           </nav>
         </div>
         <div className="recorte">
-          <small>{real ? 'Base em uso' : 'Dados de demonstração'}</small>
+          <small>Base em uso</small>
           <strong>Compras públicas</strong>
-          <span>{real ? base.data?.base ? <>{date(base.data.base.periodo_inicio)} a {date(base.data.base.periodo_fim)}<br />{base.data.cobertura.itens} itens · {base.data.cobertura.processos} compras</> : 'Consultando…' : <>Jan–Jun 2026<br />Órgãos e empresas fictícios</>}</span>
+          <span>{base.data?.base ? <>{date(base.data.base.periodo_inicio)} a {date(base.data.base.periodo_fim)}<br />{base.data.cobertura.itens} itens · {base.data.cobertura.processos} compras</> : 'Consultando…'}</span>
         </div>
         <div className="side-foot">
           <span>FATEC Jacareí · Governança e Compliance</span>
@@ -83,7 +83,6 @@ export default function Layout() {
             <span>{parts[0] === 'ranking' && parts[1] ? 'Detalhe do item' : names[parts[0] || ''] || 'Licita Clara'}</span>
           </div>
           <div className="chips">
-            {!real && <span className="demo warn">Demonstração<span className="hide-sm"> · dados simulados</span></span>}
             <button className="help-btn" onClick={() => { setMenu(false); setAjuda(true) }} aria-label="Como funciona"><CircleHelp size={18} /><span className="hide-sm">Como funciona</span></button>
             <button className="help-btn" onClick={alternar} aria-label={tema === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'} title={tema === 'dark' ? 'Modo claro' : 'Modo escuro'}>
               {tema === 'dark' ? <Sun size={18} /> : <Moon size={18} />}<span className="hide-sm">{tema === 'dark' ? 'Claro' : 'Escuro'}</span>
@@ -91,10 +90,9 @@ export default function Layout() {
           </div>
         </header>
         <main ref={contentRef} id="conteudo" className="content" tabIndex={-1}>
-          {!real && <div className="note"><b>Esta tela é uma demonstração com dados fictícios.</b>Os números não representam a base real. <Link className="link-a" to="/ranking">Ver dados oficiais</Link></div>}
           <Outlet />
           <div className="foot">
-            <span>{real ? 'Fonte: Compras.gov.br e PNCP. Cobertura limitada ao recorte importado.' : 'Demonstração acadêmica. Revisões e exportações ainda não integradas.'}</span>
+            <span>Fonte: Compras.gov.br e PNCP. Cobertura limitada ao recorte importado.</span>
             <span>Licita Clara / 2026</span>
           </div>
         </main>

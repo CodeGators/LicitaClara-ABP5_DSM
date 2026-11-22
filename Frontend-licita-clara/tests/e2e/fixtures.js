@@ -19,7 +19,7 @@ const pageOf = (rows, url, base = BASE) => {
 }
 
 export async function mockApi(page, overrides = {}) {
-  const state = { calls: [], offline: false, noBase: false, latest: BASE, documentsOffline: false, ...overrides }
+  const state = { calls: [], offline: false, noBase: false, latest: BASE, ...overrides }
   await page.addInitScript(() => localStorage.setItem('lc_ajuda_vista', '1'))
   await page.route('**/api/v1/**', async route => {
     const url = new URL(route.request().url())
@@ -34,23 +34,24 @@ export async function mockApi(page, overrides = {}) {
     if (path === '/analises/publicacao') return send({ base_id: base, status: 'nao_publicada', execucao_id: null })
     if (path === '/analises/execucoes') return send({ dados: [], total_paginas: 0 })
     if (path === '/base/status') return send(state.noBase ? { status: 'sem_base', base: null, cobertura: null } : { ...status, base: { ...status.base, id: base } })
-    if (path === '/orgaos') return send(pageOf([{ id: ORGANIZATION, nome: 'Órgão do recorte' }], url, base))
-    if (path === '/modalidades') return send(pageOf([{ id: MODALITY, nome: 'Pregão' }], url, base))
-    if (path === '/fornecedores/opcoes') return send(pageOf([{ id: SUPPLIER, nome: 'Fornecedor do recorte' }], url, base))
-    if (path === '/itens') {
-      if (url.searchParams.get('valor_minimo') === '2' && url.searchParams.get('valor_maximo') === '1') return error('Intervalo inválido.', 422)
+    if (path === '/visao/produtos') {
       const search = url.searchParams.get('busca')?.toLowerCase() || ''
-      return send(pageOf([item, otherItem].filter(i => i.descricao.toLowerCase().includes(search)), url, base))
+      const rows = [item, otherItem].filter(row => row.descricao.toLowerCase().includes(search)).map(row => ({
+        id: row.id, descricao: row.descricao, catalogo: row.catalogo, codigo_catalogo: row.codigo_catalogo,
+        unidade_medida: row.unidade_medida, preco_minimo: row.resultados[0]?.valor_unitario_homologado ?? null,
+        preco_maximo: row.resultados[0]?.valor_unitario_homologado ?? null, mediana: row.resultados[0]?.valor_unitario_homologado ?? null,
+        quantidade_registros: row.resultados.filter(r => !r.cancelado).length, requer_validacao: false,
+        sinalizacao: 'sem_analise', sinalizacao_predominante: 'sem_analise',
+        itens: [{ id: row.id, numero_item: row.numero_item, numero_compra: row.processo.numero_compra, requer_validacao: false, analise_disponivel: false, sinalizacao: 'sem_analise' }],
+      })).filter(() => !url.searchParams.getAll('sinalizacao').length || url.searchParams.getAll('sinalizacao').includes('sem_analise'))
+      const result = pageOf(rows, url, base)
+      return send({ ...result.meta, dados: result.dados })
     }
     if (path === `/itens/${ITEM}`) return send({ base_id: base, item })
     if (path === `/itens/${secondItem}`) return send({ base_id: base, item: otherItem })
     if (path.startsWith('/itens/')) return error('Item não encontrado nesta base.', path.includes('LC-') ? 422 : 404)
     if (path === `/processos/${PROCESS}`) return send({ base_id: base, processo: { ...context, valor_estimado_processo: '300.00000000', valor_homologado_processo: '200.00000001', valor_homologado_itens_recorte: '0.10000001', quantidade_itens_recorte: 2, situacao: 'Homologada' } })
     if (path === `/processos/${PROCESS}/itens`) return send(pageOf([item, otherItem], url, base))
-    if (path === `/processos/${PROCESS}/documentos`) {
-      if (state.documentsOffline) return error('Documentos indisponíveis.')
-      return send(pageOf([{ id: 'doc-1', titulo: 'Edital da compra', url_origem: 'https://pncp.gov.br/arquivo.pdf', ativo: true, publicado_na_origem_em: '2026-09-01', tipo_nome: 'Edital', contrato_versao_id: null }], url, base))
-    }
     return error('Rota inexistente.', 404)
   })
   return state

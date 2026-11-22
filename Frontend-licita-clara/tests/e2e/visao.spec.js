@@ -83,7 +83,7 @@ test('painel fixa versão/modelo, conserva filtros entre telas e distingue índi
   await expect(page.getByRole('link', { name: 'Itens Sinalizados', exact: true })).not.toHaveClass(/active/)
   await expect(page.getByRole('link', { name: 'Itens Sinalizados', exact: true })).not.toHaveAttribute('aria-current', 'page')
   await expect(page.getByRole('heading', { name: 'Compra 00001 · Item 00001' })).toBeVisible()
-  await expect(page.locator('.detail-score-number')).toContainText('0,5140')
+  await expect(page.locator('.detail-score-number')).toHaveCount(0)
   await page.getByRole('link', { name: 'Itens Sinalizados', exact: true }).click()
   await page.getByLabel('Buscar item ou código de catálogo').fill('Borracha')
   await page.getByRole('button', { name: 'Aplicar filtros' }).click()
@@ -92,7 +92,7 @@ test('painel fixa versão/modelo, conserva filtros entre telas e distingue índi
   state.active = NEW_EXEC
   await page.getByRole('link', { name: 'Borracha do recorte', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Compra 00001 · Item 00001' })).toBeVisible()
-  await expect(page.locator('.detail-score-number')).toContainText('0,5140')
+  await expect(page.locator('.detail-score-number')).toHaveCount(0)
   expect(new URL(page.url()).searchParams.get('execucao_id')).toBe(EXEC)
   await page.getByRole('link', { name: 'Voltar à consulta' }).click()
   await expect(page.getByRole('heading', { name: '1 produto' })).toBeVisible()
@@ -148,7 +148,7 @@ test('listagem ignora execução antiga e detalhe preserva validação de modelo
   expect(new URL(page.url()).searchParams.get('execucao_id')).toBe(EXEC)
   await expect(page.locator('.analysis-bar')).toHaveCount(0)
   await page.goto(`/itens/${ITEM}?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=00000000-0000-4000-8000-000000000000`)
-  await expect(page.getByRole('heading', { name: 'Modelo fora da execução selecionada' })).toBeVisible()
+  await expect(page.getByRole('alert')).toContainText('Modelo fora da execução selecionada')
   await expect(page.getByRole('cell', { name: '0,5140', exact: true })).toHaveCount(0)
 })
 
@@ -172,11 +172,11 @@ test('modelo automático preserva roteamento por item e cobertura sem média ent
   await page.getByRole('link', { name: 'Itens Sinalizados', exact: true }).click()
   await expect(page.getByRole('heading', { name: '2 produtos' })).toBeVisible()
   await page.getByRole('link', { name: 'Borracha do recorte', exact: true }).click()
-  await expect(page.locator('.detail-score-number')).toContainText('0,5140')
+  await expect(page.locator('.detail-score-number')).toHaveCount(0)
   expect(new URL(page.url()).searchParams.get('modelo_id')).toBeNull()
   await page.goto(`/processos/${PROCESS}?base_id=${BASE}&execucao_id=${EXEC}`)
-  await expect(page.getByText('Itens com análise / importados', { exact: true })).toBeVisible()
-  await expect(page.getByText('O universo oficial completo ainda não está confirmado.', { exact: false })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Itens deste processo', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Síntese da licitação', exact: true })).toHaveCount(0)
   await expect(page.getByText('Média dos sinais disponíveis', { exact: true })).toHaveCount(0)
 })
 
@@ -221,29 +221,27 @@ test('comparação não mistura resultados de fornecedores diferentes', async ({
   await expect(reading).not.toContainText('Autoencoder')
 })
 
-test('detalhe sinalizado separa resultado, referência de treino e explicação dos modelos', async ({ page }, testInfo) => {
+test('detalhe compara preços em percentual e preserva somente dados do resultado selecionado', async ({ page }, testInfo) => {
   const errors = []; page.on('pageerror', e => errors.push(e.message))
-  const state = await mockView(page, { automatic: true })
+  await mockView(page, { automatic: true })
   await page.route(`**/analises/execucoes/${EXEC}/itens/${ITEM}*`, route => route.fulfill({ json: { dados: [{ cobertura: [], resultados: [
     { id: 'score-if', modelo_id: MODEL, resultado_item_id: item.resultados[0].id, algoritmo: 'isolation_forest', medida_if: '0.514', score_bruto: '0.514', atributos: { comparacao: { mediana: '0.05', n_treino: 100, grupo: 'CATMAT-123', unidade_preco: { unidade_preco: 'kg' } } }, explicacao: { status: 'indisponivel', parcelas: [] } },
     { id: 'score-ae', modelo_id: AE, resultado_item_id: item.resultados[0].id, algoritmo: 'autoencoder', medida_if: null, erro_reconstrucao: '0.4', score_bruto: '0.4', atributos: { comparacao: { mediana: '0.05', n_treino: 100, grupo: 'CATMAT-123', unidade_preco: { unidade_preco: 'kg' } } }, explicacao: { status: 'disponivel', parcelas: [{ atributo: 'log_quantidade', parcela_score_bruto: '0.3' }, { atributo: 'log_preco_mediana', parcela_score_bruto: '0.1' }] } },
   ] }] } }))
   await page.goto(`/ranking/${ITEM}?base_id=${BASE}&execucao_id=${EXEC}`)
   await expect(page.getByRole('heading', { name: 'Compra 00001 · Item 00001' })).toBeVisible()
-  await expect(page.locator('.detail-score-number')).toContainText('0,5140')
-  await expect(page.getByText('100 observações no treino', { exact: false })).toBeVisible()
+  await expect(page.locator('.detail-score-number')).toHaveCount(0)
+  await expect(page.getByText('100 observações no treino', { exact: false })).toHaveCount(0)
+  await expect(page.locator('.detail-headline')).toContainText('100,00% acima da mediana')
   await expect(page.getByText('Unidade da mediana: kg', { exact: true })).toBeVisible()
   await expect(page.getByText('Unidade registrada no item: UN', { exact: false })).toBeVisible()
-  await expect(page.getByText('Contribuição por atributo indisponível para este modelo.', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Por que foi sinalizado?' })).toHaveCount(0)
   await expect(page.getByLabel('Modelo da comparação')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Parcelas do erro de reconstrução' })).toHaveCount(0)
-  await expect(page.locator('.detail-score-number')).not.toContainText('/ 100')
-  await page.getByRole('button', { name: 'Documentos', exact: true }).click()
-  await expect(page.getByRole('link', { name: 'Edital da compra', exact: false })).toBeVisible()
-  await page.getByRole('button', { name: 'Revisão', exact: true }).click()
-  await expect(page.getByText('Nenhuma revisão humana registrada.', { exact: false })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Incluir no relatório', exact: true })).toHaveAttribute('href', new RegExp(`processo_id=${PROCESS}`))
-  await page.getByRole('button', { name: 'Preço e sinais', exact: true }).click()
+  await expect(page.locator('.detail-score-number')).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Documentos', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Revisão', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'Gerar relatório da licitação', exact: true })).toHaveAttribute('href', new RegExp(`processo_id=${PROCESS}`))
   const { default: AxeBuilder } = await import('@axe-core/playwright')
   expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([])
   await page.screenshot({ path: testInfo.outputPath('detalhe-desktop.png'), fullPage: true })
@@ -257,9 +255,9 @@ test('detalhe sinalizado separa resultado, referência de treino e explicação 
 test('detalhe sinalizado sem score não inventa zero nem usa resultado cancelado', async ({ page }) => {
   await mockView(page, { scored: false })
   await page.goto(`/ranking/${ITEM}?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=${MODEL}`)
-  await expect(page.locator('.detail-score-number')).toContainText('—')
+  await expect(page.locator('.detail-score-number')).toHaveCount(0)
   await expect(page.getByText('Nenhuma medida IF disponível para este resultado no modelo selecionado.', { exact: false })).toBeVisible()
-  await expect(page.getByText('Referência de treino indisponível para este resultado.')).toBeVisible()
+  await expect(page.getByText('Não há referência de preço suficiente para comparar este resultado.')).toBeVisible()
   await expect(page.getByLabel('Resultado do fornecedor')).toHaveCount(0)
   await page.goto(`/ranking/00000000-0000-4000-8000-000000000000?base_id=${BASE}&execucao_id=${EXEC}`)
   await expect(page.getByRole('heading', { name: 'Registro não encontrado' })).toBeVisible()
@@ -269,13 +267,13 @@ test('detalhe mantém scores de fornecedores separados e respeita modelo fixado'
   await mockView(page, { automatic: true, bothModels: true, separateResults: true })
   await page.route(`**/api/v1/itens/${ITEM}?*`, route => route.fulfill({ json: { base_id: BASE, item: { ...item, resultados: [...item.resultados, { ...item.resultados[0], id: 'co-vencedor', fornecedor_nome: 'Outro fornecedor', sequencial_resultado: 3 }] } } }))
   await page.goto(`/ranking/${ITEM}?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=${MODEL}`)
-  await expect(page.locator('.detail-score-number')).toContainText('0,5140')
+  await expect(page.locator('.detail-score-number')).toHaveCount(0)
   await page.getByLabel('Resultado do fornecedor').selectOption('co-vencedor')
-  await expect(page.locator('.detail-score-number')).toContainText('—')
-  await expect(page.locator('.detail-score')).not.toContainText('0,5140')
+  await expect(page.locator('.detail-score-number')).toHaveCount(0)
+  await expect(page.getByText('Nenhuma medida IF disponível para este resultado no modelo selecionado.', { exact: false })).toBeVisible()
   await expect(page.getByLabel('Modelo da comparação')).toHaveCount(0)
   expect(new URL(page.url()).searchParams.get('modelo_id')).toBe(MODEL)
-  await expect(page.locator('.detail-score-number')).toContainText('—')
+  await expect(page.locator('.detail-score-number')).toHaveCount(0)
 })
 
 test('detalhe automático conserva preferência do grupo e escolhe maior resultado desse modelo', async ({ page }) => {
@@ -288,11 +286,11 @@ test('detalhe automático conserva preferência do grupo e escolhe maior resulta
     { id: 'if-2', modelo_id: MODEL, resultado_item_id: 'segundo-ativo', algoritmo: 'isolation_forest', medida_if: '0.88' },
   ] }] } }))
   await page.goto(`/ranking/${ITEM}?base_id=${BASE}&execucao_id=${EXEC}`)
-  await expect(page.locator('.detail-score-number')).toHaveText('0,8800')
-  await expect(page.locator('.score-ruler i')).toHaveAttribute('style', /width: 88%/)
-  await expect(page.locator('.score-scale')).toHaveText('01')
+  await expect(page.locator('.detail-score-number')).toHaveCount(0)
+  await expect(page.locator('.score-ruler')).toHaveCount(0)
+  await expect(page.locator('.detail-facts')).toContainText('Fornecedor maior score IF')
   await expect(page.getByLabel('Resultado do fornecedor')).toHaveValue('segundo-ativo')
-  await expect(page.locator('.detail-score')).not.toContainText('99')
+  await expect(page.locator('.detail-score')).toHaveCount(0)
 })
 
 test('itens remove Mais filtros e descarta filtros antigos da URL e da consulta', async ({ page }) => {
@@ -456,7 +454,7 @@ for (const theme of ['light', 'dark']) for (const width of [1280, 390]) {
       ['sem análise', null, false, null],
     ]
     await page.route('**/api/v1/visao/produtos?*', route => route.fulfill({ json: {
-      dados: samples.map(([name, measure, review]) => ({ id: name, descricao: `Produto ${name}`, catalogo: 'CATMAT', codigo_catalogo: '123', unidade_medida: 'UN', preco_minimo: '10', preco_maximo: '20', mediana: '15', quantidade_registros: 3, medida_if: measure, requer_validacao: review, itens: [{ id: ITEM, numero_compra: '1', numero_item: '1' }] })),
+      dados: samples.map(([name, measure, review]) => ({ id: name, descricao: `Produto ${name}`, catalogo: 'CATMAT', codigo_catalogo: '123', unidade_medida: 'UN', preco_minimo: '10', preco_maximo: '20', mediana: '15', quantidade_registros: 3, medida_if: measure, requer_validacao: review, sinalizacao_predominante: review ? 'requer_validacao' : measure == null ? 'sem_analise' : Number(measure) >= 0.7 ? 'maior_anomalia' : Number(measure) >= 0.5 ? 'anomalia_intermediaria' : 'menor_anomalia', itens: [{ id: ITEM, numero_compra: '1', numero_item: '1', requer_validacao: review, analise_disponivel: measure != null, sinalizacao: review ? 'requer_validacao' : measure == null ? 'sem_analise' : Number(measure) >= 0.7 ? 'maior_anomalia' : Number(measure) >= 0.5 ? 'anomalia_intermediaria' : 'menor_anomalia' }] })),
       total: 6, pagina: 1, tamanho_pagina: 20, total_paginas: 1,
     } }))
     await page.setViewportSize({ width, height: 900 })

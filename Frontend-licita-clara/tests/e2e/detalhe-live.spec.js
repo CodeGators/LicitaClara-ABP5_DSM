@@ -15,18 +15,19 @@ for (const theme of ['light', 'dark']) for (const width of [1280, 1062, 390]) {
     const href = await link.getAttribute('href')
     await link.click()
     await expect(page.locator('.analysis-detail')).toBeVisible()
-    await expect(page.locator('.detail-score-number')).not.toContainText('—')
+    await expect(page.locator('.detail-score-number')).toHaveCount(0)
     await expect(page.locator('[role="status"]')).toHaveCount(0, { timeout: 20000 })
     const url = new URL(page.url()), id = url.pathname.split('/').at(-1)
     expect(url.pathname).toBe(new URL(href, url).pathname)
     expect(url.searchParams.get('base_id')).toBe(config.base)
     expect(url.searchParams.get('execucao_id')).toBe(config.execucao)
-    const response = await request.get(`/api/v1/analises/execucoes/${config.execucao}/itens/${id}?base_id=${config.base}`)
+    const response = await request.get(`/api/v1/itens/${id}?base_id=${config.base}`)
     expect(response.ok()).toBe(true)
-    const scores = (await response.json()).dados[0].resultados
-    const score = scores.find(s => s.algoritmo === 'isolation_forest') || scores[0]
-    await expect(page.locator('.detail-score-number')).toContainText(Number(score.medida_if).toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 }))
-    await expect(page.locator('.detail-comparison')).toContainText(`${score.atributos.comparacao.n_treino.toLocaleString('pt-BR')} observações no treino`)
+    const { item } = await response.json()
+    await expect(page.locator('.detail-item-description')).toHaveText(item.descricao)
+    await expect(page.getByRole('link', { name: 'Gerar relatório da licitação' })).toHaveAttribute('href', new RegExp(`processo_id=${item.processo.id}`))
+    await expect(page.getByRole('button', { name: 'Documentos', exact: true })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Revisão', exact: true })).toHaveCount(0)
     const violations = (await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations
     expect(violations).toEqual([])
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)
@@ -35,6 +36,6 @@ for (const theme of ['light', 'dark']) for (const width of [1280, 1062, 390]) {
     const output = process.env.LICITA_DETAIL_OUTPUT || '../data/diagnostico/detalhe_figma'
     mkdirSync(output, { recursive: true })
     await page.screenshot({ path: `${output}/${theme}-${width}.png`, fullPage: true })
-    writeFileSync(`${output}/${theme}-${width}.json`, JSON.stringify({ route: page.url(), score: score.medida_if, violations, overflow, errors }, null, 2))
+    writeFileSync(`${output}/${theme}-${width}.json`, JSON.stringify({ route: page.url(), violations, overflow, errors }, null, 2))
   })
 }

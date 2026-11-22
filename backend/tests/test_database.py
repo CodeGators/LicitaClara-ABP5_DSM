@@ -1,23 +1,11 @@
 import pytest
 from fastapi.testclient import TestClient
 from licita_backend.core.config import Settings
-from licita_backend.db.session import build_session_factory, transaction
+from licita_backend.db.session import build_session_factory
 from licita_backend.main import create_app
 from sqlalchemy import func, insert, select
 
 pytestmark = pytest.mark.integration
-
-
-def test_transaction_commits_success_and_rolls_back_failure(integration_engine, transaction_table):
-    factory = build_session_factory(integration_engine)
-    with transaction(factory) as session:
-        session.execute(insert(transaction_table).values(id=1))
-    with pytest.raises(RuntimeError):
-        with transaction(factory) as session:
-            session.execute(insert(transaction_table).values(id=2))
-            raise RuntimeError("force rollback")
-    with factory() as session:
-        assert session.scalar(select(func.count()).select_from(transaction_table)) == 1
 
 
 def test_closing_uncommitted_session_rolls_back(integration_engine, transaction_table):

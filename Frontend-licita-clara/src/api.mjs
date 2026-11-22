@@ -80,11 +80,6 @@ export const money = value => {
   return formatted === 'Não informado' ? formatted : `R$ ${formatted}`
 }
 export const date = value => value ? value.slice(0, 10).split('-').reverse().join('/') : 'Não informada'
-export const baseLink = (path, baseId) => `${path}?${new URLSearchParams({ base_id: baseId })}`
-export const safeOfficialUrl = value => {
-  try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password ? url.href : null } catch { return null }
-}
-
 export const viewFields = ['busca', 'orgao_id', 'fornecedor_id', 'modalidade_id', 'homologacao_inicio', 'homologacao_fim', 'valor_minimo', 'valor_maximo', 'analise', 'ordenacao', 'tamanho_pagina']
 const keys = ['base_id', 'execucao_id', 'modelo_id', 'sinalizacao', ...viewFields]
 export const selectionLink = (path, source) => {
