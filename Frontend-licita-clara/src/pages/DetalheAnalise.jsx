@@ -105,7 +105,6 @@ function Detail({ item }) {
         </div>
         <QueryState query={processQuery} loading="Consultando valores da compra…" />
         {controls}
-        <p className="hint">A medida IF pertence a este resultado do item. Não existe medida IF agregada da licitação.</p>
       </div>
     </section>
     <nav className="tabs" aria-label="Seções da análise">{[['sinais', 'Preço e sinais'], ['docs', 'Documentos'], ['revisao', 'Revisão']].map(([key, label]) => <button key={key} className={tab === key ? 'on' : ''} aria-pressed={tab === key} onClick={() => setTab(key)}>{label}</button>)}</nav>
