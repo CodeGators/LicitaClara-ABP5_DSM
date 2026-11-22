@@ -451,3 +451,39 @@ test('selecionar fornecedor atualiza o painel e pagina itens sem paginar o ranki
   await expect(page.getByRole('link', { name: 'Compra 5 · item 1', exact: true })).toHaveAttribute('href', new RegExp(`/ranking/${ITEM}`))
   await expect(page.getByRole('link', { name: 'Compra 10 · item 2', exact: true })).toBeVisible()
 })
+
+for (const theme of ['light', 'dark']) for (const width of [1280, 390]) {
+  test(`faixas IF preservam revisão neutra e contraste ${theme} ${width}`, async ({ page }) => {
+    await mockView(page)
+    const samples = [
+      ['verde', '0.499999999999', false, 'green'],
+      ['amarelo', '0.50', false, 'yellow'],
+      ['limite amarelo', '0.699999999999', false, 'yellow'],
+      ['vermelho', '0.70', false, 'red'],
+      ['revisar', '0.90', true, null],
+      ['sem análise', null, false, null],
+    ]
+    await page.route('**/api/v1/visao/produtos?*', route => route.fulfill({ json: {
+      dados: samples.map(([name, measure, review]) => ({ id: name, descricao: `Produto ${name}`, catalogo: 'CATMAT', codigo_catalogo: '123', unidade_medida: 'UN', preco_minimo: '10', preco_maximo: '20', mediana: '15', quantidade_registros: 3, medida_if: measure, requer_validacao: review, itens: [{ id: ITEM, numero_compra: '1', numero_item: '1' }] })),
+      total: 6, pagina: 1, tamanho_pagina: 20, total_paginas: 1,
+    } }))
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/ranking')
+    await expect(page.locator('tbody tr')).toHaveCount(6)
+    await page.evaluate(value => { document.documentElement.dataset.theme = value }, theme)
+    const backgrounds = {}
+    for (const [name, , , band] of samples) {
+      const row = page.getByRole('row').filter({ has: page.getByRole('link', { name: `Produto ${name}`, exact: true }) })
+      if (band) {
+        await expect(row).toHaveAttribute('data-if-band', band)
+        backgrounds[band] = await row.evaluate(el => getComputedStyle(el).backgroundColor)
+        expect(backgrounds[band]).not.toBe('rgba(0, 0, 0, 0)')
+      } else await expect(row).not.toHaveAttribute('data-if-band')
+    }
+    expect(new Set(Object.values(backgrounds)).size).toBe(3)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false)
+    const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()
+    expect(axe.violations).toEqual([])
+    await expect(page.getByRole('columnheader', { name: 'Medida IF', exact: true })).toHaveCount(0)
+  })
+}

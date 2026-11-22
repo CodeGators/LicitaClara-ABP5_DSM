@@ -494,3 +494,13 @@ input.input[type=search]{appearance:none}
 .product-purchases summary{cursor:pointer;color:var(--petroleo);font-weight:600}
 .product-purchases ul{margin:.7rem 0;padding-left:1.1rem}
 .product-purchases li + li{margin-top:.4rem}
+
+/* Faixas visuais do maior IF observado no produto; revisão e ausência ficam neutras. */
+.product-table .if-band-green{--if-row-bg:#eff9f1}
+.product-table .if-band-yellow{--if-row-bg:#fff8e1}
+.product-table .if-band-red{--if-row-bg:#fff0ef}
+[data-theme=dark] .product-table .if-band-green{--if-row-bg:#193629}
+[data-theme=dark] .product-table .if-band-yellow{--if-row-bg:#393218}
+[data-theme=dark] .product-table .if-band-red{--if-row-bg:#3d242a}
+.product-table tbody tr[data-if-band]{background:var(--if-row-bg)}
+.product-table tbody tr[data-if-band]:hover td{background:transparent}

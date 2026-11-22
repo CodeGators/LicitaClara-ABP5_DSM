@@ -107,3 +107,13 @@ test('revisão vincula preço e referência ao mesmo resultado, inclusive covenc
   item.scores[0].resultado_item_id = 'b'
   assert.equal(itemRequiresPriceReview(item), true)
 })
+
+import { ifBand } from '../src/ifBands.mjs'
+
+test('faixas visuais usam IF sem arredondamento e ignoram produtos que requerem validação', () => {
+  for (const value of ['0', '0.49', '0.499999999999']) assert.equal(ifBand({ medida_if: value }), 'green')
+  for (const value of ['0.50', '0.69', '0.699999999999']) assert.equal(ifBand({ medida_if: value }), 'yellow')
+  for (const value of ['0.70', '0.99', '1']) assert.equal(ifBand({ medida_if: value }), 'red')
+  for (const value of [null, undefined, '', ' ', 'invalido', 'Infinity', -1, 1.01, false]) assert.equal(ifBand({ medida_if: value }), '')
+  for (const value of ['0.2', '0.6', '0.9']) assert.equal(ifBand({ medida_if: value, requer_validacao: true }), '')
+})
