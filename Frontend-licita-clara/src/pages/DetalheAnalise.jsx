@@ -82,7 +82,7 @@ function Detail({ item }) {
   const price = numeric(result?.valor_unitario_homologado)
   const ratio = median > 0 && price != null ? price / median : null
   const difference = ratio == null ? null : (ratio - 1) * 100
-  const fmt = v => v.toLocaleString('pt-BR', { maximumFractionDigits: 2 })
+  const fmt = v => v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   const idx = activeScore ? Math.max(0, Math.min(1, Number(activeScore.medida_if) || 0)) : null
   return <div className="analysis-detail">
     <Link className="link-a back-link" to={back}><ArrowLeft size={16} />Voltar à consulta</Link>
