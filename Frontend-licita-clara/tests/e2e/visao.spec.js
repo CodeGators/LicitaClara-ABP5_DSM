@@ -32,7 +32,7 @@ async function mockView(page, overrides = {}) {
     if (state.viewOffline) return bad('Consulta do recorte indisponível.', 503)
     if (url.searchParams.get('modelo_id') === 'invalido') return bad('Modelo não pertence à execução selecionada.', 422)
     const hasScore = state.scored && url.searchParams.get('execucao_id') && (state.automatic || url.searchParams.get('modelo_id'))
-    let rows = [item, otherItem].map((r, i) => ({ ...r, resultados: r.resultados.filter(e => !e.cancelado), valor_homologado: r.valor_homologado_item, soma_valores_conhecidos: r.valor_homologado_item, resultados_sem_total: 0, resultados_analisados: i === 0 && hasScore ? 1 : 0, status_analise: i === 0 && hasScore ? 'analisados' : 'nao_analisados', medida_if: i === 0 && hasScore ? '0.514' : null, scores: i === 0 && hasScore ? [{ id: 'score-1', resultado_item_id: r.resultados[0].id, score_bruto: '0.514', atributos: { comparacao: { mediana: state.noReference ? null : '0.05', n_treino: 100, unidade_preco: { unidade_preco: 'UN' } } } }] : [], motivos: i === 0 && hasScore ? {} : { SEM_REFERENCIA_EXATA: 1 } }))
+    let rows = [item, otherItem].map((r, i) => ({ ...r, resultados: r.resultados.filter(e => !e.cancelado), valor_homologado: r.valor_homologado_item, soma_valores_conhecidos: r.valor_homologado_item, resultados_sem_total: 0, resultados_analisados: i === 0 && hasScore ? 1 : 0, status_analise: i === 0 && hasScore ? 'analisados' : 'nao_analisados', medida_if: i === 0 && hasScore ? '0.514' : null, scores: i === 0 && hasScore ? [{ id: 'score-1', resultado_item_id: r.resultados[0].id, score_bruto: '0.514', atributos: { comparacao: { mediana: state.noReference ? null : state.extremePrice ? '0.01' : '0.05', n_treino: 100, unidade_preco: { unidade_preco: 'UN' } } } }] : [], motivos: i === 0 && hasScore ? {} : { SEM_REFERENCIA_EXATA: 1 } }))
     if (state.separateResults) rows[0].resultados.push({ ...item.resultados[0], id: 'co-vencedor', fornecedor_nome: 'Outro fornecedor do item' })
     rows = rows.filter(r => r.descricao.toLowerCase().includes((url.searchParams.get('busca') || '').toLowerCase()))
     const filter = url.searchParams.get('analise') || 'todos'
@@ -380,4 +380,19 @@ test('selecionar fornecedor atualiza o painel e pagina itens sem paginar o ranki
   await expect(page.locator('.dashboard-reading')).toContainText('Comparação de preço indisponível')
   await expect(page.locator('.dashboard-start')).toContainText('Sem referência')
   await expect(page.locator('.dashboard-reading')).not.toContainText('% acima')
+})
+
+ test('preço extremo recebe aviso no painel e ranking sem excluir o item', async ({ page }) => {
+  await mockView(page, { extremePrice: true })
+  await page.goto('/painel')
+  const reading = page.locator('.dashboard-reading')
+  await expect(reading).toContainText('Requer validação')
+  await expect(reading).toContainText('Possível erro de digitação ou cadastro')
+  await expect(page.locator('.dashboard-start')).toContainText('Requer validação')
+  await expect(reading.getByText('900,00% acima', { exact: true })).not.toBeVisible()
+  await reading.getByText('Ver diferença registrada', { exact: true }).click()
+  await expect(reading.getByText('900,00% acima', { exact: true })).toBeVisible()
+  await page.getByRole('link', { name: 'Itens Sinalizados', exact: true }).click()
+  await expect(page.getByRole('heading', { name: '2 item(ns) no ranking' })).toBeVisible()
+  await expect(page.locator('tbody')).toContainText('Requer validação')
 })

@@ -1,3 +1,5 @@
+import PriceReview from '../components/PriceReview.jsx'
+import { requiresPriceReview } from '../priceValidation.mjs'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Files, Wallet, Activity, ScanSearch, CalendarDays, ArrowRight, Search } from 'lucide-react'
@@ -21,7 +23,7 @@ function comparison(item) {
   const price = numeric(result?.valor_unitario_homologado)
   const median = numeric(reference?.mediana)
   const valid = !!basis && price != null && price >= 0 && median != null && median > 0
-  return { result, reference, basis, price, median, valid, percent: valid ? (price / median - 1) * 100 : null }
+  return { result, reference, basis, price, median, valid, review: requiresPriceReview(result?.valor_unitario_homologado, reference?.mediana, basis), percent: valid ? (price / median - 1) * 100 : null }
 }
 const difference = c => !c.valid ? 'Sem referência' : Math.abs(c.percent) < 0.005 ? 'Na mediana' : `${decimal(Math.abs(c.percent), 2, 2)}% ${c.percent > 0 ? 'acima' : 'abaixo'}`
 
@@ -31,7 +33,7 @@ function PriceReading({ item, params }) {
   return <section className="card dashboard-reading dashboard-price-reading"><h2>Confira este item</h2>
     {!item ? <p>Selecione um item analisado.</p> : <>
       <h3>{item.descricao}</h3><p className="sub">Compra {item.processo.numero_compra} · item {item.numero_item}</p>
-      {c.valid ? <><p className="dashboard-price-difference">{difference(c)}</p><p className="hint">da mediana histórica do grupo · preços por {c.basis}</p>
+      {c.valid ? <>{c.review ? <><PriceReview /><details><summary>Ver diferença registrada</summary><p>{difference(c)}</p></details></> : <p className="dashboard-price-difference">{difference(c)}</p>}<p className="hint">da mediana histórica do grupo · preços por {c.basis}</p>
         {[["Preço unitário homologado", c.price], ["Mediana histórica dos similares", c.median]].map(([label, value]) => <div className="dashboard-price-bar" key={label}><div><span>{label}</span><strong>{money(value)}</strong></div><div className="dashboard-price-track"><span style={{ width: `${100 * value / max}%` }} /></div></div>)}
         <p className="hint">{c.reference.n_treino != null ? `${number(c.reference.n_treino)} registros no treinamento. ` : ''}Referência calculada com os preços unitários históricos do grupo comparável.</p>
       </> : <p className="dashboard-price-empty">Comparação de preço indisponível: falta uma referência histórica com unidade identificada. Consulte os detalhes da análise.</p>}
@@ -67,7 +69,7 @@ export default function PainelGeral({ query, ranking, params }) {
         <QueryState query={ranking} loading="Consultando itens do recorte…" />
         {ranking.data && (!rows.length ? <p>Nenhum item analisado disponível neste recorte.</p> : <div className="table-scroll" role="region" aria-label="Itens para conferir" tabIndex={0}><table className="tbl tbl-stack"><thead><tr><th scope="col">Compra / item</th><th scope="col">Preço unitário</th><th scope="col">Mediana histórica</th><th scope="col">Diferença</th><th scope="col"><span className="sr-only">Análise</span></th></tr></thead><tbody>{rows.map(row => {
           const c = comparison(row)
-          return <tr key={row.id} className={selected?.id === row.id ? 'sel' : ''}><td><button className="dashboard-row-select" aria-pressed={selected?.id === row.id} onClick={() => setChosen(row.id)}>Compra {row.processo.numero_compra} · item {row.numero_item}</button><small className="dashboard-clamp" title={row.descricao}>{row.descricao}</small><small className="dashboard-clamp" title={row.processo.orgao_nome}>{row.processo.orgao_nome}</small></td><td className="numeric" data-label="Preço unitário"><span className="dashboard-price-number">{money(c.price)}</span></td><td className="numeric" data-label="Mediana histórica">{c.valid ? <><span className="dashboard-price-number">{money(c.median)}</span><small>por {c.basis}</small></> : 'Indisponível'}</td><td className="numeric" data-label="Diferença">{c.valid ? <><span className="dashboard-price-number">{decimal(Math.abs(c.percent), 2, 2)}%</span><small>{Math.abs(c.percent) < 0.005 ? 'na mediana' : c.percent > 0 ? 'acima' : 'abaixo'}</small></> : 'Sem referência'}</td><td><Link className="dashboard-analysis-link" to={selectionLink(`/ranking/${row.id}`, params)} state={{ from: selectionLink('/painel', params) }} title="Ver análise" aria-label="Ver análise"><Search size={17} aria-hidden="true" /></Link></td></tr>
+          return <tr key={row.id} className={selected?.id === row.id ? 'sel' : ''}><td><button className="dashboard-row-select" aria-pressed={selected?.id === row.id} onClick={() => setChosen(row.id)}>Compra {row.processo.numero_compra} · item {row.numero_item}</button><small className="dashboard-clamp" title={row.descricao}>{row.descricao}</small><small className="dashboard-clamp" title={row.processo.orgao_nome}>{row.processo.orgao_nome}</small></td><td className="numeric" data-label="Preço unitário"><span className="dashboard-price-number">{money(c.price)}</span></td><td className="numeric" data-label="Mediana histórica">{c.valid ? <><span className="dashboard-price-number">{money(c.median)}</span><small>por {c.basis}</small></> : 'Indisponível'}</td><td className="numeric" data-label="Diferença">{c.review ? <PriceReview compact /> : c.valid ? <><span className="dashboard-price-number">{decimal(Math.abs(c.percent), 2, 2)}%</span><small>{Math.abs(c.percent) < 0.005 ? 'na mediana' : c.percent > 0 ? 'acima' : 'abaixo'}</small></> : 'Sem referência'}</td><td><Link className="dashboard-analysis-link" to={selectionLink(`/ranking/${row.id}`, params)} state={{ from: selectionLink('/painel', params) }} title="Ver análise" aria-label="Ver análise"><Search size={17} aria-hidden="true" /></Link></td></tr>
         })}</tbody></table></div>)}
         <p className="hint">Cada linha mostra o resultado priorizado do item; não é o valor total da compra. A referência é histórica, não uma cotação atual.</p>
       </section><PriceReading item={selected} params={params} /></div>

@@ -486,3 +486,6 @@ input.input[type=search]{appearance:none}
 .dashboard-price-number{white-space:nowrap}
 .dashboard-start .dashboard-clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .dashboard-start .tbl td:first-child{min-width:11rem}
+.price-review{margin:.6rem 0;white-space:normal;text-align:left}
+.price-review p{font-size:.875rem;line-height:1.6;margin:.5rem 0}
+.price-review .pill{white-space:normal}

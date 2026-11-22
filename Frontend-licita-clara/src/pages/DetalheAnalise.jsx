@@ -1,3 +1,5 @@
+import PriceReview from '../components/PriceReview.jsx'
+import { requiresPriceReview } from '../priceValidation.mjs'
 import { useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { ArrowLeft, FilePlus2 } from 'lucide-react'
@@ -92,6 +94,7 @@ function Detail({ item }) {
         <p className="hint">{activeScore ? algorithm(activeScore.algoritmo) : 'Sem medida IF disponível'}{!invalidModel && scores.filter(s => s !== activeScore).length > 0 && ` · ${scores.filter(s => s !== activeScore).map(s => `${algorithm(s.algoritmo)}: ${ifMeasure(s.medida_if)}`).join(' · ')}`}</p>
       </div>
       <div className="detail-body">
+        <div>{requiresPriceReview(result?.valor_unitario_homologado, comparison?.mediana, comparison?.unidade_preco?.unidade_preco) && <PriceReview />}</div>
         <p className="detail-headline">{ratio != null ? <>O preço unitário homologado foi <span className="pill ana">{fmt(ratio)}× a mediana</span> de itens parecidos ({money(median)}).</> : 'Não há referência de preço suficiente para comparar este resultado.'}</p>
         <div className="detail-facts">
           <Info label="Fornecedor do resultado">{result?.fornecedor_nome || 'Não informado'}</Info>

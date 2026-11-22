@@ -1,3 +1,5 @@
+import PriceReview from '../components/PriceReview.jsx'
+import { itemRequiresPriceReview } from '../priceValidation.mjs'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { useBase } from '../BaseContext.jsx'
@@ -61,7 +63,7 @@ export function useView(path) {
 export function ItemRows({ rows, params, scoreLabel = 'Medida IF' }) {
   const location = useLocation()
   return <div className="table-scroll" role="region" aria-label="Itens e resultados do recorte; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl tbl-stack"><thead><tr><th scope="col">Item / compra</th><th scope="col">Órgão / fornecedores</th><th scope="col">Total homologado</th><th scope="col">{scoreLabel}</th><th scope="col">Cobertura</th></tr></thead><tbody>{rows.map(r => <tr key={r.id}>
-    <td><Link className="link-a" to={selectionLink(`/ranking/${r.id}`, params)} state={{ from: location.pathname + location.search }}>{r.descricao}</Link><small>Item {r.numero_item} · Compra {r.processo.numero_compra}</small></td>
+    <td><Link className="link-a" to={selectionLink(`/ranking/${r.id}`, params)} state={{ from: location.pathname + location.search }}>{r.descricao}</Link><small>Item {r.numero_item} · Compra {r.processo.numero_compra}</small>{itemRequiresPriceReview(r) && <PriceReview compact />}</td>
     <td data-label="Órgão">{r.processo.orgao_nome}<small>{[...new Set(r.resultados.map(e => e.fornecedor_nome))].join('; ') || 'Nenhum resultado conhecido'}</small></td>
     <td className="numeric" data-label="Total homologado">{money(r.valor_homologado)}{r.resultados_sem_total > 0 && <small>Total incompleto na fonte</small>}</td>
     <td className="numeric" data-label={scoreLabel}>{indexText(r.medida_if)}</td>

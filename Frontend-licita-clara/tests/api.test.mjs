@@ -89,3 +89,21 @@ test('medida IF mantém quatro casas e não converte para percentil', () => {
   assert.equal(ifMeasure('0'), '0,0000')
   assert.equal(ifMeasure(null), 'Indisponível')
 })
+
+import { requiresPriceReview, itemRequiresPriceReview } from '../src/priceValidation.mjs'
+
+test('revisão de preço é estritamente acima de 500%, antes do arredondamento', () => {
+  assert.equal(requiresPriceReview('600', '100', 'UN'), false)
+  assert.equal(requiresPriceReview('600.00000001', '100', 'UN'), true)
+  assert.equal(requiresPriceReview('599.99999999', '100', 'UN'), false)
+  assert.equal(requiresPriceReview('216.18', '22.8', 'UN'), true)
+  assert.equal(requiresPriceReview('30185.2', '0.8', 'copo de 200 ml'), true)
+  for (const [p, m, u] of [[null, '1', 'UN'], ['1', '0', 'UN'], ['1', '-1', 'UN'], ['900', '1', null], ['Infinity', '1', 'UN']]) assert.equal(requiresPriceReview(p, m, u), false)
+})
+
+test('revisão vincula preço e referência ao mesmo resultado, inclusive covencedores', () => {
+  const item = { resultados: [{ id: 'a', valor_unitario_homologado: '1' }, { id: 'b', valor_unitario_homologado: '100' }], scores: [{ resultado_item_id: 'a', atributos: { comparacao: { mediana: '1', unidade_preco: { unidade_preco: 'UN' } } } }] }
+  assert.equal(itemRequiresPriceReview(item), false)
+  item.scores[0].resultado_item_id = 'b'
+  assert.equal(itemRequiresPriceReview(item), true)
+})
