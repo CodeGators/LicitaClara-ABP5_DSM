@@ -43,9 +43,9 @@ export function LookupFilter({ kind, title, value, onChange, baseId, compact = f
 }
 
 // Mantido fora das telas para reutilizar o contrato de resultados por fornecedor.
-export function Results({ results }) {
+export function Results({ results, hideStatus = false }) {
   return <div className="card"><h2>Resultados do item</h2><p className="sub">Preço e quantidade por fornecedor. Resultados cancelados ficam fora do total.</p>
-    {!results.length ? <p className="sub">Nenhum resultado conhecido nesta base.</p> : <div className="table-scroll" role="region" aria-label="Resultados do item; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Quantidade homologada</th><th scope="col">Preço unitário</th><th scope="col">Total homologado</th><th scope="col">Data do resultado</th><th scope="col">Situação</th></tr></thead><tbody>{results.map(r => <tr key={r.id}><td>{r.fornecedor_nome}</td><td>{decimal(r.quantidade_homologada)}</td><td title={`Valor original: ${exactDecimal(r.valor_unitario_homologado)}`}>{money(r.valor_unitario_homologado)}</td><td>{money(r.valor_total_homologado)}</td><td>{date(r.data_resultado)}</td><td>{r.cancelado ? 'Cancelado' : 'Não cancelado'}<small>{r.situacao}</small></td></tr>)}</tbody></table></div>}
+    {!results.length ? <p className="sub">Nenhum resultado conhecido nesta base.</p> : <div className="table-scroll" role="region" aria-label="Resultados do item; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Quantidade homologada</th><th scope="col">Preço unitário</th><th scope="col">Total homologado</th><th scope="col">Data do resultado</th>{!hideStatus && <th scope="col">Situação</th>}</tr></thead><tbody>{results.map(r => <tr key={r.id}><td>{r.fornecedor_nome}</td><td>{decimal(r.quantidade_homologada)}</td><td title={`Valor original: ${exactDecimal(r.valor_unitario_homologado)}`}>{money(r.valor_unitario_homologado)}</td><td>{money(r.valor_total_homologado)}</td><td>{date(r.data_resultado)}</td>{!hideStatus && <td>{r.cancelado ? 'Cancelado' : 'Não cancelado'}<small>{r.situacao}</small></td>}</tr>)}</tbody></table></div>}
   </div>
 }
 
