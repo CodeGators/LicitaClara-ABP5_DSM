@@ -7,7 +7,7 @@ import { useBase } from '../BaseContext.jsx'
 import { useAnalysis } from '../AnalysisContext.jsx'
 import { ifMeasure, date, decimal, exactDecimal, money, reportLink, selectionLink } from '../api.mjs'
 import { Documents, Field, Info, QueryState, Results } from '../components/consultas.jsx'
-import { Head, Aviso, Progress } from '../components/ui.jsx'
+import { Head, Progress } from '../components/ui.jsx'
 import useApi from '../useApi.js'
 
 const algorithm = name => ({ isolation_forest: 'Isolation Forest', autoencoder: 'Autoencoder' })[name] || name
@@ -108,7 +108,6 @@ function Detail({ item }) {
         <p className="hint">A medida IF pertence a este resultado do item. Não existe medida IF agregada da licitação.</p>
       </div>
     </section>
-    <Aviso />
     <nav className="tabs" aria-label="Seções da análise">{[['sinais', 'Preço e sinais'], ['docs', 'Documentos'], ['revisao', 'Revisão']].map(([key, label]) => <button key={key} className={tab === key ? 'on' : ''} aria-pressed={tab === key} onClick={() => setTab(key)}>{label}</button>)}</nav>
     <QueryState query={analysis} loading="Consultando análise do item…" />
     {invalidModel && <p className="note" role="alert">Modelo fora da execução selecionada. Nenhum score de outro modelo será usado.</p>}
