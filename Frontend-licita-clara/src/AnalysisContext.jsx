@@ -8,18 +8,31 @@ const Context = createContext(null)
 export const useAnalysis = () => useContext(Context)
 export { viewFields, selectionLink } from './api.mjs'
 
-export function AnalysisProvider({ enabled, children }) {
+export function AnalysisProvider({ enabled, automatic = false, children }) {
   const base = useBase()
   const [params, setParams] = useSearchParams()
   const [page, setPage] = useState(1)
-  const selected = params.get('execucao_id') || ''
-  const modelId = params.get('modelo_id') || ''
   const validBase = !!(enabled && base.baseId && base.data?.base)
-  const publication = useApi('/analises/publicacao', { base_id: base.baseId }, validBase && !params.has('execucao_id'))
-  const runs = useApi('/analises/execucoes', { base_id: base.baseId, pagina: page, tamanho_pagina: 20 }, validBase)
+  const publication = useApi('/analises/publicacao', { base_id: base.baseId }, validBase && (automatic || !params.has('execucao_id')))
+  const selected = automatic ? (publication.data ? publication.data.execucao_id || 'nenhuma' : '') : params.get('execucao_id') || ''
+  const modelId = automatic ? '' : params.get('modelo_id') || ''
+  const runs = useApi('/analises/execucoes', { base_id: base.baseId, pagina: page, tamanho_pagina: 20 }, validBase && !automatic)
   const executionId = selected && selected !== 'nenhuma' ? selected : ''
   const run = useApi(`/analises/execucoes/${encodeURIComponent(executionId)}`, { base_id: base.baseId }, validBase && !!executionId)
   useEffect(() => {
+    if (automatic) {
+      if (!validBase || !publication.data) return
+      const current = publication.data.execucao_id || 'nenhuma'
+      if (params.get('execucao_id') === current && !params.has('modelo_id')) return
+      setParams(previous => {
+        const next = new URLSearchParams(previous)
+        if ((next.has('execucao_id') && next.get('execucao_id') !== current) || next.has('modelo_id')) next.delete('pagina')
+        next.set('execucao_id', current)
+        next.delete('modelo_id')
+        return next
+      }, { replace: true })
+      return
+    }
     if (validBase && !params.has('execucao_id') && publication.data) setParams(previous => {
       if (previous.has('execucao_id')) return previous
       const next = new URLSearchParams(previous)
@@ -27,31 +40,33 @@ export function AnalysisProvider({ enabled, children }) {
       next.delete('modelo_id')
       return next
     }, { replace: true })
-  }, [validBase, params, publication.data, setParams])
+  }, [automatic, validBase, params, publication.data, setParams])
   useEffect(() => {
-    if (run.data && !run.data.roteamento_automatico && !modelId && run.data.modelos.some(m => m.algoritmo === 'isolation_forest')) setParams(previous => {
+    if (!automatic && run.data && !run.data.roteamento_automatico && !modelId && run.data.modelos.some(m => m.algoritmo === 'isolation_forest')) setParams(previous => {
       const next = new URLSearchParams(previous)
       if (next.get('execucao_id') !== executionId || next.get('modelo_id')) return previous
       const models = run.data.modelos.filter(m => m.algoritmo === 'isolation_forest').sort((a, b) => a.id.localeCompare(b.id))
       next.set('modelo_id', (models.find(m => m.algoritmo === 'isolation_forest') || models[0]).id)
       return next
     }, { replace: true })
-  }, [run.data, executionId, modelId, setParams])
-  const ready = validBase && params.has('execucao_id') && (!executionId || (run.data && (modelId || run.data.roteamento_automatico || !run.data.modelos.some(m => m.algoritmo === 'isolation_forest'))))
+  }, [automatic, run.data, executionId, modelId, setParams])
+  const ready = automatic
+    ? validBase && !!publication.data && params.get('execucao_id') === selected && !params.has('modelo_id') && (!executionId || !!run.data)
+    : validBase && params.has('execucao_id') && (!executionId || (run.data && (modelId || run.data.roteamento_automatico || !run.data.modelos.some(m => m.algoritmo === 'isolation_forest'))))
   const setSelection = (key, value) => setParams(previous => {
     const next = new URLSearchParams(previous)
     next.set(key, value); next.delete('pagina'); next.delete('pagina_itens')
     if (key === 'execucao_id') next.delete('modelo_id')
     return next
   })
-  return <Context.Provider value={{ ready, executionId, modelId, run, runs, publication, page, setPage, params, setParams, setSelection, selected }}>{children}</Context.Provider>
+  return <Context.Provider value={{ automatic, ready, executionId, modelId, run, runs, publication, page, setPage, params, setParams, setSelection, selected }}>{children}</Context.Provider>
 }
 
 export function AnalysisGate({ children }) {
   const selection = useAnalysis()
-  if (selection.executionId && selection.run.error) return <><h1>Não foi possível abrir a análise</h1><AnalysisSelector /><QueryState query={selection.run} /></>
-  if (selection.publication.error && !selection.params.has('execucao_id')) return <section><h1>Consulta da análise</h1><QueryState query={selection.publication} /></section>
-  if (!selection.ready) return <section><h1 className="sr-only">Consulta da análise</h1><div className="card" role="status">Selecionando a versão da análise…</div></section>
+  if (selection.executionId && selection.run.error) return <><h1>Não foi possível abrir a análise</h1>{!selection.automatic && <AnalysisSelector />}<QueryState query={selection.run} /></>
+  if (selection.publication.error && (selection.automatic || !selection.params.has('execucao_id'))) return <section><h1>Consulta da análise</h1><QueryState query={selection.publication} /></section>
+  if (!selection.ready) return <section><h1 className="sr-only">Consulta da análise</h1><div className="card" role="status">{selection.automatic ? 'Carregando a análise publicada…' : 'Selecionando a versão da análise…'}</div></section>
   return children
 }
 
@@ -60,6 +75,7 @@ const modelName = m => m.algoritmo === 'autoencoder' ? 'Autoencoder' : m.algorit
 // Linha resumida: mostra a análise em uso e só abre as opções quando a pessoa pede.
 export function AnalysisSelector({ allModels = false }) {
   const s = useAnalysis()
+  if (s.automatic) return null
   const model = s.run.data?.modelos.find(m => m.id === s.modelId)
   const when = s.run.data?.concluido_em ? new Date(s.run.data.concluido_em).toLocaleDateString('pt-BR') : null
   const summary = !s.executionId ? 'Sem análise: só dados importados'

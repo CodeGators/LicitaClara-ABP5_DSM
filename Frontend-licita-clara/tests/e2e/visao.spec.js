@@ -8,15 +8,11 @@ const MODEL = '88888888-8888-4888-8888-888888888888'
 const OTHER_SUPPLIER = '99999999-9999-4999-8999-999999999999'
 const AE = '88888888-8888-4888-8888-999999999999'
 
-async function abrirAnalise(page) {
-  const bar = page.locator('details.analysis-bar')
-  if (!(await bar.evaluate(el => el.open))) await bar.locator('summary').click()
-}
-
 async function mockView(page, overrides = {}) {
   const state = await mockApi(page, { active: EXEC, scored: true, ...overrides, handler: async ({ url, path, send, error }) => {
     const done = async body => { await send(body); return true }
     const bad = async (message, status) => { await error(message, status); return true }
+    if (path === '/analises/publicacao' && state.publicationOffline) return bad('Publicação indisponível.', 503)
     if (path === '/analises/publicacao') return done({ base_id: BASE, execucao_id: state.active, status: state.active ? 'publicada_experimental' : 'nao_publicada', experimental: true })
     const run = id => ({ id, roteamento_automatico: !!state.automatic, base_id: BASE, concluido_em: '2026-11-03T15:00:00Z', modelos: [{ id: MODEL, algoritmo: 'isolation_forest' }, { id: AE, algoritmo: 'autoencoder' }] })
     if (path === '/analises/execucoes') return done({ dados: [run(EXEC), run(NEW_EXEC)], total: 2, total_paginas: 1 })
@@ -31,7 +27,7 @@ async function mockView(page, overrides = {}) {
     if (!path.startsWith('/visao/')) return false
     if (state.viewOffline) return bad('Consulta do recorte indisponível.', 503)
     if (url.searchParams.get('modelo_id') === 'invalido') return bad('Modelo não pertence à execução selecionada.', 422)
-    const hasScore = state.scored && url.searchParams.get('execucao_id') && (state.automatic || url.searchParams.get('modelo_id'))
+    const hasScore = state.scored && url.searchParams.get('execucao_id') && (state.automatic || path === '/visao/produtos' || url.searchParams.get('modelo_id'))
     let rows = [item, state.twoScored ? { ...otherItem, resultados: [{ ...item.resultados[0], id: 'caneta-result', fornecedor_nome: 'Fornecedor da caneta', valor_unitario_homologado: '2.00' }] } : otherItem].map((r, i) => ({ ...r, resultados: r.resultados.filter(e => !e.cancelado), valor_homologado: r.valor_homologado_item, soma_valores_conhecidos: r.valor_homologado_item, resultados_sem_total: 0, resultados_analisados: (i === 0 || state.twoScored) && hasScore ? 1 : 0, status_analise: (i === 0 || state.twoScored) && hasScore ? 'analisados' : 'nao_analisados', medida_if: (i === 0 || state.twoScored) && hasScore ? '0.514' : null, scores: (i === 0 || state.twoScored) && hasScore ? [{ id: 'score-1', resultado_item_id: r.resultados[0].id, score_bruto: '0.514', atributos: { comparacao: { mediana: state.noReference ? null : state.extremePrice ? '0.01' : '0.05', n_treino: 100, unidade_preco: { unidade_preco: 'UN' } } } }] : [], motivos: (i === 0 || state.twoScored) && hasScore ? {} : { SEM_REFERENCIA_EXATA: 1 } }))
     if (state.separateResults) rows[0].resultados.push({ ...item.resultados[0], id: 'co-vencedor', fornecedor_nome: 'Outro fornecedor do item' })
     rows = rows.filter(r => r.descricao.toLowerCase().includes((url.searchParams.get('busca') || '').toLowerCase()))
@@ -124,15 +120,13 @@ test('fornecedor mostra compras e contratos separados e concentração desconhec
   await expect(page.getByText(/0 contratos vinculados conhecidos/)).toBeVisible()
 })
 
-test('troca de modelo, paginação, erro e retentativa mantêm seleção explícita', async ({ page }) => {
+test('seleção automática, paginação, erro e retentativa conservam a execução publicada', async ({ page }) => {
   const state = await mockView(page)
   await page.goto(`/ranking?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=${MODEL}&tamanho_pagina=1`)
   await expect(page.getByRole('link', { name: 'Borracha do recorte', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Próxima', exact: true }).click()
   await expect(page.getByRole('link', { name: 'Caneta do recorte', exact: true })).toBeVisible()
-  await abrirAnalise(page)
-  await page.getByLabel('Modelo experimental').selectOption(MODEL)
-  await expect(page).not.toHaveURL(/pagina=2/)
+  await expect(page.locator('.analysis-bar')).toHaveCount(0)
   state.viewOffline = true
   await page.getByLabel('Ordenação', { exact: true }).selectOption('descricao_asc')
   await page.getByRole('button', { name: 'Aplicar filtros' }).click()
@@ -140,17 +134,15 @@ test('troca de modelo, paginação, erro e retentativa mantêm seleção explíc
   state.viewOffline = false
   await page.getByRole('button', { name: 'Tentar novamente' }).click()
   await expect(page.getByRole('heading', { name: '2 produtos' })).toBeVisible()
-  expect(new URL(page.url()).searchParams.get('modelo_id')).toBe(MODEL)
+  expect(new URL(page.url()).searchParams.get('modelo_id')).toBeNull()
 })
 
-test('execução inexistente não troca silenciosamente para a ativa e permite escolher outra', async ({ page }) => {
+test('listagem ignora execução antiga e detalhe preserva validação de modelo explícito', async ({ page }) => {
   await mockView(page)
   await page.goto(`/ranking?base_id=${BASE}&execucao_id=00000000-0000-4000-8000-000000000000`)
-  await expect(page.getByRole('heading', { name: 'Registro não encontrado' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Borracha do recorte', exact: true })).toHaveCount(0)
-  await abrirAnalise(page)
-  await page.getByLabel('Execução publicada').selectOption(EXEC)
   await expect(page.getByRole('heading', { name: '2 produtos' })).toBeVisible()
+  expect(new URL(page.url()).searchParams.get('execucao_id')).toBe(EXEC)
+  await expect(page.locator('.analysis-bar')).toHaveCount(0)
   await page.goto(`/itens/${ITEM}?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=00000000-0000-4000-8000-000000000000`)
   await expect(page.getByRole('heading', { name: 'Modelo fora da execução selecionada' })).toBeVisible()
   await expect(page.getByRole('cell', { name: '0,5140', exact: true })).toHaveCount(0)
@@ -519,3 +511,47 @@ for (const width of [1280, 390]) {
     await expect(page.getByRole('heading', { name: '2 produtos', exact: true })).toBeVisible()
   })
 }
+
+test('itens escolhe publicação ativa e modelo automático mesmo com seleção antiga na URL', async ({ page }) => {
+  const state = await mockView(page)
+  await page.goto(`/ranking/?base_id=${BASE}&execucao_id=${NEW_EXEC}&modelo_id=${AE}&busca=Borracha&sinalizacao=anomalia_intermediaria&sinalizacao=sem_analise`)
+  await expect(page.getByRole('heading', { name: '1 produto', exact: true })).toBeVisible()
+  const params = new URL(page.url()).searchParams
+  expect(params.get('execucao_id')).toBe(EXEC)
+  expect(params.has('modelo_id')).toBe(false)
+  expect(params.getAll('sinalizacao')).toEqual(['anomalia_intermediaria', 'sem_analise'])
+  expect(params.get('busca')).toBe('Borracha')
+  await expect(page.getByLabel('Execução publicada')).toHaveCount(0)
+  await expect(page.getByLabel('Modelo experimental')).toHaveCount(0)
+  expect(state.calls.filter(u => u.pathname.endsWith('/analises/execucoes'))).toHaveLength(0)
+  const calls = state.calls.filter(u => u.pathname.endsWith('/visao/produtos'))
+  expect(calls.length).toBeGreaterThan(0)
+  expect(calls.every(u => u.searchParams.get('execucao_id') === EXEC && !u.searchParams.has('modelo_id'))).toBe(true)
+  state.active = NEW_EXEC
+  await page.reload()
+  await expect(page.getByRole('heading', { name: '1 produto', exact: true })).toBeVisible()
+  expect(new URL(page.url()).searchParams.get('execucao_id')).toBe(NEW_EXEC)
+  expect(new URL(page.url()).searchParams.has('modelo_id')).toBe(false)
+})
+
+test('sem publicação a seleção automática mantém dados e não inventa análise', async ({ page }) => {
+  const state = await mockView(page, { active: null, scored: false })
+  await page.goto(`/ranking?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=${MODEL}`)
+  await expect(page.getByRole('heading', { name: '2 produtos', exact: true })).toBeVisible()
+  expect(new URL(page.url()).searchParams.get('execucao_id')).toBe('nenhuma')
+  await expect(page.locator('.analysis-bar')).toHaveCount(0)
+  await expect(page.locator('[data-if-band]')).toHaveCount(0)
+  expect(state.calls.some(u => u.pathname.endsWith(`/analises/execucoes/${EXEC}`))).toBe(false)
+})
+
+test('falha na publicação oferece retentativa sem seletor manual ou uso da versão antiga', async ({ page }) => {
+  const state = await mockView(page, { publicationOffline: true })
+  await page.goto(`/ranking?base_id=${BASE}&execucao_id=${NEW_EXEC}`)
+  await expect(page.getByRole('heading', { name: 'Consulta indisponível', exact: true })).toBeVisible()
+  await expect(page.locator('.analysis-bar')).toHaveCount(0)
+  expect(state.calls.some(u => u.pathname.endsWith('/visao/produtos'))).toBe(false)
+  state.publicationOffline = false
+  await page.getByRole('button', { name: 'Tentar novamente', exact: true }).click()
+  await expect(page.getByRole('heading', { name: '2 produtos', exact: true })).toBeVisible()
+  expect(new URL(page.url()).searchParams.get('execucao_id')).toBe(EXEC)
+})
