@@ -81,6 +81,7 @@ function Detail({ item }) {
   const median = numeric(comparison?.mediana)
   const price = numeric(result?.valor_unitario_homologado)
   const ratio = median > 0 && price != null ? price / median : null
+  const difference = ratio == null ? null : (ratio - 1) * 100
   const fmt = v => v.toLocaleString('pt-BR', { maximumFractionDigits: 2 })
   const idx = activeScore ? Math.max(0, Math.min(1, Number(activeScore.medida_if) || 0)) : null
   return <div className="analysis-detail">
@@ -95,7 +96,7 @@ function Detail({ item }) {
       </div>
       <div className="detail-body">
         <div>{requiresPriceReview(result?.valor_unitario_homologado, comparison?.mediana, comparison?.unidade_preco?.unidade_preco) && <PriceReview />}</div>
-        <p className="detail-headline">{ratio != null ? <>O preço unitário homologado foi <span className="pill ana">{fmt(ratio)}× a mediana</span> de itens parecidos ({money(median)}).</> : 'Não há referência de preço suficiente para comparar este resultado.'}</p>
+        <p className="detail-headline">{ratio != null ? <>O preço unitário homologado foi <span className="pill ana">{difference === 0 ? 'igual à mediana' : `${fmt(Math.abs(difference))}% ${difference > 0 ? 'acima' : 'abaixo'} da mediana`}</span> de itens parecidos ({money(median)}).</> : 'Não há referência de preço suficiente para comparar este resultado.'}</p>
         <div className="detail-facts">
           <Info label="Fornecedor do resultado">{result?.fornecedor_nome || 'Não informado'}</Info>
           <Info label="Total homologado do resultado">{money(result?.valor_total_homologado)}</Info>
