@@ -10,7 +10,7 @@ for (const theme of ['light', 'dark']) for (const width of [1280, 1062, 390]) {
     const errors = []; page.on('pageerror', e => errors.push(e.message))
     await page.goto(target.routes.find(([name]) => name === 'painel')[1])
     await expect(page.locator('.dashboard-kpis .kpi')).toHaveCount(4)
-    await expect(page.getByRole('heading', { name: 'Por onde começar' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Itens para conferir' })).toBeVisible()
     await expect(page.locator('[role="status"]')).toHaveCount(0)
     await expect(page.locator('.query-error')).toHaveCount(0)
     await expect(page.getByRole('form', { name: 'Filtros do recorte' })).toHaveCount(0)

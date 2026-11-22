@@ -468,3 +468,21 @@ input.input[type=search]{appearance:none}
 
 /* Contém o cabeçalho acessível na área de rolagem do painel. */
 .dashboard-start .table-scroll { position: relative; }
+
+/* Comparação de preços no painel: referência e resultado sempre identificados. */
+.dashboard-price-reading{min-width:0;overflow-wrap:anywhere}
+.dashboard-price-reading h3{margin-top:1rem;font-size:1rem;line-height:1.5}
+.dashboard-price-difference{font-size:1.6rem;font-weight:700;color:var(--petroleo);margin:1rem 0 .25rem}
+.dashboard-price-bar{margin:1.2rem 0}
+.dashboard-price-bar>div:first-child{display:flex;justify-content:space-between;gap:.75rem;flex-wrap:wrap;font-size:.875rem}
+.dashboard-price-track{height:.5rem;background:var(--fundo);border-radius:1rem;margin-top:.5rem;overflow:hidden}
+.dashboard-price-track span{display:block;height:100%;background:var(--petroleo);border-radius:inherit}
+.dashboard-price-facts{display:grid;gap:.3rem;margin:1rem 0}
+.dashboard-price-facts dt{color:var(--secundario);font-size:.8125rem;margin-top:.5rem}
+.dashboard-price-facts dd{margin:0;font-size:.9375rem}
+.dashboard-price-help p{font-size:.9375rem;line-height:1.65;margin-top:.6rem}
+.dashboard-start td.numeric{white-space:normal;min-width:7rem}
+.dashboard-price-empty{margin:1rem 0;line-height:1.6}
+.dashboard-price-number{white-space:nowrap}
+.dashboard-start .dashboard-clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.dashboard-start .tbl td:first-child{min-width:11rem}

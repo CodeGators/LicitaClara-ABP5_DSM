@@ -1,88 +1,49 @@
-import { useId, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Files, Wallet, Activity, ScanSearch, CalendarDays, ArrowRight, Search } from 'lucide-react'
 import { useBase } from '../BaseContext.jsx'
-import { useAnalysis } from '../AnalysisContext.jsx'
-import { ifMeasure, decimal, money, selectionLink } from '../api.mjs'
-import { QueryState, Field } from '../components/consultas.jsx'
-import { Head, Aviso } from '../components/ui.jsx'
-import useApi from '../useApi.js'
+import { date, decimal, money, selectionLink } from '../api.mjs'
+import { QueryState } from '../components/consultas.jsx'
+import { Head } from '../components/ui.jsx'
 
 const number = value => Number(value).toLocaleString('pt-BR')
-const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-const month = value => value ? `${months[Number(value.slice(5, 7)) - 1]} ${value.slice(0, 4)}` : 'Período não informado'
+const month = value => value ? new Date(`${value.slice(0, 7)}-15T12:00:00`).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }) : 'Período não informado'
 const period = (start, end) => start?.slice(0, 7) === end?.slice(0, 7) ? month(start) : `${month(start)} – ${month(end)}`
-const range = b => `${decimal(b.inicio, 1, 1)}–${decimal(b.fim, 1, 1)}`
-const algorithm = value => ({ isolation_forest: 'Isolation Forest', autoencoder: 'Autoencoder' })[value] || value
 const compactMoney = value => value == null ? 'Não informado' : Math.abs(Number(value)) >= 1_000_000 ? `R$ ${(Number(value) / 1_000_000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} mi` : money(value)
+const numeric = value => value != null && value !== '' && Number.isFinite(Number(value)) ? Number(value) : null
 
-function Distribution({ data }) {
-  const max = Math.max(1, ...data.map(b => b.itens))
-  const available = data.some(b => b.itens)
-  return <section className="card dashboard-chart"><h2>Distribuição da medida IF</h2><p className="sub">Medida original de 0 a 1 · maior indica maior anomalia.</p>
-    {!available ? <p className="dashboard-chart-empty">Nenhuma medida IF disponível neste recorte.</p> : <div className="dashboard-chart-scroll" role="region" aria-label="Distribuição das medidas IF; use as setas para rolar" tabIndex={0}><div className="dashboard-bins">{data.map((b, i) => <div className="dashboard-bin" key={b.inicio}><div className="dashboard-bar-track"><div className="dashboard-bar" style={{ height: `${100 * b.itens / max}%`, background: 'var(--petroleo)' }}><span>{b.itens}</span></div></div><small>{range(b, i)}</small></div>)}</div></div>}
-    <div className="dashboard-legend">{[[0, 5, '0,0–0,5', 'baixa'], [5, 10, '0,5–1,0', 'baixa']].map(([start, end, label, color]) => <span key={label}><i style={{ background: `var(--${color})` }} />{label}: {number(data.slice(start, end).reduce((n, b) => n + b.itens, 0))}</span>)}</div>
-    <p className="dashboard-chart-caption">{number(data.reduce((n, b) => n + b.itens, 0))} itens com medida IF (o maior de cada item)</p>
-    <details className="dashboard-chart-data"><summary>Ver dados da distribuição</summary><table className="tbl"><caption>Contagem de itens por intervalo</caption><thead><tr><th scope="col">Intervalo</th><th scope="col">Itens</th></tr></thead><tbody>{data.map((b, i) => <tr key={b.inicio}><th scope="row">{range(b, i)}</th><td>{b.itens}</td></tr>)}</tbody></table></details>
-  </section>
+function comparison(item) {
+  // The same result supplies the price, supplier and reference. Never mix winners.
+  const score = [...(item?.scores || [])].sort((a, b) => Number(b.score_bruto) - Number(a.score_bruto) || String(a.id).localeCompare(String(b.id)))[0]
+  const result = item?.resultados.find(r => r.id === score?.resultado_item_id)
+  const reference = score?.atributos?.comparacao
+  const basis = reference?.unidade_preco?.unidade_preco
+  const price = numeric(result?.valor_unitario_homologado)
+  const median = numeric(reference?.mediana)
+  const valid = !!basis && price != null && price >= 0 && median != null && median > 0
+  return { result, reference, basis, price, median, valid, percent: valid ? (price / median - 1) * 100 : null }
 }
+const difference = c => !c.valid ? 'Sem referência' : Math.abs(c.percent) < 0.005 ? 'Na mediana' : `${decimal(Math.abs(c.percent), 2, 2)}% ${c.percent > 0 ? 'acima' : 'abaixo'}`
 
-function Evolution({ data }) {
-  const id = useId()
-  const dated = data.filter(m => m.mes !== 'sem_data').sort((a, b) => a.mes.localeCompare(b.mes))
-  const unknown = data.filter(m => m.mes === 'sem_data').reduce((n, m) => n + m.itens, 0)
-  const count = m => m.analisados + m.parcial
-  const max = Math.max(1, ...dated.map(count))
-  const serial = m => Number(m.slice(0, 4)) * 12 + Number(m.slice(5, 7))
-  const first = dated.length ? serial(dated[0].mes) : 0
-  const last = dated.length ? serial(dated.at(-1).mes) : 0
-  const points = dated.map(m => ({ ...m, n: count(m), x: first === last ? 230 : 38 + (serial(m.mes) - first) * 382 / (last - first), y: 142 - 108 * count(m) / max }))
-  const oneYear = new Set(dated.map(m => m.mes.slice(0, 4))).size <= 1
-  const ticks = []
-  points.forEach((p, i) => { if (!ticks.length || p.x - points[ticks.at(-1)].x >= (oneYear ? 55 : 100)) ticks.push(i) })
-  if (points.length && ticks.at(-1) !== points.length - 1) {
-    while (ticks.length > 1 && points.at(-1).x - points[ticks.at(-1)].x < (oneYear ? 55 : 100)) ticks.pop()
-    ticks.push(points.length - 1)
-  }
-  const hasAnalysis = points.some(p => p.n)
-  const line = points.map(p => `${p.x},${p.y}`).join(' ')
-  return <section className="card dashboard-chart"><h2>Evolução dos itens analisados</h2><p className="sub">Itens analisados por mês do último resultado conhecido.</p>
-    {hasAnalysis ? <svg className="dashboard-line" viewBox="0 0 450 180" role="img" aria-labelledby={id}>
-      <title id={id}>{points.map(p => `${month(p.mes)}: ${p.n} itens com análise`).join('; ')}</title>
-      {[0, 0.5, 1].map(t => <g key={t}><line x1="38" x2="420" y1={142 - 108 * t} y2={142 - 108 * t} className="dashboard-grid-line" /><text x="30" y={146 - 108 * t} textAnchor="end">{Math.round(max * t)}</text></g>)}
-      {points.length > 1 && <><polygon points={`${points[0].x},142 ${line} ${points.at(-1).x},142`} className="dashboard-line-area" /><polyline points={line} className="dashboard-line-path" /></>}
-      {points.map((p, i) => <g key={p.mes}><circle cx={p.x} cy={p.y} r="3" className="dashboard-point" />{ticks.includes(i) && <><text x={p.x} y={p.y - 10} textAnchor="middle">{p.n}</text><text x={p.x} y="164" textAnchor={i === 0 && points.length > 1 ? 'start' : i === points.length - 1 && points.length > 1 ? 'end' : 'middle'}>{months[Number(p.mes.slice(5, 7)) - 1]}{oneYear ? '' : ` ${p.mes.slice(2, 4)}`}</text></>}</g>)}
-    </svg> : <p className="dashboard-chart-empty">Nenhum item analisado nos meses com data conhecida.</p>}
-    <p className="dashboard-chart-caption">{dated.length > 0 && `${dated[0].mes.slice(0, 4)}${oneYear ? '' : `–${dated.at(-1).mes.slice(0, 4)}`} · `}{unknown ? `${number(unknown)} itens sem data ficam fora do gráfico.` : 'Cada item aparece uma vez. Não é a data de pagamento.'}</p>
-    <details className="dashboard-chart-data"><summary>Ver dados da evolução</summary><table className="tbl"><caption>Cobertura de análise por mês</caption><thead><tr><th scope="col">Mês</th><th scope="col">Com análise</th><th scope="col">Total de itens</th></tr></thead><tbody>{data.map(m => <tr key={m.mes}><th scope="row">{m.mes === 'sem_data' ? 'Sem data conhecida' : month(m.mes)}</th><td>{count(m)}</td><td>{m.itens}</td></tr>)}</tbody></table></details>
-  </section>
-}
-
-function ModelReading({ item, baseId, executionId }) {
-  const [chosen, setChosen] = useState('')
-  const query = useApi(`/analises/execucoes/${encodeURIComponent(executionId || '')}/itens/${item?.id}`, { base_id: baseId }, !!item && !!executionId)
-  const scores = (query.data?.dados[0]?.resultados || []).filter(s => s.algoritmo === 'isolation_forest')
-  const results = [...new Set(scores.map(s => s.resultado_item_id))].sort()
-  const resultId = results.includes(chosen) ? chosen : results[0]
-  const supplier = item?.resultados.find(r => r.id === resultId)?.fornecedor_nome
-  return <section className="card dashboard-reading"><h2>Leitura dos modelos</h2><p className="sub">Os dois modelos para o mesmo resultado.</p>
-    {!item ? <p className="dashboard-muted">Selecione um item com análise disponível.</p> : <>
-      <p className="dashboard-selected">Compra {item.processo.numero_compra} · Item {item.numero_item}</p>
-      <QueryState query={query} loading="Consultando os modelos do item…" />
-      {results.length > 1 && <Field label="Resultado do fornecedor"><select className="select" value={resultId} onChange={e => setChosen(e.target.value)}>{results.map(id => <option key={id} value={id}>{item.resultados.find(r => r.id === id)?.fornecedor_nome || id.slice(0, 8)}</option>)}</select></Field>}
-      {supplier && <p className="dashboard-supplier" title={supplier}>{supplier}</p>}
-      {scores.filter(s => s.resultado_item_id === resultId).map(score => <div className="dashboard-model" key={score.id}><span title={`Modelo ${score.modelo_id}`}>{algorithm(score.algoritmo)}</span><strong>{ifMeasure(score.medida_if)} </strong></div>)}
-      {query.data && !scores.length && <p>Nenhuma medida IF disponível para este item na execução.</p>}
-      <Link className="link-a" to={selectionLink(`/itens/${item.id}`, `base_id=${baseId}&execucao_id=${executionId}`)}>Ver análise do item <ArrowRight size={13} /></Link>
+function PriceReading({ item, params }) {
+  const c = comparison(item)
+  const max = Math.max(c.price || 0, c.median || 0, 1)
+  return <section className="card dashboard-reading dashboard-price-reading"><h2>Confira este item</h2>
+    {!item ? <p>Selecione um item analisado.</p> : <>
+      <h3>{item.descricao}</h3><p className="sub">Compra {item.processo.numero_compra} · item {item.numero_item}</p>
+      {c.valid ? <><p className="dashboard-price-difference">{difference(c)}</p><p className="hint">da mediana histórica do grupo · preços por {c.basis}</p>
+        {[["Preço unitário homologado", c.price], ["Mediana histórica dos similares", c.median]].map(([label, value]) => <div className="dashboard-price-bar" key={label}><div><span>{label}</span><strong>{money(value)}</strong></div><div className="dashboard-price-track"><span style={{ width: `${100 * value / max}%` }} /></div></div>)}
+        <p className="hint">{c.reference.n_treino != null ? `${number(c.reference.n_treino)} registros no treinamento. ` : ''}Referência calculada com os preços unitários históricos do grupo comparável.</p>
+      </> : <p className="dashboard-price-empty">Comparação de preço indisponível: falta uma referência histórica com unidade identificada. Consulte os detalhes da análise.</p>}
+      <dl className="dashboard-price-facts"><dt>Órgão comprador</dt><dd>{item.processo.orgao_nome || 'Não informado'}</dd><dt>Fornecedor deste resultado</dt><dd>{c.result?.fornecedor_nome || 'Não informado'}</dd><dt>Quantidade homologada</dt><dd>{c.result?.quantidade_homologada == null ? 'Não informada' : decimal(c.result.quantidade_homologada)}</dd><dt>Data do resultado</dt><dd>{date(c.result?.data_resultado)}</dd></dl>
+      <p className="hint">A análise também considera a quantidade. Esta comparação de preços não explica, sozinha, o motivo da sinalização.</p>
+      <Link className="btn primary" to={selectionLink(`/ranking/${item.id}`, params)} state={{ from: selectionLink('/painel', params) }}><Search size={16} aria-hidden="true" /> Ver análise completa</Link>
     </>}
-    <p className="dashboard-model-note">Análise experimental · utilidade não validada</p>
-    <p className="hint">Os modelos podem discordar. Medidas IF não são probabilidades e não se somam.</p>
   </section>
 }
 
 export default function PainelGeral({ query, ranking, params }) {
   const { baseId, data: baseData } = useBase()
-  const selection = useAnalysis()
   const [chosen, setChosen] = useState('')
   const data = query.data
   const rows = ranking.data?.dados.filter(r => r.medida_if != null) || []
@@ -97,17 +58,20 @@ export default function PainelGeral({ query, ranking, params }) {
     ['Sem análise', number(summary.nao_analisados), 'Veja os motivos abaixo', ScanSearch],
   ] : []
   return <div className="dashboard">
-    <Head title="Painel geral" sub="Um resumo das compras analisadas e dos itens que merecem atenção primeiro."
-      action={<span className="btn ghost dashboard-period" title="Período da base"><CalendarDays size={16} aria-hidden="true" />{periodLabel}</span>} />
+    <Head title="Painel geral" sub="Veja quais itens merecem uma conferência e compare os preços registrados."
+      action={<span className="btn ghost dashboard-period" title="Competência dos arquivos importados; as datas dos resultados podem variar"><CalendarDays size={16} aria-hidden="true" />Base: {periodLabel}</span>} />
     <QueryState query={query} />
     {data && <>
       <div className="dashboard-kpis">{cards.map(([label, value, note, Icon], i) => <section className="card kpi" key={label}><div className="dashboard-kpi-label"><span>{label}</span><Icon size={17} aria-hidden="true" /></div><strong title={i === 1 ? money(summary.valor_homologado) : undefined}>{value}</strong><small>{note}</small></section>)}</div>
-      <div className="dashboard-charts"><Distribution data={data.distribuicao} /><Evolution data={data.evolucao} /></div>
-      <div className="dashboard-bottom"><section className="card dashboard-start"><div className="mini"><div><h2>Por onde começar</h2><p className="sub">Os itens com os maiores medidas IF do recorte. Clique em um para ver os modelos ao lado.</p></div><Link className="link-a" to={selectionLink('/ranking', params)}>Ver todos <ArrowRight size={13} /></Link></div>
+      <div className="dashboard-bottom"><section className="card dashboard-start"><div className="mini"><div><h2>Itens para conferir</h2><p className="sub">Priorizados pela análise de anomalias, que considera preço e quantidade. A diferença de preço é uma informação para conferência.</p></div><Link className="link-a" to={selectionLink('/ranking', params)}>Ver todos <ArrowRight size={13} /></Link></div>
         <QueryState query={ranking} loading="Consultando itens do recorte…" />
-        {ranking.data && (!rows.length ? <p className="dashboard-muted">Nenhum item com medida IF disponível nos filtros selecionados.</p> : <div className="table-scroll" role="region" aria-label="Itens com maior medida IF; use as setas para rolar" tabIndex={0}><table className="tbl tbl-stack"><thead><tr><th scope="col">Compra / item</th><th scope="col">Órgão / fornecedor</th><th scope="col">Homologado</th><th scope="col">Medida IF</th><th scope="col"><span className="sr-only">Análise</span></th></tr></thead><tbody>{rows.map(row => <tr key={row.id} className={selected?.id === row.id ? 'sel' : ''}><td><button className="dashboard-row-select" aria-pressed={selected?.id === row.id} onClick={() => setChosen(row.id)}>Compra {row.processo.numero_compra} · item {row.numero_item}</button><small className="dashboard-clamp" title={row.descricao}>{row.descricao}</small></td><td data-label="Órgão"><span className="dashboard-clamp" title={row.processo.orgao_nome}>{row.processo.orgao_nome}</span><small className="dashboard-clamp" title={[...new Set(row.resultados.map(r => r.fornecedor_nome))].join('; ')}>{[...new Set(row.resultados.map(r => r.fornecedor_nome))].join('; ') || 'Fornecedor não informado'}</small></td><td className="numeric" data-label="Homologado">{money(row.valor_homologado)}</td><td className="numeric dashboard-index" data-label="Índice">{ifMeasure(row.medida_if)}</td><td><Link className="dashboard-analysis-link" to={selectionLink(`/ranking/${row.id}`, params)} state={{ from: selectionLink('/painel', params) }} title="Ver análise" aria-label="Ver análise"><Search size={17} aria-hidden="true" /></Link></td></tr>)}</tbody></table></div>)}
-      </section><ModelReading key={`${selection.executionId}:${selected?.id}`} item={selected} baseId={baseId} executionId={selection.executionId} /></div>
-      <Aviso detalhe />
+        {ranking.data && (!rows.length ? <p>Nenhum item analisado disponível neste recorte.</p> : <div className="table-scroll" role="region" aria-label="Itens para conferir" tabIndex={0}><table className="tbl tbl-stack"><thead><tr><th scope="col">Compra / item</th><th scope="col">Preço unitário</th><th scope="col">Mediana histórica</th><th scope="col">Diferença</th><th scope="col"><span className="sr-only">Análise</span></th></tr></thead><tbody>{rows.map(row => {
+          const c = comparison(row)
+          return <tr key={row.id} className={selected?.id === row.id ? 'sel' : ''}><td><button className="dashboard-row-select" aria-pressed={selected?.id === row.id} onClick={() => setChosen(row.id)}>Compra {row.processo.numero_compra} · item {row.numero_item}</button><small className="dashboard-clamp" title={row.descricao}>{row.descricao}</small><small className="dashboard-clamp" title={row.processo.orgao_nome}>{row.processo.orgao_nome}</small></td><td className="numeric" data-label="Preço unitário"><span className="dashboard-price-number">{money(c.price)}</span></td><td className="numeric" data-label="Mediana histórica">{c.valid ? <><span className="dashboard-price-number">{money(c.median)}</span><small>por {c.basis}</small></> : 'Indisponível'}</td><td className="numeric" data-label="Diferença">{c.valid ? <><span className="dashboard-price-number">{decimal(Math.abs(c.percent), 2, 2)}%</span><small>{Math.abs(c.percent) < 0.005 ? 'na mediana' : c.percent > 0 ? 'acima' : 'abaixo'}</small></> : 'Sem referência'}</td><td><Link className="dashboard-analysis-link" to={selectionLink(`/ranking/${row.id}`, params)} state={{ from: selectionLink('/painel', params) }} title="Ver análise" aria-label="Ver análise"><Search size={17} aria-hidden="true" /></Link></td></tr>
+        })}</tbody></table></div>)}
+        <p className="hint">Cada linha mostra o resultado priorizado do item; não é o valor total da compra. A referência é histórica, não uma cotação atual.</p>
+      </section><PriceReading item={selected} params={params} /></div>
+      <section className="card dashboard-price-help"><h2>Uma diferença de preço é um sinal para conferir</h2><p>Especificações, embalagem, quantidade, condições de entrega ou erros nos registros podem explicar a diferença. Ela não comprova irregularidade.</p><p>Antes de concluir, confira a unidade de fornecimento e os documentos da compra. A comparação usa a mediana do grupo de itens do treinamento; não garante que marcas e modelos sejam equivalentes.</p></section>
       <details className="dashboard-chart-data dashboard-motives"><summary>Consultar motivos de indisponibilidade</summary>{Object.keys(data.motivos_indisponibilidade).length ? <ul>{Object.entries(data.motivos_indisponibilidade).map(([reason, n]) => <li key={reason}>{reason.replaceAll('_', ' ').toLocaleLowerCase('pt-BR')}: {n} ocorrência(s)</li>)}</ul> : <p>Nenhum motivo registrado neste recorte.</p>}</details>
     </>}
   </div>

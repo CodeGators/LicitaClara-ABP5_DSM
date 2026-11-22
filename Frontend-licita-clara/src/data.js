@@ -49,7 +49,7 @@ export const desenvolvedores = [
   { nome: 'Rodrigo Augusto', papel: 'Desenvolvedor', user: 'rodrigoaslima' },
 ]
 export const passos = [
-  { t: 'Veja o panorama', to: '/painel', cta: 'Abrir o Painel geral', d: 'O Painel mostra quantos itens foram analisados e quais têm os maiores medidas IF. É o melhor ponto de partida.' },
+  { t: 'Veja o panorama', to: '/painel', cta: 'Abrir o Painel geral', d: 'O Painel destaca itens para conferir e compara o preço unitário com a mediana histórica de similares. Selecione um item para ver fornecedor, órgão e unidade da referência.' },
   { t: 'Abra um item sinalizado', to: '/ranking', cta: 'Ver itens sinalizados', d: 'Compare o preço homologado com a mediana de itens parecidos e entenda a medida IF.' },
   { t: 'Leve o relatório', to: '/relatorios', cta: 'Preparar relatório', d: 'Escolha uma compra e baixe em PDF ou CSV, com valores, fontes e limitações. Não precisa de login.' },
 ]
