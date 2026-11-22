@@ -76,7 +76,7 @@ export function ItemRows({ rows, params, scoreLabel = 'Medida IF' }) {
 }
 
 function Shell({ title, children }) {
-  return <><Head title={title} /><Filters products={title === 'Itens Sinalizados'} suppliers={title !== 'Itens Sinalizados'} />{children}<Aviso detalhe /></>
+  return <><Head title={title} /><Filters products={title === 'Itens Sinalizados'} suppliers={title !== 'Itens Sinalizados'} />{children}</>
 }
 
 function DashboardContent() {
