@@ -39,6 +39,10 @@ class TenderFilters(ProductFilters):
     """Sinalizações calculadas sobre a média dos itens da compra."""
 
 
+class SupplierFilters(ProductFilters):
+    """Seleciona fornecedores inteiros por nome e sinalização."""
+
+
 class ViewContext(BaseModel):
     base_id: UUID
     execucao_id: UUID | None

@@ -220,3 +220,18 @@ Sem seleção, todos os produtos são incluídos. A seleção usa união das cat
 após calcular as estatísticas completas de cada produto e antes da paginação.
 `Requer validação` tem precedência sobre as faixas IF. As demais usam o maior IF
 disponível do produto: abaixo de 0,50, de 0,50 a menos de 0,70, ou de 0,70 a 1.
+
+### Fornecedores por sinalização
+
+`GET /api/v1/visao/fornecedores` aceita seleção múltipla `sinalizacao`, com as
+mesmas cinco categorias das demais listagens. Busca por nome e sinalização são
+aplicadas ao fornecedor agregado antes da paginação, conservando seus totais e
+contagens completos. `itens_com_medida_if` conta itens com IF próprio do fornecedor;
+`medida_if` é o maior IF dos seus resultados, sem usar medidas dos covencedores.
+`requer_validacao` exige que um resultado do próprio fornecedor ultrapasse seis
+vezes a mediana positiva do seu produto/unidade na base atual completa.
+
+`GET /api/v1/visao/fornecedores/{id}` conserva o fornecedor completo mesmo quando
+a busca/sinalização da lista não corresponde a ele. Os itens relacionados expõem
+somente seus resultados, scores, valores e marcações. O denominador da participação
+e do HHI conserva os demais vencedores dos itens do recorte.

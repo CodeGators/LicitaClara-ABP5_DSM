@@ -22,7 +22,7 @@ function Content() {
   const location = useLocation()
   const { query, params, changePage } = useView(id ? `/visao/licitacoes/${encodeURIComponent(id)}` : '/visao/licitacoes')
   const data = query.data, row = data?.licitacao
-  const listLink = selectionLink('/licitacoes', params)
+  const listLink = `/licitacoes?${params}`
   const back = location.state?.from?.startsWith('/licitacoes?') ? location.state.from : listLink
   const detailLink = tenderId => {
     const next = new URLSearchParams(params)

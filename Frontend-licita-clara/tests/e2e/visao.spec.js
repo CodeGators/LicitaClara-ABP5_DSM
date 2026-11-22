@@ -27,7 +27,7 @@ async function mockView(page, overrides = {}) {
     if (!path.startsWith('/visao/')) return false
     if (state.viewOffline) return bad('Consulta do recorte indisponível.', 503)
     if (url.searchParams.get('modelo_id') === 'invalido') return bad('Modelo não pertence à execução selecionada.', 422)
-    const hasScore = state.scored && url.searchParams.get('execucao_id') && (state.automatic || path === '/visao/produtos' || url.searchParams.get('modelo_id'))
+    const hasScore = state.scored && url.searchParams.get('execucao_id') && (state.automatic || path === '/visao/produtos' || path.startsWith('/visao/fornecedores') || url.searchParams.get('modelo_id'))
     let rows = [item, state.twoScored ? { ...otherItem, resultados: [{ ...item.resultados[0], id: 'caneta-result', fornecedor_nome: 'Fornecedor da caneta', valor_unitario_homologado: '2.00' }] } : otherItem].map((r, i) => ({ ...r, resultados: r.resultados.filter(e => !e.cancelado), valor_homologado: r.valor_homologado_item, soma_valores_conhecidos: r.valor_homologado_item, resultados_sem_total: 0, resultados_analisados: (i === 0 || state.twoScored) && hasScore ? 1 : 0, status_analise: (i === 0 || state.twoScored) && hasScore ? 'analisados' : 'nao_analisados', medida_if: (i === 0 || state.twoScored) && hasScore ? '0.514' : null, scores: (i === 0 || state.twoScored) && hasScore ? [{ id: 'score-1', resultado_item_id: r.resultados[0].id, score_bruto: '0.514', atributos: { comparacao: { mediana: state.noReference ? null : state.extremePrice ? '0.01' : '0.05', n_treino: 100, unidade_preco: { unidade_preco: 'UN' } } } }] : [], motivos: (i === 0 || state.twoScored) && hasScore ? {} : { SEM_REFERENCIA_EXATA: 1 } }))
     if (state.separateResults) rows[0].resultados.push({ ...item.resultados[0], id: 'co-vencedor', fornecedor_nome: 'Outro fornecedor do item' })
     rows = rows.filter(r => r.descricao.toLowerCase().includes((url.searchParams.get('busca') || '').toLowerCase()))
@@ -55,8 +55,12 @@ async function mockView(page, overrides = {}) {
       }).filter(r => !selected.length || selected.includes(r.sinalizacao))
       return done({ ...context, ...pageOf(products) })
     }
-    const supplier = { id: SUPPLIER, nome: 'Fornecedor do recorte', compras_com_resultado: 1, contratos_vinculados: 0, itens: 1, orgaos: 1, valor_homologado: '0.10000001', resultados_sem_total: 0, medida_if: hasScore ? '0.514' : null }
-    if (path === '/visao/fornecedores') return done({ ...context, ...pageOf(rows.length ? (state.twoSuppliers ? [supplier, { ...supplier, id: OTHER_SUPPLIER, nome: 'Segundo fornecedor' }] : [supplier]) : []) })
+    const supplier = { id: SUPPLIER, nome: 'Fornecedor do recorte', compras_com_resultado: 1, contratos_vinculados: 0, itens: 1, orgaos: 1, valor_homologado: '0.10000001', resultados_sem_total: 0, itens_com_medida_if: hasScore ? 1 : 0, requer_validacao: !!state.supplierReview, sinalizacao: state.supplierReview ? 'requer_validacao' : hasScore ? 'anomalia_intermediaria' : 'sem_analise', medida_if: hasScore ? '0.514' : null }
+    if (path === '/visao/fornecedores') {
+      const selected = url.searchParams.getAll('sinalizacao')
+      const suppliers = (state.twoSuppliers ? [supplier, { ...supplier, id: OTHER_SUPPLIER, nome: 'Segundo fornecedor' }] : [supplier]).filter(r => r.nome.toLowerCase().includes((url.searchParams.get('busca') || '').toLowerCase()) && (!selected.length || selected.includes(r.sinalizacao)))
+      return done({ ...context, ...pageOf(suppliers) })
+    }
     if (state.twoSuppliers && path === `/visao/fornecedores/${OTHER_SUPPLIER}`) return done({ ...context, fornecedor: { ...supplier, id: OTHER_SUPPLIER, nome: 'Segundo fornecedor' }, relacoes: [], itens: pageOf(rows) })
     if (path === `/visao/fornecedores/${SUPPLIER}`) return done({ ...context, fornecedor: supplier, relacoes: [{ orgao_id: 'org', orgao_nome: 'Órgão do recorte', compras_com_resultado: 1, valor_fornecedor: null, valor_homologado: null, participacao: null, hhi: null, motivo: 'TOTAIS_INCOMPLETOS' }], itens: pageOf(rows.slice(0,1)) })
     return bad('Fornecedor não encontrado neste recorte.', 404)
@@ -117,7 +121,6 @@ test('fornecedor mostra compras e contratos separados e concentração desconhec
   await expect(page.getByLabel('Fornecedor selecionado').getByText('Indisponível', { exact: true })).toBeVisible()
   await expect(page.getByText('HHI: Indisponível', { exact: true })).toBeVisible()
   await expect(page.getByLabel('Fornecedor selecionado').getByText('compras com resultado', { exact: true })).toBeVisible()
-  await expect(page.getByText(/0 contratos vinculados conhecidos/)).toBeVisible()
 })
 
 test('seleção automática, paginação, erro e retentativa conservam a execução publicada', async ({ page }) => {
@@ -328,41 +331,46 @@ test('filtros básicos dos produtos funcionam no celular sem opções avançadas
 })
 
 
-test('fornecedores seleciona o primeiro, mantém relatório vinculado e adapta o layout ao celular', async ({ page }, testInfo) => {
+test('fornecedores usa lista simplificada e abre resumo e relações pela lupa', async ({ page }, testInfo) => {
   await mockView(page)
   await page.goto(`/fornecedores?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=${MODEL}`)
   await expect(page.getByRole('heading', { name: 'Fornecedores', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Ranking de fornecedores' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '1 fornecedor', exact: true })).toBeVisible()
+  await expect(page.locator('.analysis-bar')).toHaveCount(0)
+  await expect(page.locator('.kpis')).toHaveCount(0)
+  await expect(page.getByText('Mais filtros', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('columnheader', { name: 'Maior medida IF', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('row').filter({ has: page.getByRole('link', { name: 'Fornecedor do recorte', exact: true }) })).toHaveAttribute('data-if-band', 'yellow')
+  await page.getByRole('link', { name: 'Ver fornecedor Fornecedor do recorte', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Fornecedor do recorte', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Itens relacionados a Fornecedor do recorte' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Preparar relatório' })).toHaveAttribute('href', new RegExp(`processo_id=${PROCESS}`))
   expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations).toEqual([])
-  await page.screenshot({ path: testInfo.outputPath('fornecedores-desktop.png'), fullPage: true })
   await page.setViewportSize({ width: 390, height: 844 })
   await page.getByRole('button', { name: 'Ativar modo escuro' }).click()
-  await page.getByText('Mais filtros', { exact: true }).click()
-  await expect(page.getByLabel('Homologação a partir de')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.screenshot({ path: testInfo.outputPath('fornecedores-mobile.png'), fullPage: true })
 })
 
 
-test('selecionar fornecedor atualiza o painel e pagina itens sem paginar o ranking', async ({ page }) => {
+test('paginação dos itens do fornecedor mantém retorno à página da lista', async ({ page }) => {
   await mockView(page, { twoSuppliers: true })
   await page.goto(`/fornecedores?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=${MODEL}&tamanho_pagina=1`)
   const ranking = page.locator('.supplier-ranking')
-  await expect(page.getByRole('heading', { name: 'Fornecedor do recorte', exact: true })).toBeVisible()
+  await expect(ranking.getByRole('link', { name: 'Fornecedor do recorte', exact: true })).toBeVisible()
   await ranking.getByRole('button', { name: 'Próxima', exact: true }).click()
   await ranking.getByRole('link', { name: 'Segundo fornecedor', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Segundo fornecedor', exact: true })).toBeVisible()
-  await expect(ranking.getByRole('link', { name: 'Segundo fornecedor', exact: true })).toHaveAttribute('aria-current', 'true')
   await expect(page.getByText('Sem relações disponíveis neste recorte.')).toBeVisible()
   const related = page.locator('.supplier-related')
   await related.getByRole('button', { name: 'Próxima', exact: true }).click()
   await expect(page).toHaveURL(/pagina_itens=2/)
   await expect(related.getByRole('link', { name: 'Caneta do recorte', exact: true })).toBeVisible()
+  await page.getByRole('link', { name: 'Voltar aos fornecedores', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Fornecedores', exact: true })).toBeVisible()
+  expect(new URL(page.url()).searchParams.get('pagina')).toBe('2')
+  expect(new URL(page.url()).searchParams.has('pagina_itens')).toBe(false)
   await page.getByRole('button', { name: 'Limpar filtros', exact: true }).click()
-  await expect(page).not.toHaveURL(/pagina_itens=/)
+  expect(new URL(page.url()).searchParams.has('pagina')).toBe(false)
 })
 
  test('painel não inventa comparação sem mediana válida', async ({ page }) => {
@@ -555,3 +563,41 @@ test('falha na publicação oferece retentativa sem seletor manual ou uso da ver
   await expect(page.getByRole('heading', { name: '2 produtos', exact: true })).toBeVisible()
   expect(new URL(page.url()).searchParams.get('execucao_id')).toBe(EXEC)
 })
+
+for (const width of [1280, 390]) {
+  test(`fornecedores filtram sinalizações, mantêm automação e revisão neutra ${width}`, async ({ page }) => {
+    const state = await mockView(page)
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto(`/fornecedores?base_id=${BASE}&execucao_id=${NEW_EXEC}&modelo_id=${AE}&orgao_id=antigo`)
+    await expect(page.getByRole('heading', { name: '1 fornecedor', exact: true })).toBeVisible()
+    const params = new URL(page.url()).searchParams
+    expect(params.get('execucao_id')).toBe(EXEC)
+    expect(params.has('modelo_id')).toBe(false)
+    expect(params.has('orgao_id')).toBe(false)
+    await expect(page.getByLabel('Execução publicada')).toHaveCount(0)
+    await page.getByLabel('Buscar fornecedor', { exact: true }).fill('Fornecedor do recorte')
+    const group = page.getByRole('group', { name: 'Sinalização do fornecedor', exact: true })
+    await group.locator('summary').click()
+    await expect(group.getByRole('checkbox')).toHaveCount(5)
+    await page.getByRole('checkbox', { name: 'Anomalia intermediária', exact: true }).check()
+    await page.getByRole('checkbox', { name: 'Requer validação', exact: true }).check()
+    await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
+    await expect(page.getByRole('heading', { name: '1 fornecedor', exact: true })).toBeVisible()
+    expect(new URL(page.url()).searchParams.getAll('sinalizacao')).toEqual(['anomalia_intermediaria', 'requer_validacao'])
+    await expect(page.locator('td[data-label="Itens analisados"]')).toHaveText('1 de 1 analisado')
+    state.supplierReview = true
+    await page.reload()
+    const row = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'Fornecedor do recorte', exact: true }) })
+    await expect(row).toContainText('Requer validação')
+    await expect(row).not.toHaveAttribute('data-if-band')
+    await group.locator('summary').click()
+    await expect(page.getByRole('checkbox', { name: 'Anomalia intermediária', exact: true })).toBeChecked()
+    await expect(page.getByRole('checkbox', { name: 'Requer validação', exact: true })).toBeChecked()
+    const axe = await new AxeBuilder({ page }).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()
+    expect(axe.violations).toEqual([])
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false)
+    await page.getByRole('button', { name: 'Limpar filtros', exact: true }).click()
+    await expect(page.getByLabel('Buscar fornecedor', { exact: true })).toHaveValue('')
+    expect(new URL(page.url()).searchParams.getAll('sinalizacao')).toEqual([])
+  })
+}

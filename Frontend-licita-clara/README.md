@@ -180,21 +180,18 @@ A comparação no detalhe identifica separadamente a unidade da mediana históri
 e a unidade registrada no item. Unidades ausentes permanecem “Não informada”.
 A unidade do grupo não é inferida da descrição do item atual.
 
-As consultas de itens, licitações e fornecedores usam o mesmo painel de filtros:
-busca, estado da análise e ordenação ficam à vista; órgão, fornecedor,
-modalidade, período, valores e tamanho da página ficam em **Mais filtros**.
-**Aplicar filtros** confirma o recorte e **Limpar filtros** restaura a consulta,
-preservando a base e a versão da análise. Na consulta oficial de itens, os
-campos principais são busca e ordenação. A seleção de licitação dos relatórios
-usa o mesmo estilo e mantém os controles de exportação separados.
+As listagens de produtos, licitações e fornecedores usam busca, ordenação e
+seleção múltipla das cinco sinalizações. A análise publicada ativa é automática;
+seletores de versão e opções avançadas ficam fora dessas listagens.
 
-A tela **Fornecedores** reúne ranking e detalhe na mesma página. O primeiro
-fornecedor da página é selecionado inicialmente; links no ranking atualizam o
-resumo, a participação por órgão e os itens relacionados. Os itens têm
-paginação independente (`pagina_itens`). Compras com resultado e contratos
-vinculados são contagens separadas; participação e HHI ausentes não recebem
-zero. **Preparar relatório** abre a compra do primeiro item relacionado exibido;
-a tela de relatórios permite selecionar outra compra.
+### Fornecedores
+
+`/fornecedores` mostra uma linha por fornecedor, com compras, total homologado e
+itens analisados no formato “3 de 14 analisados”. As cores usam o maior IF dos
+resultados do próprio fornecedor. A marcação de preço extremo também pertence ao
+resultado vencedor, sem ser propagada aos covencedores com preço regular.
+A lupa abre `/fornecedores/:id`, com resumo, participação por órgão e itens
+paginados. A busca seleciona fornecedores inteiros, sem reduzir seus totais.
 
 Números exibidos usam até duas casas decimais; valores monetários usam pelo
 menos duas. O arredondamento é apenas de apresentação e preserva inteiros acima

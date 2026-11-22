@@ -12,6 +12,7 @@ from licita_backend.schemas.consultas import ErrorResponse
 from licita_backend.schemas.visao import (
     Dashboard,
     ProductFilters,
+    SupplierFilters,
     SupplierView,
     TenderDetail,
     TenderFilters,
@@ -44,12 +45,12 @@ def products(session: DB, params: Annotated[ProductFilters, Query()]):
 
 
 @router.get("/fornecedores", response_model=ViewPage)
-def suppliers(session: DB, params: Annotated[ViewFilters, Query()]):
+def suppliers(session: DB, params: Annotated[SupplierFilters, Query()]):
     return ViewRepository(session).suppliers(params)
 
 
 @router.get("/fornecedores/{supplier_id}", response_model=SupplierView)
-def supplier(supplier_id: UUID, session: DB, params: Annotated[ViewFilters, Query()]):
+def supplier(supplier_id: UUID, session: DB, params: Annotated[SupplierFilters, Query()]):
     return ViewRepository(session).supplier(params, supplier_id)
 
 

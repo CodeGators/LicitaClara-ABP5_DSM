@@ -22,7 +22,7 @@ export default function App() {
   const legacyParams = new URLSearchParams(location.search)
   legacyParams.delete('aba')
   return (
-    <BaseProvider enabled={real}><AnalysisProvider enabled={real && analytic} automatic={/^\/(ranking|licitacoes)\/?$/.test(location.pathname)}><Routes>
+    <BaseProvider enabled={real}><AnalysisProvider enabled={real && analytic} automatic={/^\/(ranking|licitacoes|fornecedores)\/?$/.test(location.pathname)}><Routes>
       <Route element={<Layout />}>
         <Route index element={<Navigate to="/itens" replace />} />
         <Route path="itens" element={<BaseGate><Itens /></BaseGate>} />

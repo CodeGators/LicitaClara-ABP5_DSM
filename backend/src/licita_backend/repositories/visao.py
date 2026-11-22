@@ -367,7 +367,10 @@ class ViewRepository:
         context, rows, _, _ = self.dataset(filters)
         return wire({**context, **self.page(rows, filters)})
 
-    def supplier_rows(self, rows, contracts, links, filters):
+    def supplier_rows(self, rows, contracts, links, filters, review_ids=None):
+        from licita_backend.repositories.produtos import product_signal
+
+        review_ids = review_ids or set()
         grouped = {}
         for item in rows:
             for event in item["resultados"]:
@@ -382,22 +385,35 @@ class ViewRepository:
                         "organs": set(),
                         "events": [],
                         "scores": [],
+                        "analyzed_items": set(),
                     },
                 )
                 supplier["items"].add(item["id"])
                 supplier["processes"].add(item["processo"]["processo_versao_id"])
                 supplier["organs"].add(item["processo"]["orgao_id"])
                 supplier["events"].append(event)
-                supplier["scores"].extend(
+                own_scores = [
                     r["score_bruto"]
                     for r in item["scores"]
                     if r["resultado_item_id"] == event["id"]
-                )
+                ]
+                supplier["scores"].extend(own_scores)
+                if own_scores:
+                    supplier["analyzed_items"].add(item["id"])
+
         return [
             {
                 "id": uid,
                 "nome": s["nome"],
                 "itens": len(s["items"]),
+                "itens_com_medida_if": len(s["analyzed_items"]),
+                "requer_validacao": any(e["id"] in review_ids for e in s["events"]),
+                "sinalizacao": product_signal(
+                    {
+                        "medida_if": max(s["scores"], default=None),
+                        "requer_validacao": any(e["id"] in review_ids for e in s["events"]),
+                    }
+                ),
                 "compras_com_resultado": len(s["processes"]),
                 "orgaos": len(s["organs"]),
                 "resultados": len(s["events"]),
@@ -409,14 +425,38 @@ class ViewRepository:
             if not filters.fornecedor_id or uid == filters.fornecedor_id
         ]
 
+    def supplier_dataset(self, filters):
+        # Supplier search/state selects whole suppliers, without changing their totals or HHI.
+        from licita_backend.repositories.produtos import price_review_result_ids
+
+        clean = filters.model_copy(update={"busca": None, "analise": "todos"})
+        context, rows, contracts, links = self.dataset(clean)
+        legacy = [
+            "fornecedor_id",
+            "orgao_id",
+            "modalidade_id",
+            "homologacao_inicio",
+            "homologacao_fim",
+            "valor_minimo",
+            "valor_maximo",
+        ]
+        reference = rows
+        if any(getattr(clean, key) is not None for key in legacy):
+            reference = self.dataset(clean.model_copy(update=dict.fromkeys(legacy)))[1]
+        return context, rows, contracts, links, price_review_result_ids(reference)
+
     def suppliers(self, filters):
-        context, rows, contracts, links = self.dataset(filters)
-        suppliers = self.supplier_rows(rows, contracts, links, filters)
+        context, rows, contracts, links, review_ids = self.supplier_dataset(filters)
+        suppliers = self.supplier_rows(rows, contracts, links, filters, review_ids)
+        if filters.busca and (search := filters.busca.strip().casefold()):
+            suppliers = [s for s in suppliers if search in s["nome"].casefold()]
+        if getattr(filters, "sinalizacao", []):
+            suppliers = [s for s in suppliers if s["sinalizacao"] in filters.sinalizacao]
         return wire({**context, **self.page(suppliers, filters)})
 
     def supplier(self, filters, supplier_id):
-        context, rows, contracts, links = self.dataset(filters)
-        suppliers = self.supplier_rows(rows, contracts, links, filters)
+        context, rows, contracts, links, review_ids = self.supplier_dataset(filters)
+        suppliers = self.supplier_rows(rows, contracts, links, filters, review_ids)
         found = next((r for r in suppliers if r["id"] == supplier_id), None)
         if found is None:
             raise QueryError(
@@ -435,6 +475,12 @@ class ViewRepository:
                     {
                         **item,
                         "resultados": own,
+                        "scores": [
+                            s
+                            for s in item["scores"]
+                            if any(s["resultado_item_id"] == e["id"] for e in own)
+                        ],
+                        "requer_validacao": any(e["id"] in review_ids for e in own),
                         "resultados_ativos": len(own),
                         "resultados_analisados": len(indices),
                         "status_analise": "nao_analisados"

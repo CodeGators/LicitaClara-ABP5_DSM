@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import { useBase } from './BaseContext.jsx'
 import useApi from './useApi.js'
 import { Field, QueryState } from './components/consultas.jsx'
@@ -10,6 +10,7 @@ export { viewFields, selectionLink } from './api.mjs'
 
 export function AnalysisProvider({ enabled, automatic = false, children }) {
   const base = useBase()
+  const location = useLocation()
   const [params, setParams] = useSearchParams()
   const [page, setPage] = useState(1)
   const validBase = !!(enabled && base.baseId && base.data?.base)
@@ -30,7 +31,7 @@ export function AnalysisProvider({ enabled, automatic = false, children }) {
         next.set('execucao_id', current)
         next.delete('modelo_id')
         return next
-      }, { replace: true })
+      }, { replace: true, state: location.state })
       return
     }
     if (validBase && !params.has('execucao_id') && publication.data) setParams(previous => {
@@ -39,8 +40,8 @@ export function AnalysisProvider({ enabled, automatic = false, children }) {
       next.set('execucao_id', publication.data.execucao_id || 'nenhuma')
       next.delete('modelo_id')
       return next
-    }, { replace: true })
-  }, [automatic, validBase, params, publication.data, setParams])
+    }, { replace: true, state: location.state })
+  }, [automatic, validBase, params, publication.data, setParams, location.state])
   useEffect(() => {
     if (!automatic && run.data && !run.data.roteamento_automatico && !modelId && run.data.modelos.some(m => m.algoritmo === 'isolation_forest')) setParams(previous => {
       const next = new URLSearchParams(previous)
@@ -48,8 +49,8 @@ export function AnalysisProvider({ enabled, automatic = false, children }) {
       const models = run.data.modelos.filter(m => m.algoritmo === 'isolation_forest').sort((a, b) => a.id.localeCompare(b.id))
       next.set('modelo_id', (models.find(m => m.algoritmo === 'isolation_forest') || models[0]).id)
       return next
-    }, { replace: true })
-  }, [automatic, run.data, executionId, modelId, setParams])
+    }, { replace: true, state: location.state })
+  }, [automatic, run.data, executionId, modelId, setParams, location.state])
   const ready = automatic
     ? validBase && !!publication.data && params.get('execucao_id') === selected && !params.has('modelo_id') && (!executionId || !!run.data)
     : validBase && params.has('execucao_id') && (!executionId || (run.data && (modelId || run.data.roteamento_automatico || !run.data.modelos.some(m => m.algoritmo === 'isolation_forest'))))
