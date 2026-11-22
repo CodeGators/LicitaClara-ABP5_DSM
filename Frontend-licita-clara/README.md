@@ -37,7 +37,7 @@ npm run dev     # http://localhost:5173
 npm run build
 ```
 
-Entrada `/` → `/itens`. Detalhes reais em `/itens/:id` e `/processos/:id`. Demonstrações em `/demonstracao/painel`, `/demonstracao/itens`, `/fornecedores` e `/relatorios`.
+Entrada `/` → `/ranking` (Itens Sinalizados). Detalhes reais em `/ranking/:id` e `/processos/:id`. Os endereços antigos `/itens` e `/itens/:id` apenas redirecionam para as telas correspondentes em `/ranking`, preservando os parâmetros. Demonstrações em `/demonstracao/painel`, `/demonstracao/itens`, `/demonstracao/fornecedores` e `/demonstracao/relatorios`.
 Tokens de cor/tipografia em `src/styles.css` (`:root`), seguindo a proposta de identidade (Inter, #102D46, #087F83...).
 
 O frontend incorporou a entrega de 01/11/2026 da equipe e a integração da etapa 03. Subir a API na porta 8000 pelo README do backend; o Vite encaminha `/api` para ela. Configuração opcional em `.env` desta pasta, conforme `.env.example` (sem credenciais). Para outra API, configurar `API_PROXY_TARGET` no desenvolvimento ou `VITE_API_URL` pública até `/api/v1` e CORS apropriado.

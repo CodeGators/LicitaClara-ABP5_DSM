@@ -13,7 +13,7 @@ export default function Detalhe() {
   const [aba, setAba] = useState('sinais')
   const [status, setStatus] = useState(p?.rev || '')
   const [log, setLog] = useState([])
-  if (!p) return <div className="card" role="alert"><h1>Exemplo não encontrado</h1><Link className="link-a" to="/itens">Consultar dados oficiais</Link></div>
+  if (!p) return <div className="card" role="alert"><h1>Exemplo não encontrado</h1><Link className="link-a" to="/ranking">Consultar dados oficiais</Link></div>
   const marca = p.forn.split(' ')[0]
   const cmp = [['Mediana dos similares', d.unitMed, 'var(--petroleo)'], ['Estimado do item', d.unitEst, 'var(--secundario)'], ['Homologado do item', d.unitHom, 'var(--alta)']]
   const contrib = [

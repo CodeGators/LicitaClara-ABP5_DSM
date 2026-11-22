@@ -1,6 +1,5 @@
 import { cloneElement, useId, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { baseLink, date, decimal, exactDecimal, money, safeOfficialUrl, selectionLink } from '../api.mjs'
+import { date, decimal, exactDecimal, money, safeOfficialUrl } from '../api.mjs'
 import useApi from '../useApi.js'
 
 export function QueryState({ query, loading = 'Carregando…' }) {
@@ -16,13 +15,6 @@ export function Field({ label, children }) {
   return <div className="field">{control ? <label htmlFor={id}>{label}</label> : <span id={id} className="field-label">{label}</span>}{cloneElement(children, control ? { id } : { role: 'group', 'aria-labelledby': id })}</div>
 }
 export const Info = ({ label, children, title }) => <div><small>{label}</small><strong title={title}>{children}</strong></div>
-export function NoAnalysis() {
-  const { search } = useLocation()
-  const execution = new URLSearchParams(search).get('execucao_id')
-  const selected = execution && execution !== 'nenhuma'
-  return <div className="note"><b>{selected ? 'Análise selecionada' : 'Sem análise selecionada'}</b>{selected ? 'Abra um item para ver a medida IF ou o motivo de ela não existir.' : 'Você está vendo só os dados importados. Escolha uma versão da análise no Painel ou em Itens sinalizados para ver as medidas IF.'} Sem medida IF não significa que a compra esteja regular.</div>
-}
-
 export function LookupFilter({ kind, title, value, onChange, baseId, compact = false }) {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -66,13 +58,4 @@ export function Documents({ processId, baseId }) {
 
 export function Pager({ meta, onChange }) {
   return <div className="mini pagination"><span>{meta.total} registro(s){meta.total_paginas ? ` · página ${meta.pagina} de ${meta.total_paginas}` : ''}</span><div className="pager">{meta.pagina > 1 && <button className="btn ghost sm" onClick={() => onChange(1)}>Primeira página</button>}<button className="btn ghost sm" disabled={meta.pagina <= 1} onClick={() => onChange(meta.pagina - 1)}>Anterior</button><button className="btn ghost sm" disabled={meta.pagina >= meta.total_paginas} onClick={() => onChange(meta.pagina + 1)}>Próxima</button></div></div>
-}
-
-export function ItemTable({ items, baseId, from }) {
-  const location = useLocation()
-  const selected = new URLSearchParams(location.search).get('execucao_id')
-  return <div className="table-scroll" role="region" aria-label="Itens encontrados; use as setas para rolar na horizontal" tabIndex={0}><table className="tbl tbl-stack"><thead><tr><th scope="col">Item</th><th scope="col">Órgão / compra</th><th scope="col">Fornecedores</th><th scope="col">Total homologado</th><th scope="col">Análise</th></tr></thead><tbody>{items.map(item => {
-    const suppliers = [...new Set(item.resultados.filter(r => !r.cancelado).map(r => r.fornecedor_nome))]
-    return <tr key={item.id}><td><Link className="link-a" to={selected ? selectionLink(`/itens/${item.id}`, location.search) : baseLink(`/itens/${item.id}`, baseId)} state={{ from }}>{item.descricao}</Link><small>Item {item.numero_item} · {item.catalogo ? `${item.catalogo} ${item.codigo_catalogo}` : 'Catálogo não informado'}</small></td><td data-label="Órgão">{item.processo.orgao_nome}<small>Compra {item.processo.numero_compra}</small></td><td data-label="Fornecedores">{suppliers.length ? suppliers.join('; ') : 'Não informado'}</td><td className="numeric" data-label="Total homologado">{money(item.valor_homologado_item)}{item.resultados_sem_valor_total > 0 && <small>Total incompleto na fonte</small>}</td><td data-label="Análise"><span className="pill rev">{selected && selected !== 'nenhuma' ? 'Ver no detalhe' : 'Não publicada'}</span></td></tr>
-  })}</tbody></table></div>
 }

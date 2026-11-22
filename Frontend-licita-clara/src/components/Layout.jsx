@@ -16,7 +16,7 @@ const nav = [
   { to: '/fornecedores', label: 'Fornecedores', icon: Building2 },
   { to: '/relatorios', label: 'Relatórios', icon: FileText },
 ]
-const names = { itens: 'Consultar itens', processos: 'Compra', demonstracao: 'Demonstração', painel: 'Painel Geral', ranking: 'Itens Sinalizados', licitacoes: 'Licitações Sinalizadas', fornecedores: 'Fornecedores', relatorios: 'Relatórios' }
+const names = { processos: 'Compra', demonstracao: 'Demonstração', painel: 'Painel Geral', ranking: 'Itens Sinalizados', licitacoes: 'Licitações Sinalizadas', fornecedores: 'Fornecedores', relatorios: 'Relatórios' }
 const readSeen = () => { try { return localStorage.getItem('lc_ajuda_vista') } catch { return null } }
 
 export default function Layout() {
@@ -91,7 +91,7 @@ export default function Layout() {
           </div>
         </header>
         <main ref={contentRef} id="conteudo" className="content" tabIndex={-1}>
-          {!real && <div className="note"><b>Esta tela é uma demonstração com dados fictícios.</b>Os números não representam a base real. <Link className="link-a" to="/itens">Ver dados oficiais</Link></div>}
+          {!real && <div className="note"><b>Esta tela é uma demonstração com dados fictícios.</b>Os números não representam a base real. <Link className="link-a" to="/ranking">Ver dados oficiais</Link></div>}
           <Outlet />
           <div className="foot">
             <span>{real ? 'Fonte: Compras.gov.br e PNCP. Cobertura limitada ao recorte importado.' : 'Demonstração acadêmica. Revisões e exportações ainda não integradas.'}</span>

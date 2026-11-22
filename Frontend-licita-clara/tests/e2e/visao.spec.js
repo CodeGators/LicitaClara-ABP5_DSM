@@ -648,3 +648,29 @@ for (const width of [1280, 390]) {
     expect(calls).toBe(2)
   })
 }
+
+for (const entry of ['/', '/itens', '/processos']) test(`entrada ${entry} usa somente Itens Sinalizados`, async ({ page }) => {
+  const state = await mockView(page)
+  await page.goto(`${entry}?base_id=${BASE}&busca=Borracha`)
+  await expect(page.getByRole('heading', { name: 'Itens Sinalizados', exact: true })).toBeVisible()
+  await expect(page).toHaveURL(/\/ranking\?/)
+  expect(new URL(page.url()).searchParams.get('base_id')).toBe(BASE)
+  expect(new URL(page.url()).searchParams.get('busca')).toBe('Borracha')
+  await expect(page.getByText('Consultar itens', { exact: true })).toHaveCount(0)
+  expect(state.calls.some(url => url.pathname === '/api/v1/itens')).toBe(false)
+})
+
+test('compra e endereço antigo abrem detalhe único e retornam aos itens sinalizados', async ({ page }) => {
+  const state = await mockView(page)
+  await page.goto(`/processos/${PROCESS}?base_id=${BASE}&execucao_id=${EXEC}`)
+  await expect(page.getByRole('link', { name: '← Itens Sinalizados' })).toHaveAttribute('href', /\/ranking\?/)
+  await page.getByRole('link', { name: 'Item 00001 · Borracha do recorte', exact: true }).click()
+  await expect(page).toHaveURL(new RegExp(`/ranking/${ITEM}\\?`))
+  await expect(page.getByRole('heading', { name: 'Compra 00001 · Item 00001' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Gerar relatório da licitação' })).toBeVisible()
+  expect(state.calls.some(url => url.pathname.endsWith('/documentos'))).toBe(false)
+  await page.goto(`/itens/${ITEM}?base_id=${BASE}&execucao_id=${EXEC}`)
+  await expect(page).toHaveURL(new RegExp(`/ranking/${ITEM}\\?`))
+  await page.getByRole('link', { name: 'Voltar à consulta' }).click()
+  await expect(page.getByRole('heading', { name: 'Itens Sinalizados', exact: true })).toBeVisible()
+})
