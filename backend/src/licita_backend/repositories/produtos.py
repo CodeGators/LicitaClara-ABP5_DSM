@@ -121,6 +121,28 @@ def group_products(items):
     return output
 
 
+def price_review_item_ids(items):
+    """Only flag occurrences above the current product median, not every buyer of that product."""
+    by_id = {item["id"]: item for item in items}
+    flagged = set()
+    with localcontext() as ctx:
+        ctx.prec = 60
+        for group in group_products(items):
+            median = group["mediana"]
+            if median is None or median <= 0:
+                continue
+            for reference in group["itens"]:
+                item = by_id[reference["id"]]
+                if any(
+                    not event["cancelado"]
+                    and event["valor_unitario_homologado"] is not None
+                    and event["valor_unitario_homologado"] > 6 * median
+                    for event in item["resultados"]
+                ):
+                    flagged.add(item["id"])
+    return flagged
+
+
 class ProductRepository(ViewRepository):
     def product_page(self, rows, filters):
         if filters.ordenacao == "descricao_asc":

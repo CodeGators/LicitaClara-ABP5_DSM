@@ -180,6 +180,13 @@ origem. `valor_homologado` e `valores_itens_importados` são medidas distintas.
 `maior_medida_if` acompanham a média; `itens_oficiais` fica nulo porque a integridade
 da importação não foi confirmada. A média é descritiva, sem prioridade validada.
 
+A seleção múltipla `sinalizacao` aceita as mesmas cinco categorias dos produtos,
+com união antes da paginação. As faixas da licitação usam `medida_if_media`.
+`requer_validacao` prevalece quando algum resultado da compra ultrapassa seis
+vezes a mediana positiva do seu produto/unidade na base atual completa. Os
+valores extremos permanecem na média e nos totais. Somente compras com ocorrências
+nessa condição recebem a marcação; outras compras do mesmo produto não a herdam.
+
 `GET /api/v1/visao/licitacoes/{process_id}` retorna `licitacao` e `itens`
 paginados. Os filtros da listagem são ignorados no detalhe para conservar toda
 a compra importada. Paginar os itens não modifica o resumo. Nenhum modelo é

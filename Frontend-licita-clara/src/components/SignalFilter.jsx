@@ -8,7 +8,7 @@ const options = [
   ['sem_analise', 'Sem análise disponível', 'neutral'],
 ]
 
-export default function SignalFilter({ value = [], onChange }) {
+export default function SignalFilter({ value = [], onChange, label = 'Sinalização do item' }) {
   const ref = useRef(null)
   useEffect(() => {
     const closeOutside = event => {
@@ -22,7 +22,7 @@ export default function SignalFilter({ value = [], onChange }) {
     onChange(next)
   }
   const selected = options.find(([key]) => value.length === 1 && value[0] === key)
-  return <fieldset className="field signal-filter"><legend>Sinalização do item</legend>
+  return <fieldset className="field signal-filter"><legend>{label}</legend>
     <details ref={ref} onKeyDown={e => { if (e.key === 'Escape') { e.preventDefault(); ref.current.open = false; ref.current.querySelector('summary').focus() } }}>
       <summary className="select">{selected ? <><span className={`signal-dot ${selected[2]}`} aria-hidden="true" />{selected[1]}</> : value.length ? `${value.length} opções selecionadas` : 'Todas as sinalizações'}</summary>
       <div className="signal-options">

@@ -4,9 +4,14 @@ from datetime import date
 from decimal import Decimal
 from uuid import uuid4
 
+import test_consultas as shared
 from licita_backend.repositories.licitacoes import group_purchases
 from licita_backend.repositories.visao import ViewRepository
 from licita_backend.schemas.visao import ViewFilters
+
+query_database = shared.query_database
+populated = shared.populated
+query_client = shared.query_client
 
 
 def sample():
@@ -111,3 +116,72 @@ def test_mean_rounding_and_nulls_last_sort_before_pagination():
     )
     assert [r["medida_if_media"] for r in result["dados"]] == [Decimal("0.99"), 0]
     assert result["total"] == 3
+
+
+def test_tender_signal_uses_mean_not_maximum_and_review_overrides_it():
+    process, items, filters = sample()
+    items[0]["medida_if"], items[1]["medida_if"] = Decimal("0.4"), Decimal("0.8")
+    row = group_purchases([process], items, filters)[0]
+    assert row["medida_if_media"] == Decimal("0.6")
+    assert row["maior_medida_if"] == Decimal("0.8")
+    assert row["sinalizacao"] == "anomalia_intermediaria"
+    assert row["requer_validacao"] is False
+    flagged = group_purchases([process], items, filters, {items[0]["id"]})[0]
+    assert flagged["sinalizacao"] == "requer_validacao"
+    assert flagged["medida_if_media"] == row["medida_if_media"]
+    unrelated = group_purchases([process], items, filters, {uuid4()})[0]
+    assert unrelated["requer_validacao"] is False
+
+
+def test_signal_filter_selects_whole_tender_with_or_semantics():
+    from licita_backend.schemas.visao import TenderFilters
+
+    process, items, _ = sample()
+    filters = TenderFilters(base_id=uuid4(), sinalizacao=["menor_anomalia", "maior_anomalia"])
+    assert not group_purchases([process], items, filters)
+    filters = filters.model_copy(
+        update={"sinalizacao": ["menor_anomalia", "anomalia_intermediaria"]}
+    )
+    row = group_purchases([process], items, filters)[0]
+    assert row["itens_importados"] == 3
+    assert row["medida_if_media"] == Decimal("0.5")
+    assert row["sinalizacao"] == "anomalia_intermediaria"
+
+
+def test_api_signal_filters_do_not_hide_detail_or_shrink_its_items(query_client):
+    client, data = query_client
+    response = client.get(
+        "/api/v1/visao/licitacoes",
+        params=[
+            ("base_id", data["base"]),
+            ("sinalizacao", "sem_analise"),
+            ("sinalizacao", "maior_anomalia"),
+        ],
+    )
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["total"] >= 1
+    assert all(r["sinalizacao"] == "sem_analise" for r in payload["dados"])
+    row = payload["dados"][0]
+    assert row["medida_if_media"] is None
+    detail = client.get(
+        "/api/v1/visao/licitacoes/" + row["id"],
+        params={
+            "base_id": data["base"],
+            "sinalizacao": "menor_anomalia",
+            "tamanho_pagina": 1,
+        },
+    )
+    assert detail.status_code == 200, detail.text
+    assert detail.json()["licitacao"]["itens_importados"] == row["itens_importados"]
+    assert detail.json()["itens"]["total"] == row["itens_importados"]
+    assert (
+        client.get(
+            "/api/v1/visao/licitacoes",
+            params={
+                "base_id": data["base"],
+                "sinalizacao": "invalido",
+            },
+        ).status_code
+        == 422
+    )

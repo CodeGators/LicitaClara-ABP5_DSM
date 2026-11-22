@@ -14,6 +14,7 @@ from licita_backend.schemas.visao import (
     ProductFilters,
     SupplierView,
     TenderDetail,
+    TenderFilters,
     TenderPage,
     ViewFilters,
     ViewPage,
@@ -53,10 +54,10 @@ def supplier(supplier_id: UUID, session: DB, params: Annotated[ViewFilters, Quer
 
 
 @router.get("/licitacoes", response_model=TenderPage)
-def tenders(session: DB, params: Annotated[ViewFilters, Query()]):
+def tenders(session: DB, params: Annotated[TenderFilters, Query()]):
     return TenderRepository(session).listing(params)
 
 
 @router.get("/licitacoes/{process_id}", response_model=TenderDetail)
-def tender(process_id: UUID, session: DB, params: Annotated[ViewFilters, Query()]):
+def tender(process_id: UUID, session: DB, params: Annotated[TenderFilters, Query()]):
     return TenderRepository(session).detail(params, process_id)

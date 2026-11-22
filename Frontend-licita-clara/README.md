@@ -156,10 +156,18 @@ O arquivo local de configuração segue o formato `{ "base": "UUID", "execucao":
 
 ## Licitações Sinalizadas
 
-O menu abre `/licitacoes`, com uma linha por compra, valor global homologado,
-cobertura, Score médio e maior Score. A média atribui o mesmo peso a cada item
-com Score; itens sem análise não viram zero. O indicador é descritivo e compara
-posições relativas a diferentes grupos de treino, sem representar risco validado.
+O menu abre `/licitacoes`, com uma linha por compra, órgão, valor total homologado
+e quantidade de itens importados/com análise. A execução publicada ativa e o
+roteamento dos modelos são selecionados automaticamente. Busca, ordenação e
+sinalização múltipla ficam visíveis; opções avançadas e indicadores numéricos de
+IF não aparecem na listagem.
+
+As linhas usam a média das medidas IF dos itens analisados: verde abaixo de 0,50,
+amarelo de 0,50 a menos de 0,70 e vermelho de 0,70 a 1. Cada item tem o mesmo peso;
+sem análise não recebe zero. Licitações sem IF ou com `Requer validação` ficam
+neutras. A validação é marcada quando uma ocorrência da compra tem preço unitário
+mais de 500% acima da mediana do mesmo produto/unidade na base atual. Ela não é
+propagada às compras com preços regulares do mesmo produto.
 
 A lupa abre `/licitacoes/:id`, com resumo e itens paginados. Clicar no item abre
 a análise salva e permite voltar à licitação. Os filtros selecionam compras

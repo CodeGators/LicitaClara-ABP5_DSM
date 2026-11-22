@@ -18,26 +18,27 @@ const productFields = ['busca', 'sinalizacao', 'ordenacao', 'tamanho_pagina']
 const read = (params, products = false) => ({ ...Object.fromEntries(viewFields.map(key => [key, params.get(key) || (key === 'analise' ? 'todos' : key === 'ordenacao' ? 'indice_desc' : key === 'tamanho_pagina' ? '20' : '')])), ...(products ? { sinalizacao: params.getAll('sinalizacao') } : {}) })
 
 export function Filters({ purchases = false, suppliers = false, products = false }) {
+  const simple = products || purchases
   const { params, setParams } = useAnalysis()
   const { baseId } = useBase()
-  const [draft, setDraft] = useState(() => read(params, products))
-  useEffect(() => setDraft(read(params, products)), [params, products])
+  const [draft, setDraft] = useState(() => read(params, simple))
+  useEffect(() => setDraft(read(params, simple)), [params, simple])
   useEffect(() => {
-    if (!products || !viewFields.some(key => !productFields.includes(key) && params.has(key))) return
+    if (!simple || !viewFields.some(key => !productFields.includes(key) && params.has(key))) return
     setParams(previous => {
       const next = new URLSearchParams(previous)
       for (const key of viewFields) if (!productFields.includes(key)) next.delete(key)
       next.delete('pagina')
       return next
     }, { replace: true })
-  }, [products, params, setParams])
+  }, [simple, params, setParams])
   const change = (key, value) => setDraft(previous => ({ ...previous, [key]: value }))
   const apply = event => {
     event.preventDefault()
     setParams(previous => {
       const next = new URLSearchParams(previous)
       for (const key of [...viewFields, 'sinalizacao', 'pagina', 'pagina_itens']) next.delete(key)
-      for (const key of products ? productFields : viewFields) {
+      for (const key of simple ? productFields : viewFields) {
         const value = draft[key]
         if (Array.isArray(value)) value.forEach(entry => next.append(key, entry))
         else if (value) next.set(key, value)
@@ -45,7 +46,7 @@ export function Filters({ purchases = false, suppliers = false, products = false
       return next
     })
   }
-  const clear = () => { setDraft(read(new URLSearchParams(), products)); setParams(previous => {
+  const clear = () => { setDraft(read(new URLSearchParams(), simple)); setParams(previous => {
     const next = new URLSearchParams(previous); for (const key of [...viewFields, 'sinalizacao', 'pagina', 'pagina_itens']) next.delete(key); return next
   }) }
   return <ItemFilters draft={draft} change={change} apply={apply} clear={clear} baseId={baseId} params={params} purchases={purchases} suppliers={suppliers} products={products}>
@@ -57,8 +58,9 @@ export function Filters({ purchases = false, suppliers = false, products = false
 export function useView(path) {
   const { baseId } = useBase()
   const s = useAnalysis()
-  const allFilters = read(s.params, path === '/visao/produtos')
-  const filters = path === '/visao/produtos' ? Object.fromEntries(productFields.map(key => [key, allFilters[key]])) : allFilters
+  const simple = path === '/visao/produtos' || path === '/visao/licitacoes' || path.startsWith('/visao/licitacoes/')
+  const allFilters = read(s.params, simple)
+  const filters = simple ? Object.fromEntries(productFields.map(key => [key, allFilters[key]])) : allFilters
   const query = useApi(path, { base_id: baseId, execucao_id: s.executionId, modelo_id: s.modelId, ...filters, pagina: s.params.get('pagina') || '1' }, !!s.ready)
   const changePage = page => s.setParams(previous => { const next = new URLSearchParams(previous); next.set('pagina', String(page)); return next })
   return { query, params: s.params, changePage }

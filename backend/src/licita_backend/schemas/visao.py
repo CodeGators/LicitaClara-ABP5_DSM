@@ -22,16 +22,21 @@ class ViewFilters(ProcurementFilters):
         return self
 
 
+Signal = Literal[
+    "menor_anomalia",
+    "anomalia_intermediaria",
+    "maior_anomalia",
+    "requer_validacao",
+    "sem_analise",
+]
+
+
 class ProductFilters(ViewFilters):
-    sinalizacao: list[
-        Literal[
-            "menor_anomalia",
-            "anomalia_intermediaria",
-            "maior_anomalia",
-            "requer_validacao",
-            "sem_analise",
-        ]
-    ] = Field(default_factory=list, max_length=5)
+    sinalizacao: list[Signal] = Field(default_factory=list, max_length=5)
+
+
+class TenderFilters(ProductFilters):
+    """Sinalizações calculadas sobre a média dos itens da compra."""
 
 
 class ViewContext(BaseModel):
@@ -64,6 +69,8 @@ class SupplierView(ViewContext):
 
 
 class TenderRow(BaseModel):
+    requer_validacao: bool
+    sinalizacao: Signal
     id: UUID
     processo: dict[str, Any]
     descricao: str

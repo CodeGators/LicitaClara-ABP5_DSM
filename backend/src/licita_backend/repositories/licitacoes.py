@@ -5,10 +5,12 @@ from decimal import Decimal, localcontext
 
 from licita_backend.api.errors import QueryError
 from licita_backend.repositories.consultas import QueryRepository
+from licita_backend.repositories.produtos import price_review_item_ids, product_signal
 from licita_backend.repositories.visao import ViewRepository, amounts, wire
 
 
-def group_purchases(processes, items, filters):
+def group_purchases(processes, items, filters, review_items=None):
+    review_items = review_items or set()
     grouped = defaultdict(list)
     for item in items:
         grouped[item["processo"]["id"]].append(item)
@@ -68,9 +70,15 @@ def group_purchases(processes, items, filters):
         )
         if filters.analise != "todos" and status != filters.analise:
             continue
+        review = any(i["id"] in review_items for i in selected)
+        signal = product_signal({"medida_if": mean, "requer_validacao": review})
+        if getattr(filters, "sinalizacao", []) and signal not in filters.sinalizacao:
+            continue
         rows.append(
             {
                 "id": process["id"],
+                "requer_validacao": review,
+                "sinalizacao": signal,
                 "processo": process,
                 "descricao": process["objeto"],
                 "medida_if_media": mean,
@@ -113,7 +121,7 @@ class TenderRepository:
         processes = self.view.read(
             QueryRepository(self.view.session).process_query(filters.base_id)
         )
-        rows = group_purchases(processes, items, filters)
+        rows = group_purchases(processes, items, filters, price_review_item_ids(items))
         context["resumo"] = {
             "licitacoes": len(rows),
             "com_medida_if": sum(r["medida_if_media"] is not None for r in rows),
@@ -150,6 +158,7 @@ class TenderRepository:
                 "valor_minimo": None,
                 "valor_maximo": None,
                 "analise": "todos",
+                "sinalizacao": [],
             }
         )
         context, rows, items = self.dataset(clean)

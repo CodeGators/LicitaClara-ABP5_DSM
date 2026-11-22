@@ -518,3 +518,11 @@ input.input[type=search]{appearance:none}
 .signal-dot.green{background:var(--baixa)}.signal-dot.yellow{background:var(--media)}.signal-dot.red{background:var(--alta)}.signal-dot.neutral{background:var(--secundario)}
 @media(max-width:760px){.signal-options{position:static;width:100%;min-width:0;max-width:none;margin-top:.4rem;box-shadow:none}}
 .signal-dot.yellow{background:#e9bf35;border:1px solid var(--media)}
+.tender-description,.tender-org{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+.tender-description{-webkit-line-clamp:3}.tender-org{-webkit-line-clamp:4}
+@media(min-width:761px){
+  .tender-table{table-layout:fixed;min-width:52rem}
+  .tender-table th:nth-child(1){width:35%}.tender-table th:nth-child(2){width:27%}
+  .tender-table th:nth-child(3){width:22%}.tender-table th:nth-child(4){width:10%}.tender-table th:nth-child(5){width:6%}
+  .tender-count,.tender-count small{overflow-wrap:normal}
+}

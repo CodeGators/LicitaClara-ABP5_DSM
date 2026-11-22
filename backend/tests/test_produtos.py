@@ -195,3 +195,10 @@ def test_api_accepts_repeated_signals_and_rejects_unknown_categories(query_clien
         ).status_code
         == 422
     )
+
+
+def test_review_marks_only_the_occurrence_with_extreme_price():
+    from licita_backend.repositories.produtos import price_review_item_ids
+
+    regular_a, regular_b, extreme = item("1"), item("1"), item("10")
+    assert price_review_item_ids([regular_a, regular_b, extreme]) == {extreme["id"]}
