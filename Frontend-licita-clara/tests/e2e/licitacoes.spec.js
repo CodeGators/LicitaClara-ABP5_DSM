@@ -65,7 +65,7 @@ test('filtros, paginação dos itens e retentativa mantêm resumo da licitação
   await page.goto(`/licitacoes/${PROCESS}?base_id=${BASE}&execucao_id=${EXEC}&tamanho_pagina=1`)
   await page.getByRole('button', { name: 'Próxima', exact: true }).click()
   await expect(page.getByRole('link', { name: otherItem.descricao, exact: true })).toBeVisible()
-  await expect(page.getByText('1 de 2 itens importados', { exact: false })).toBeVisible()
+  await expect(page.getByText('1 de 2 analisados', { exact: false })).toBeVisible()
   state.fail = true
   await page.getByRole('link', { name: 'Voltar às licitações' }).click()
   await expect(page.getByRole('heading', { name: 'Consulta indisponível' })).toBeVisible()

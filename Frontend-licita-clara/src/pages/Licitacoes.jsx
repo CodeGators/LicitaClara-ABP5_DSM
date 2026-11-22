@@ -11,8 +11,10 @@ import { ifMeasure, money, selectionLink, reportLink } from '../api.mjs'
 const score = value => value == null ? 'Sem medida IF' : ifMeasure(value)
 const status = value => ({ analisados: 'Completa nos itens importados', parcial: 'Parcial', nao_analisados: 'Sem análise' })[value]
 
+const coverageText = row => `${row.itens_com_medida_if} de ${row.itens_importados} ${row.itens_importados === 1 ? 'analisado' : 'analisados'}`
+
 function Coverage({ row }) {
-  return <>{row.itens_com_medida_if} de {row.itens_importados} itens importados<small>{status(row.status_analise)}{row.itens_analise_parcial > 0 ? ` · ${row.itens_analise_parcial} item(ns) com resultados parcialmente analisados` : ''}</small></>
+  return <>{coverageText(row)}<small>{status(row.status_analise)}{row.itens_analise_parcial > 0 ? ` · ${row.itens_analise_parcial} item(ns) com resultados parcialmente analisados` : ''}</small></>
 }
 
 function Content() {
@@ -41,7 +43,7 @@ function Content() {
           <td>{band && <span className="sr-only">{ifBandLabels[band]}. </span>}<Link className="link-a" to={detailLink(tender.id)} state={{ from: listLink }}>Compra {tender.processo.numero_compra}</Link><small className="tender-description" title={tender.processo.objeto}>{tender.processo.objeto}</small><small>{tender.processo.modalidade_nome}</small>{tender.requer_validacao && <PriceReview />}</td>
           <td data-label="Órgão"><span className="tender-org" title={tender.processo.orgao_nome}>{tender.processo.orgao_nome}</span></td>
           <td className="numeric" data-label="Valor total">{money(tender.valor_homologado)}</td>
-          <td className="tender-count" data-label="Itens">{tender.itens_importados}<small>{tender.itens_com_medida_if} com análise</small></td>
+          <td className="tender-count" data-label="Itens">{coverageText(tender)}</td>
           <td><Link className="dashboard-analysis-link" title="Ver itens da licitação" aria-label={`Ver itens da compra ${tender.processo.numero_compra}`} to={detailLink(tender.id)} state={{ from: listLink }}><Search size={17} aria-hidden="true" /></Link></td>
         </tr>
       })}</tbody></table></div> : <p>Nenhuma licitação encontrada neste recorte.</p>}
