@@ -123,3 +123,44 @@ test('cliente e links preservam múltiplas sinalizações como parâmetros repet
   const link = new URL(selectionLink('/ranking', requested.searchParams), 'http://localhost')
   assert.deepEqual(link.searchParams.getAll('sinalizacao'), ['menor_anomalia', 'maior_anomalia'])
 })
+
+test('primeira consulta aguarda a API despertar e recupera respostas transitórias', async () => {
+  let calls = 0
+  const get = createApiClient({ retryDelayMs: 1, startupTimeoutMs: 200, fetchImpl: async () => {
+    calls++
+    return calls < 3 ? new Response('<html>iniciando</html>', { status: 503 }) : Response.json({ base: 'pronta' })
+  } })
+  assert.deepEqual(await get('/base/status', {}, { startup: true }), { base: 'pronta' })
+  assert.equal(calls, 3)
+})
+
+test('espera inicial preserva erros permanentes e o comportamento normal das demais consultas', async () => {
+  let calls = 0
+  const permanent = createApiClient({ retryDelayMs: 1, fetchImpl: async () => {
+    calls++; return Response.json({ erro: { mensagem: 'Base ausente' } }, { status: 404 })
+  } })
+  await assert.rejects(permanent('/base/status', {}, { startup: true }), error => error.status === 404)
+  assert.equal(calls, 1)
+  const unavailable = createApiClient({ fetchImpl: async () => {
+    calls++; return Response.json({ erro: { mensagem: 'Indisponível' } }, { status: 503 })
+  } })
+  await assert.rejects(unavailable('/itens'), error => error.status === 503)
+  assert.equal(calls, 2)
+})
+
+test('espera inicial termina e pode ser cancelada durante a pausa entre tentativas', async () => {
+  let calls = 0
+  const fetchImpl = async () => { calls++; throw new Error('offline') }
+  const bounded = createApiClient({ fetchImpl, retryDelayMs: 1, startupTimeoutMs: 15 })
+  const started = Date.now()
+  await assert.rejects(bounded('/base/status', {}, { startup: true }), error => error.code === 'conexao_indisponivel')
+  assert.ok(calls > 1)
+  assert.ok(Date.now() - started < 2000)
+  calls = 0
+  const controller = new AbortController()
+  const cancellable = createApiClient({ fetchImpl, retryDelayMs: 1000 })
+  const pending = cancellable('/base/status', {}, { startup: true, signal: controller.signal })
+  setTimeout(() => controller.abort(), 10)
+  await assert.rejects(pending, error => error.name === 'AbortError')
+  assert.equal(calls, 1)
+})

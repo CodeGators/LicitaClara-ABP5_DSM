@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from './api.mjs'
 
-export default function useApi(path, params = {}, enabled = true) {
-  const key = JSON.stringify([path, params, enabled])
+export default function useApi(path, params = {}, enabled = true, { startup = false } = {}) {
+  const key = JSON.stringify([path, params, enabled, startup])
   const [attempt, setAttempt] = useState(0)
   const [state, setState] = useState({ key: null, data: null, loading: enabled, error: null })
   useEffect(() => {
@@ -10,7 +10,7 @@ export default function useApi(path, params = {}, enabled = true) {
     const controller = new AbortController()
     let active = true
     setState({ key, data: null, loading: true, error: null })
-    api(path, params, { signal: controller.signal }).then(
+    api(path, params, { signal: controller.signal, startup }).then(
       data => active && setState({ key, data, loading: false, error: null }),
       error => active && error.name !== 'AbortError' && setState({ key, data: null, loading: false, error }),
     )

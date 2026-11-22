@@ -180,3 +180,16 @@ ou treinar. O pacote é opcional. Ao extrair em `data/`, use `--dados data/entra
 na conferência e na importação.
 O TAR contém somente ZIPs listados no manifesto: não inclui `.env`, banco,
 modelos, dependências ou documentos locais. O TAR gerado permanece fora do Git; os ZIPs de entrada estão versionados.
+
+## Exportar o banco para publicação
+
+`scripts/exportar_banco.py` cria uma cópia PostgreSQL completa e um manifesto
+SHA-256 em `data/deploy/`, sem alterar os dados nem executar a ML:
+
+```bash
+uv run --locked --package licita-backend python scripts/exportar_banco.py
+```
+
+O PostgreSQL local deve estar em execução no Compose. O dump não contém as senhas
+dos papéis e omite proprietários/grants, que precisam ser configurados no destino.
+Veja [o guia de publicação](../infra/DEPLOY_RENDER_NEON.md) antes de restaurar.

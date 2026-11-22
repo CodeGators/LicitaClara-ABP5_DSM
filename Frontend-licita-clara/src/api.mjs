@@ -8,9 +8,9 @@ export class ApiError extends Error {
   }
 }
 
-export function createApiClient({ baseUrl = '/api/v1', fetchImpl = globalThis.fetch, timeoutMs = 15000 } = {}) {
+export function createApiClient({ baseUrl = '/api/v1', fetchImpl = globalThis.fetch, timeoutMs = 15000, startupTimeoutMs = 90000, retryDelayMs = 2000 } = {}) {
   const base = baseUrl.replace(/\/$/, '')
-  return async function get(path, params = {}, { signal } = {}) {
+  const request = async function (path, params = {}, { signal, deadlineMs = timeoutMs } = {}) {
     const url = new URL(`${base}${path}`, globalThis.location?.origin || 'http://localhost')
     for (const [key, value] of Object.entries(params)) {
       for (const entry of Array.isArray(value) ? value : [value]) {
@@ -22,7 +22,7 @@ export function createApiClient({ baseUrl = '/api/v1', fetchImpl = globalThis.fe
     const cancel = () => controller.abort()
     if (signal?.aborted) cancel()
     signal?.addEventListener('abort', cancel, { once: true })
-    const timer = setTimeout(() => { timedOut = true; cancel() }, timeoutMs)
+    const timer = setTimeout(() => { timedOut = true; cancel() }, deadlineMs)
     try {
       const response = await fetchImpl(url.toString(), { signal: controller.signal, headers: { Accept: 'application/json' } })
       let body
@@ -42,6 +42,26 @@ export function createApiClient({ baseUrl = '/api/v1', fetchImpl = globalThis.fe
     } finally {
       clearTimeout(timer)
       signal?.removeEventListener('abort', cancel)
+    }
+  }
+  return async function get(path, params = {}, { signal, startup = false } = {}) {
+    if (!startup) return request(path, params, { signal })
+    const end = Date.now() + startupTimeoutMs
+    while (true) {
+      try {
+        return await request(path, params, { signal, deadlineMs: Math.min(timeoutMs, Math.max(1, end - Date.now())) })
+      } catch (error) {
+        const transient = ['conexao_indisponivel', 'tempo_esgotado'].includes(error.code)
+          || [502, 503, 504].includes(error.status)
+          || (error.code === 'resposta_invalida' && error.status === 200)
+        if (!transient || Date.now() >= end) throw error
+        await new Promise((resolve, reject) => {
+          const cancel = () => { clearTimeout(timer); signal?.removeEventListener('abort', cancel); reject(new DOMException('Consulta cancelada', 'AbortError')) }
+          const timer = setTimeout(() => { signal?.removeEventListener('abort', cancel); resolve() }, Math.min(retryDelayMs, Math.max(1, end - Date.now())))
+          if (signal?.aborted) cancel()
+          else signal?.addEventListener('abort', cancel, { once: true })
+        })
+      }
     }
   }
 }

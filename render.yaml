@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: licita-clara-api
+    runtime: python
+    plan: free
+    region: virginia
+    branch: main
+    autoDeployTrigger: "off"
+    buildCommand: uv sync --locked --package licita-backend --no-dev
+    startCommand: .venv/bin/uvicorn licita_backend.main:create_app --factory --host 0.0.0.0 --port $PORT --workers 1 --no-access-log
+    healthCheckPath: /api/v1/ready
+    envVars:
+      - key: UV_VERSION
+        value: "0.13.2"
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        value: "[]"
+      - key: DB_CONNECT_TIMEOUT
+        value: "10"
+      - key: DB_STATEMENT_TIMEOUT_MS
+        value: "10000"
+      - key: DB_POOL_SIZE
+        value: "2"
+      - key: DB_MAX_OVERFLOW
+        value: "0"

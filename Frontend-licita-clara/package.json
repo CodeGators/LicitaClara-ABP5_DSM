@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "node --test tests/api.test.mjs",
     "test:e2e": "playwright test --project=mock",
-    "test:live": "playwright test --project=live"
+    "test:live": "playwright test --project=live",
+    "test:startup": "VITE_API_STARTUP_WAIT=true playwright test --project=startup"
   },
   "dependencies": {
     "lucide-react": "^0.453.0",

@@ -223,3 +223,11 @@ quatro casas decimais. Maior valor indica maior anomalia; não é probabilidade
 nem o antigo percentil de 0 a 100. A troca usa valores já salvos: não exige novo
 treinamento ou importação. Reinicie o backend e atualize o frontend para usar
 os campos novos da API. Veja [o contrato da medida](backend/README.md#medida-original-do-isolation-forest).
+
+## Publicação na internet
+
+A preparação para Render gratuito e PostgreSQL Neon está descrita em
+[infra/DEPLOY_RENDER_NEON.md](infra/DEPLOY_RENDER_NEON.md). O primeiro deploy usa
+uma cópia do banco com as análises já calculadas. Os scripts de treinamento não
+rodam na inicialização da API. O `render.yaml` configura somente a API; o frontend
+é criado como Static Site seguindo o guia.
