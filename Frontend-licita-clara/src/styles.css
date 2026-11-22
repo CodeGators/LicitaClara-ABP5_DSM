@@ -303,7 +303,6 @@ input.input[type=search]{appearance:none}
 .dashboard-reading .link-a{margin-top:1rem}
 .dashboard-muted{color:var(--secundario);padding:1.25rem 0}
 .dashboard-analysis-link{display:inline-flex;align-items:center;justify-content:center;min-width:2.5rem;min-height:2.5rem;color:var(--petroleo);border-radius:var(--r-sm)}
-button.dashboard-analysis-link{border:0;background:transparent;padding:0}
 .dashboard-analysis-link:hover{background:var(--sel)}
 
 /* Detalhe do item */

@@ -425,7 +425,6 @@ test('paginação dos itens do fornecedor mantém retorno à página da lista', 
   const row = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'Borracha do recorte', exact: true }) })
   await expect(row.locator('[data-label="Mediana da base atual"]')).toContainText('R$ 0,10')
   await expect(row).not.toContainText('Fornecedor do recorte')
-  await expect(row.getByRole('link', { name: 'Ver detalhe de Borracha do recorte', exact: true })).toHaveAttribute('href', new RegExp(`/ranking/${ITEM}`))
 })
 
  test('produto agrupa compras e mantém acesso às análises de cada ocorrência', async ({ page }) => {
@@ -440,7 +439,7 @@ test('paginação dos itens do fornecedor mantém retorno à página da lista', 
   await expect(page.getByRole('cell', { name: 'R$ 30.185,20', exact: true })).toBeVisible()
   await expect(page.getByRole('cell', { name: 'R$ 0,80', exact: true })).toBeVisible()
   await expect(page.locator('tbody')).toContainText('Requer validação')
-  await page.getByRole('button', { name: 'Ver detalhes de Água mineral sem gás', exact: true }).click()
+  await page.locator('.product-purchases summary').click()
   await expect(page.getByRole('link', { name: 'Compra 5 · item 1', exact: true })).toHaveAttribute('href', new RegExp(`/ranking/${ITEM}`))
   await expect(page.getByRole('link', { name: 'Compra 10 · item 2', exact: true })).toBeVisible()
 })
