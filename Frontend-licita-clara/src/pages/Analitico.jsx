@@ -39,18 +39,6 @@ export function Filters({ purchases = false, suppliers = false }) {
 }
 
 
-function Cards({ summary }) {
-  const itens = [
-    ['Itens no recorte', summary.itens, `${summary.processos} compras · ${summary.contratos_vinculados} contratos`],
-    ['Total homologado', money(summary.valor_homologado), summary.resultados_sem_total ? `${summary.resultados_sem_total} resultado(s) sem total` : 'Não é valor pago'],
-    ['Fornecedores', summary.fornecedores, `${summary.orgaos} órgãos`],
-    ['Com análise completa', summary.analisados, 'Todos os resultados do item têm medida IF'],
-    ['Com análise parcial', summary.parcial, 'Há resultados sem medida IF'],
-    ['Sem análise', summary.nao_analisados, 'Motivo na consulta'],
-  ]
-  return <section className="card" aria-label="Resumo do recorte"><div className="stat-strip">{itens.map(([label, value, text]) => <div key={label}><span>{label}</span><strong>{value}</strong><small>{text}</small></div>)}</div></section>
-}
-
 export function useView(path) {
   const { baseId } = useBase()
   const s = useAnalysis()
@@ -71,8 +59,8 @@ export function ItemRows({ rows, params, scoreLabel = 'Medida IF' }) {
   </tr>)}</tbody></table></div>
 }
 
-function Shell({ title, summary, children }) {
-  return <><Head title={title} sub={title === 'Itens Sinalizados' ? 'Itens ordenados pela medida IF experimental. Busque pelo nome ou abra Mais filtros para refinar.' : 'Consulta com base e análise versionadas. Os filtros valem para o painel, o ranking e os fornecedores.'} />{summary && <Cards summary={summary} />}<AnalysisSelector /><Filters suppliers={title !== 'Itens Sinalizados'} />{children}<Aviso detalhe /></>
+function Shell({ title, children }) {
+  return <><Head title={title} /><AnalysisSelector /><Filters suppliers={title !== 'Itens Sinalizados'} />{children}<Aviso detalhe /></>
 }
 
 function DashboardContent() {
@@ -90,7 +78,7 @@ function DashboardContent() {
 function RankingContent() {
   const { query, params, changePage } = useView('/visao/ranking')
   const data = query.data
-  return <Shell title="Itens Sinalizados" summary={data?.resumo}><QueryState query={query} />{data && <><section className="card"><h2>{data.total} item(ns) no ranking</h2><p className="sub">Quem tem medida IF aparece primeiro; quem não tem fica no fim, sem receber zero. Não é uma fila de risco validada.</p>{data.dados.length ? <ItemRows rows={data.dados} params={params} /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section></>}</Shell>
+  return <Shell title="Itens Sinalizados"><QueryState query={query} />{data && <><section className="card"><h2>{data.total} item(ns) no ranking</h2><p className="sub">Quem tem medida IF aparece primeiro; quem não tem fica no fim, sem receber zero. Não é uma fila de risco validada.</p>{data.dados.length ? <ItemRows rows={data.dados} params={params} /> : <p>Nenhum item encontrado nesta página.</p>}<Pager meta={data} onChange={changePage} /></section></>}</Shell>
 }
 
 function SuppliersContent() {
