@@ -14,14 +14,14 @@ import PainelGeral from './PainelGeral.jsx'
 import ItemFilters from '../components/ItemFilters.jsx'
 
 export const indexText = value => value == null ? 'Indisponível' : ifMeasure(value)
-const productFields = ['busca', 'analise', 'ordenacao', 'tamanho_pagina']
-const read = params => Object.fromEntries(viewFields.map(key => [key, params.get(key) || (key === 'analise' ? 'todos' : key === 'ordenacao' ? 'indice_desc' : key === 'tamanho_pagina' ? '20' : '')]))
+const productFields = ['busca', 'sinalizacao', 'ordenacao', 'tamanho_pagina']
+const read = (params, products = false) => ({ ...Object.fromEntries(viewFields.map(key => [key, params.get(key) || (key === 'analise' ? 'todos' : key === 'ordenacao' ? 'indice_desc' : key === 'tamanho_pagina' ? '20' : '')])), ...(products ? { sinalizacao: params.getAll('sinalizacao') } : {}) })
 
 export function Filters({ purchases = false, suppliers = false, products = false }) {
   const { params, setParams } = useAnalysis()
   const { baseId } = useBase()
-  const [draft, setDraft] = useState(() => read(params))
-  useEffect(() => setDraft(read(params)), [params])
+  const [draft, setDraft] = useState(() => read(params, products))
+  useEffect(() => setDraft(read(params, products)), [params, products])
   useEffect(() => {
     if (!products || !viewFields.some(key => !productFields.includes(key) && params.has(key))) return
     setParams(previous => {
@@ -36,13 +36,17 @@ export function Filters({ purchases = false, suppliers = false, products = false
     event.preventDefault()
     setParams(previous => {
       const next = new URLSearchParams(previous)
-      for (const key of [...viewFields, 'pagina', 'pagina_itens']) next.delete(key)
-      for (const key of products ? productFields : viewFields) if (draft[key]) next.set(key, draft[key])
+      for (const key of [...viewFields, 'sinalizacao', 'pagina', 'pagina_itens']) next.delete(key)
+      for (const key of products ? productFields : viewFields) {
+        const value = draft[key]
+        if (Array.isArray(value)) value.forEach(entry => next.append(key, entry))
+        else if (value) next.set(key, value)
+      }
       return next
     })
   }
-  const clear = () => { setDraft(read(new URLSearchParams())); setParams(previous => {
-    const next = new URLSearchParams(previous); for (const key of [...viewFields, 'pagina', 'pagina_itens']) next.delete(key); return next
+  const clear = () => { setDraft(read(new URLSearchParams(), products)); setParams(previous => {
+    const next = new URLSearchParams(previous); for (const key of [...viewFields, 'sinalizacao', 'pagina', 'pagina_itens']) next.delete(key); return next
   }) }
   return <ItemFilters draft={draft} change={change} apply={apply} clear={clear} baseId={baseId} params={params} purchases={purchases} suppliers={suppliers} products={products}>
     {suppliers && <p className="hint">Filtrar por fornecedor seleciona os itens em que ele tem resultado. Valores e concentração incluem os demais vencedores desses itens.</p>}
@@ -53,7 +57,7 @@ export function Filters({ purchases = false, suppliers = false, products = false
 export function useView(path) {
   const { baseId } = useBase()
   const s = useAnalysis()
-  const allFilters = read(s.params)
+  const allFilters = read(s.params, path === '/visao/produtos')
   const filters = path === '/visao/produtos' ? Object.fromEntries(productFields.map(key => [key, allFilters[key]])) : allFilters
   const query = useApi(path, { base_id: baseId, execucao_id: s.executionId, modelo_id: s.modelId, ...filters, pagina: s.params.get('pagina') || '1' }, !!s.ready)
   const changePage = page => s.setParams(previous => { const next = new URLSearchParams(previous); next.set('pagina', String(page)); return next })

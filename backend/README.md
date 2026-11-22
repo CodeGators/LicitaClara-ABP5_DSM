@@ -205,3 +205,11 @@ de treino do IF. O limite provisório `maior preço > 6 × mediana da base atual
 marca o produto como `requer_validacao` quando a mediana é positiva, sem confirmar
 erro ou remover registros.
 A resposta inclui as ocorrências para abrir as análises individuais.
+
+O parâmetro repetido `sinalizacao` permite combinar `menor_anomalia`,
+`anomalia_intermediaria`, `maior_anomalia`, `requer_validacao` e `sem_analise`.
+Exemplo: `&sinalizacao=menor_anomalia&sinalizacao=maior_anomalia`.
+Sem seleção, todos os produtos são incluídos. A seleção usa união das categorias,
+após calcular as estatísticas completas de cada produto e antes da paginação.
+`Requer validação` tem precedência sobre as faixas IF. As demais usam o maior IF
+disponível do produto: abaixo de 0,50, de 0,50 a menos de 0,70, ou de 0,70 a 1.

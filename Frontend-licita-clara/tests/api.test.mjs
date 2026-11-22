@@ -117,3 +117,16 @@ test('faixas visuais usam IF sem arredondamento e ignoram produtos que requerem 
   for (const value of [null, undefined, '', ' ', 'invalido', 'Infinity', -1, 1.01, false]) assert.equal(ifBand({ medida_if: value }), '')
   for (const value of ['0.2', '0.6', '0.9']) assert.equal(ifBand({ medida_if: value, requer_validacao: true }), '')
 })
+
+test('cliente e links preservam múltiplas sinalizações como parâmetros repetidos', async () => {
+  let requested
+  const client = createApiClient({ fetchImpl: async url => {
+    requested = new URL(url)
+    return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } })
+  } })
+  await client('/visao/produtos', { sinalizacao: ['menor_anomalia', 'maior_anomalia'], busca: 'água' })
+  assert.deepEqual(requested.searchParams.getAll('sinalizacao'), ['menor_anomalia', 'maior_anomalia'])
+  const { selectionLink } = await import('../src/api.mjs')
+  const link = new URL(selectionLink('/ranking', requested.searchParams), 'http://localhost')
+  assert.deepEqual(link.searchParams.getAll('sinalizacao'), ['menor_anomalia', 'maior_anomalia'])
+})

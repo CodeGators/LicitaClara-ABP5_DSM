@@ -13,7 +13,9 @@ export function createApiClient({ baseUrl = '/api/v1', fetchImpl = globalThis.fe
   return async function get(path, params = {}, { signal } = {}) {
     const url = new URL(`${base}${path}`, globalThis.location?.origin || 'http://localhost')
     for (const [key, value] of Object.entries(params)) {
-      if (value !== null && value !== undefined && value !== '') url.searchParams.set(key, String(value))
+      for (const entry of Array.isArray(value) ? value : [value]) {
+        if (entry !== null && entry !== undefined && entry !== '') url.searchParams.append(key, String(entry))
+      }
     }
     const controller = new AbortController()
     let timedOut = false
@@ -84,7 +86,7 @@ export const safeOfficialUrl = value => {
 }
 
 export const viewFields = ['busca', 'orgao_id', 'fornecedor_id', 'modalidade_id', 'homologacao_inicio', 'homologacao_fim', 'valor_minimo', 'valor_maximo', 'analise', 'ordenacao', 'tamanho_pagina']
-const keys = ['base_id', 'execucao_id', 'modelo_id', ...viewFields]
+const keys = ['base_id', 'execucao_id', 'modelo_id', 'sinalizacao', ...viewFields]
 export const selectionLink = (path, source) => {
   const params = new URLSearchParams(source)
   return `${path}?${new URLSearchParams([...params].filter(([key]) => keys.includes(key)))}`

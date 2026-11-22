@@ -124,3 +124,74 @@ def test_attribute_order_is_ignored_but_all_specifications_are_preserved():
     assert len(groups) == 2
     assert sorted(r["quantidade_registros"] for r in groups) == [1, 2]
     assert next(r for r in groups if r["quantidade_registros"] == 2)["mediana"] == Decimal("0.75")
+
+
+def test_signal_boundaries_and_review_precedence():
+    from licita_backend.repositories.produtos import product_signal
+
+    cases = [
+        ("0", "menor_anomalia"),
+        ("0.499999999999", "menor_anomalia"),
+        ("0.50", "anomalia_intermediaria"),
+        ("0.699999999999", "anomalia_intermediaria"),
+        ("0.70", "maior_anomalia"),
+        ("1", "maior_anomalia"),
+    ]
+    for measure, expected in cases:
+        row = {"requer_validacao": False, "medida_if": Decimal(measure)}
+        assert product_signal(row) == expected
+        assert product_signal({**row, "requer_validacao": True}) == "requer_validacao"
+    assert product_signal({"requer_validacao": False, "medida_if": None}) == "sem_analise"
+    assert product_signal({"requer_validacao": True, "medida_if": None}) == "requer_validacao"
+
+
+def test_multi_signal_filter_is_union_before_pagination_and_keeps_full_group_prices(monkeypatch):
+    from licita_backend.repositories.produtos import ProductRepository
+    from licita_backend.schemas.visao import ProductFilters
+
+    items = []
+    for code, score in [("1", "0.49"), ("2", "0.50"), ("3", "0.70"), ("4", None)]:
+        row = item("1", code=code)
+        row["medida_if"] = Decimal(score) if score else None
+        items.append(row)
+    for price in ["1", "1", "10"]:
+        row = item(price, code="5")
+        row["medida_if"] = Decimal("0.9")
+        items.append(row)
+    repository = ProductRepository(None)
+    monkeypatch.setattr(repository, "dataset", lambda _: ({"universo": {}}, items, [], []))
+    filters = ProductFilters(
+        base_id=uuid4(), sinalizacao=["menor_anomalia", "maior_anomalia"], tamanho_pagina=1
+    )
+    first = repository.listing(filters)
+    second = repository.listing(filters.model_copy(update={"pagina": 2}))
+    assert first["total"] == second["total"] == 2
+    assert first["total_paginas"] == 2
+    assert {first["dados"][0]["sinalizacao"], second["dados"][0]["sinalizacao"]} == {
+        "menor_anomalia",
+        "maior_anomalia",
+    }
+    review = repository.listing(filters.model_copy(update={"sinalizacao": ["requer_validacao"]}))
+    assert review["total"] == 1
+    assert review["dados"][0]["mediana"] == "1"
+    assert review["dados"][0]["quantidade_registros"] == 3
+    assert repository.listing(filters.model_copy(update={"sinalizacao": []}))["total"] == 5
+
+
+def test_api_accepts_repeated_signals_and_rejects_unknown_categories(query_client):
+    client, data = query_client
+    params = [
+        ("base_id", data["base"]),
+        ("sinalizacao", "sem_analise"),
+        ("sinalizacao", "maior_anomalia"),
+    ]
+    response = client.get("/api/v1/visao/produtos", params=params)
+    assert response.status_code == 200, response.text
+    assert response.json()["total"] == 2
+    assert {r["sinalizacao"] for r in response.json()["dados"]} == {"sem_analise"}
+    assert (
+        client.get(
+            "/api/v1/visao/produtos", params={"base_id": data["base"], "sinalizacao": "invalido"}
+        ).status_code
+        == 422
+    )

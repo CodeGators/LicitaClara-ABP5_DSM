@@ -9,6 +9,19 @@ from hashlib import sha256
 from licita_backend.repositories.visao import ViewRepository, amounts, wire
 
 
+def product_signal(product):
+    if product["requer_validacao"]:
+        return "requer_validacao"
+    measure = product["medida_if"]
+    if measure is None or not measure.is_finite() or not Decimal(0) <= measure <= Decimal(1):
+        return "sem_analise"
+    if measure >= Decimal("0.70"):
+        return "maior_anomalia"
+    if measure >= Decimal("0.50"):
+        return "anomalia_intermediaria"
+    return "menor_anomalia"
+
+
 def normalized(value):
     return " ".join(str(value or "").casefold().split())
 
@@ -136,8 +149,11 @@ class ProductRepository(ViewRepository):
                 for r in rows
                 if search in normalized(r["descricao"] + " " + str(r["codigo_catalogo"] or ""))
             ]
-        if filters.analise != "todos":
-            rows = [r for r in rows if r["status_analise"] == filters.analise]
+        for row in rows:
+            row["sinalizacao"] = product_signal(row)
+        if filters.sinalizacao:
+            selected = set(filters.sinalizacao)
+            rows = [r for r in rows if r["sinalizacao"] in selected]
         return wire(
             {
                 **context,

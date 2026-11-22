@@ -11,6 +11,7 @@ from licita_backend.repositories.visao import ViewRepository
 from licita_backend.schemas.consultas import ErrorResponse
 from licita_backend.schemas.visao import (
     Dashboard,
+    ProductFilters,
     SupplierView,
     TenderDetail,
     TenderPage,
@@ -37,7 +38,7 @@ def ranking(session: DB, params: Annotated[ViewFilters, Query()]):
 
 
 @router.get("/produtos", response_model=ViewPage)
-def products(session: DB, params: Annotated[ViewFilters, Query()]):
+def products(session: DB, params: Annotated[ProductFilters, Query()]):
     return ProductRepository(session).listing(params)
 
 

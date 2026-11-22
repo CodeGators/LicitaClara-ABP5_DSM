@@ -44,15 +44,21 @@ async function mockView(page, overrides = {}) {
     }
     if (path === '/visao/painel') return done({ ...context, distribuicao: Array.from({ length: 10 }, (_,i) => ({ inicio: i/10, fim: (i+1)/10, itens: i === 8 ? context.resumo.analisados : 0 })), evolucao: rows.length ? [{ mes: '2026-09', itens: rows.length, analisados: context.resumo.analisados, parcial: 0, nao_analisados: context.resumo.nao_analisados }] : [], motivos_indisponibilidade: context.resumo.nao_analisados ? { SEM_REFERENCIA_EXATA: context.resumo.nao_analisados } : {} })
     if (path === '/visao/ranking') return done({ ...context, ...pageOf(rows) })
-    if (path === '/visao/produtos') return done({ ...context, ...pageOf(rows.map(r => ({
-      id: r.id, descricao: r.descricao, catalogo: r.catalogo, codigo_catalogo: r.codigo_catalogo,
-      unidade_medida: r.unidade_medida, preco_minimo: r.resultados[0]?.valor_unitario_homologado ?? null,
-      preco_maximo: r.resultados[0]?.valor_unitario_homologado ?? null,
-      mediana: state.extremePrice ? '0.01' : r.resultados[0]?.valor_unitario_homologado ?? null,
-      quantidade_registros: r.resultados.length, requer_validacao: !!state.extremePrice,
-      itens: [{ id: r.id, numero_item: r.numero_item, numero_compra: r.processo.numero_compra }],
-    }))) })
-
+    if (path === '/visao/produtos') {
+      const selected = url.searchParams.getAll('sinalizacao')
+      const products = rows.map(r => {
+        const review = !!state.extremePrice
+        const signal = review ? 'requer_validacao' : r.medida_if == null ? 'sem_analise' : Number(r.medida_if) >= 0.70 ? 'maior_anomalia' : Number(r.medida_if) >= 0.50 ? 'anomalia_intermediaria' : 'menor_anomalia'
+        return { id: r.id, descricao: r.descricao, catalogo: r.catalogo, codigo_catalogo: r.codigo_catalogo,
+          unidade_medida: r.unidade_medida, preco_minimo: r.resultados[0]?.valor_unitario_homologado ?? null,
+          preco_maximo: r.resultados[0]?.valor_unitario_homologado ?? null,
+          mediana: state.extremePrice ? '0.01' : r.resultados[0]?.valor_unitario_homologado ?? null,
+          quantidade_registros: r.resultados.length, requer_validacao: review, medida_if: r.medida_if,
+          sinalizacao: signal, itens: [{ id: r.id, numero_item: r.numero_item, numero_compra: r.processo.numero_compra }],
+        }
+      }).filter(r => !selected.length || selected.includes(r.sinalizacao))
+      return done({ ...context, ...pageOf(products) })
+    }
     const supplier = { id: SUPPLIER, nome: 'Fornecedor do recorte', compras_com_resultado: 1, contratos_vinculados: 0, itens: 1, orgaos: 1, valor_homologado: '0.10000001', resultados_sem_total: 0, medida_if: hasScore ? '0.514' : null }
     if (path === '/visao/fornecedores') return done({ ...context, ...pageOf(rows.length ? (state.twoSuppliers ? [supplier, { ...supplier, id: OTHER_SUPPLIER, nome: 'Segundo fornecedor' }] : [supplier]) : []) })
     if (state.twoSuppliers && path === `/visao/fornecedores/${OTHER_SUPPLIER}`) return done({ ...context, fornecedor: { ...supplier, id: OTHER_SUPPLIER, nome: 'Segundo fornecedor' }, relacoes: [], itens: pageOf(rows) })
@@ -100,7 +106,8 @@ test('ausência de scores e publicação não vira zero nem bloqueia consultas r
   await page.getByRole('link', { name: 'Itens Sinalizados', exact: true }).click()
   await expect(page.getByRole('heading', { name: '2 produtos' })).toBeVisible()
   await expect(page.getByRole('cell', { name: 'Indisponível', exact: true })).toHaveCount(3)
-  await page.getByLabel('Estado da análise').selectOption('analisados')
+  await page.locator('.signal-filter summary').click()
+  await page.getByRole('checkbox', { name: 'Menor anomalia', exact: true }).check()
   await page.getByRole('button', { name: 'Aplicar filtros' }).click()
   await expect(page.getByText('Nenhum item encontrado nesta página.')).toBeVisible()
 })
@@ -319,7 +326,7 @@ test('filtros básicos dos produtos funcionam no celular sem opções avançadas
   await page.goto(`/ranking?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=${MODEL}`)
   await expect(page.getByText('Mais filtros', { exact: true })).toHaveCount(0)
   await expect(page.getByLabel('Buscar item ou código de catálogo')).toBeVisible()
-  await expect(page.getByLabel('Estado da análise', { exact: true })).toBeVisible()
+  await expect(page.getByRole('group', { name: 'Sinalização do item', exact: true })).toBeVisible()
   await page.getByLabel('Ordenação', { exact: true }).selectOption('descricao_asc')
   await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
   expect(new URL(page.url()).searchParams.get('ordenacao')).toBe('descricao_asc')
@@ -469,5 +476,43 @@ for (const theme of ['light', 'dark']) for (const width of [1280, 390]) {
     const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()
     expect(axe.violations).toEqual([])
     await expect(page.getByRole('columnheader', { name: 'Medida IF', exact: true })).toHaveCount(0)
+  })
+}
+
+for (const width of [1280, 390]) {
+  test(`sinalização permite múltipla seleção, restauração e limpeza ${width}`, async ({ page }) => {
+    const state = await mockView(page)
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/ranking')
+    await expect(page.getByLabel('Estado da análise', { exact: true })).toHaveCount(0)
+    const group = page.getByRole('group', { name: 'Sinalização do item', exact: true })
+    await group.locator('summary').click()
+    await page.getByRole('checkbox', { name: 'Menor anomalia', exact: true }).check()
+    await page.getByRole('checkbox', { name: 'Maior anomalia', exact: true }).check()
+    await expect(page.getByRole('checkbox', { name: 'Menor anomalia', exact: true })).toBeChecked()
+    await expect(page.getByRole('checkbox', { name: 'Maior anomalia', exact: true })).toBeChecked()
+    expect(new URL(page.url()).searchParams.getAll('sinalizacao')).toEqual([])
+    const axe = await new AxeBuilder({ page }).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()
+    expect(axe.violations).toEqual([])
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false)
+    await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
+    await expect.poll(() => new URL(page.url()).searchParams.getAll('sinalizacao')).toEqual(['menor_anomalia', 'maior_anomalia'])
+    await expect(page.getByText('Nenhum item encontrado nesta página.', { exact: true })).toBeVisible()
+    expect(state.calls.filter(u => u.pathname.endsWith('/visao/produtos')).at(-1).searchParams.getAll('sinalizacao')).toEqual(['menor_anomalia', 'maior_anomalia'])
+    await page.reload()
+    await group.locator('summary').click()
+    await expect(page.getByRole('checkbox', { name: 'Menor anomalia', exact: true })).toBeChecked()
+    await expect(page.getByRole('checkbox', { name: 'Maior anomalia', exact: true })).toBeChecked()
+    await page.getByRole('checkbox', { name: 'Todos os itens', exact: true }).check()
+    await expect(page.getByRole('checkbox', { name: 'Menor anomalia', exact: true })).not.toBeChecked()
+    await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
+    await expect(page.getByRole('heading', { name: '2 produtos', exact: true })).toBeVisible()
+    expect(new URL(page.url()).searchParams.getAll('sinalizacao')).toEqual([])
+    await group.locator('summary').click()
+    await page.getByRole('checkbox', { name: 'Sem análise disponível', exact: true }).check()
+    await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
+    await expect(page.getByRole('heading', { name: '1 produto', exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Limpar filtros', exact: true }).click()
+    await expect(page.getByRole('heading', { name: '2 produtos', exact: true })).toBeVisible()
   })
 }

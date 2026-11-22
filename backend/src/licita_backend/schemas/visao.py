@@ -3,7 +3,7 @@
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 from licita_backend.schemas.consultas import Money, ProcurementFilters
 
@@ -20,6 +20,18 @@ class ViewFilters(ProcurementFilters):
         if self.modelo_id is not None and self.execucao_id is None:
             raise ValueError("Selecionar execução antes do modelo")
         return self
+
+
+class ProductFilters(ViewFilters):
+    sinalizacao: list[
+        Literal[
+            "menor_anomalia",
+            "anomalia_intermediaria",
+            "maior_anomalia",
+            "requer_validacao",
+            "sem_analise",
+        ]
+    ] = Field(default_factory=list, max_length=5)
 
 
 class ViewContext(BaseModel):
