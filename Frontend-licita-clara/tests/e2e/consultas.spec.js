@@ -8,7 +8,7 @@ test('entrada abre dados reais, fixa base e pagina sem fabricar scores', async (
   await expect(page).toHaveURL(new RegExp(`/itens\\?base_id=${BASE}`))
   await expect(page.getByRole('heading', { name: '2 item(ns) encontrado(s)' })).toBeVisible()
   await expect(page.getByText('Sem análise selecionada', { exact: true })).toBeVisible()
-  await expect(page.getByText('Dados oficiais · sem análise')).toBeVisible()
+  await expect(page.getByText('Dados oficiais · sem análise')).toHaveCount(0)
   await expect(page.getByText('Nexo Suprimentos Ltda.', { exact: true })).toHaveCount(0)
   await page.getByText('Mais filtros', { exact: true }).click()
   await page.getByLabel('Itens por página', { exact: true }).selectOption('5')
