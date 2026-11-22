@@ -25,7 +25,6 @@ function Comparison({ item, result, score }) {
     <p className="detail-unit-basis"><strong>Unidade da mediana: {basis || 'Não informada'}</strong><br />Unidade registrada no item: {item.unidade_medida || 'Não informada'}</p>
     <p className="detail-item-description">{item.descricao}</p><p className="hint">{item.catalogo || 'Catálogo não informado'} {item.codigo_catalogo} · {item.unidade_medida || 'Unidade não informada'} · Quantidade: {decimal(result?.quantidade_homologada ?? item.quantidade)}</p>
     <div className="detail-bars">{bars.map(([label, value, color]) => <div key={label}><div className="mini"><span>{label}</span><strong title={value == null ? undefined : `Valor original: ${exactDecimal(value)}`} style={{ color }}>{value == null ? 'Não informado' : money(value)}</strong></div>{value != null && <Progress pct={value} max={max} cor={color} />}</div>)}</div>
-    <p className="hint">Confira especificações, embalagem e condições de entrega nos documentos antes de concluir qualquer coisa.</p>
     <details className="detail-result-data"><summary>Ver resultados e dados do item</summary><Results results={item.resultados} hideStatus /><div className="stats"><Info label="Total homologado do item">{money(item.valor_homologado_item)}</Info><Info label="Quantidade do item">{decimal(item.quantidade)}</Info><Info label="Unidade">{item.unidade_medida || 'Não informada'}</Info></div></details>
   </section>
 }
