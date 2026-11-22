@@ -5,7 +5,7 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { ArrowLeft, FilePlus2 } from 'lucide-react'
 import { useBase } from '../BaseContext.jsx'
 import { useAnalysis } from '../AnalysisContext.jsx'
-import { ifMeasure, date, decimal, exactDecimal, money, reportLink, selectionLink } from '../api.mjs'
+import { date, decimal, exactDecimal, money, reportLink, selectionLink } from '../api.mjs'
 import { Documents, Field, Info, QueryState, Results } from '../components/consultas.jsx'
 import { Head, Progress } from '../components/ui.jsx'
 import useApi from '../useApi.js'
@@ -28,17 +28,6 @@ function Comparison({ item, result, score }) {
     <div className="detail-bars">{bars.map(([label, value, color]) => <div key={label}><div className="mini"><span>{label}</span><strong title={value == null ? undefined : `Valor original: ${exactDecimal(value)}`} style={{ color }}>{value == null ? 'Não informado' : money(value)}</strong></div>{value != null && <Progress pct={value} max={max} cor={color} />}</div>)}</div>
     <p className="hint">Confira especificações, embalagem e condições de entrega nos documentos antes de concluir qualquer coisa.</p>
     <details className="detail-result-data"><summary>Ver resultados e dados do item</summary><Results results={item.resultados} /><div className="stats"><Info label="Total homologado do item">{money(item.valor_homologado_item)}</Info><Info label="Quantidade do item">{decimal(item.quantidade)}</Info><Info label="Unidade">{item.unidade_medida || 'Não informada'}</Info></div></details>
-  </section>
-}
-
-function Explanation({ score, result }) {
-  const parts = score?.explicacao?.status === 'disponivel' ? score.explicacao.parcelas || [] : []
-  const total = parts.reduce((sum, part) => sum + Math.max(0, numeric(part.parcela_score_bruto) || 0), 0)
-  return <section className="card detail-explanation"><h2>Por que foi sinalizado?</h2><p className="sub">O que o modelo usou para chegar a esta medida IF.</p>
-    <div className="detail-observations"><Info label="Modelo">{score ? algorithm(score.algoritmo) : 'Sem medida IF disponível'}</Info><Info label="Quantidade homologada">{decimal(result?.quantidade_homologada)}</Info><Info label="Preço unitário homologado" title={`Valor original: ${exactDecimal(result?.valor_unitario_homologado)}`}>{money(result?.valor_unitario_homologado)}</Info></div>
-    {parts.length ? <><h3>De onde vem a medida IF</h3><div className="detail-bars">{parts.map(part => <div key={part.atributo}><div className="mini"><span>{({ log_quantidade: 'Quantidade', log_preco_mediana: 'Preço relativo à mediana' })[part.atributo] || part.atributo}</span><strong>{decimal(part.parcela_score_bruto)}</strong></div><Progress pct={Math.max(0, numeric(part.parcela_score_bruto) || 0)} max={total || 1} cor="var(--media)" /><p className="hint">{total > 0 ? `${(100 * Number(part.parcela_score_bruto) / total).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}% do erro bruto` : 'Sem erro de reconstrução'}</p></div>)}</div><p className="hint">São parcelas do erro de reconstrução do Autoencoder. Não indicam causa nem a importância dos atributos no Isolation Forest.</p></> : <p className="detail-unavailable">{score ? 'Contribuição por atributo indisponível para este modelo.' : 'Este resultado não possui medida IF na execução selecionada.'}</p>}
-    {score && <p className="hint">Medida original do IF: {ifMeasure(score.medida_if)}. Escala de 0 a 1, maior indica maior anomalia. Não é percentil nem probabilidade.</p>}
-
   </section>
 }
 
@@ -105,7 +94,7 @@ function Detail({ item }) {
     {invalidModel && <p className="note" role="alert">Modelo fora da execução selecionada. Nenhum score de outro modelo será usado.</p>}
     {tab === 'sinais' && <>
       {!activeScore && !analysis.loading && !analysis.error && <p className="note">Nenhuma medida IF disponível para este resultado no modelo selecionado. {[...new Set((data?.cobertura || []).filter(c => (!selection.modelId || c.modelo_id === selection.modelId) && (!c.resultado_item_id || c.resultado_item_id === result?.id)).map(c => c.motivo?.replaceAll('_', ' ').toLowerCase()).filter(Boolean))].join('; ')}. Ausência de medida IF não representa regularidade.</p>}
-      <div className="detail-panels"><Comparison item={item} result={result} score={activeScore} /><Explanation score={activeScore} result={result} /></div></>}
+      <Comparison item={item} result={result} score={activeScore} /></>}
     {tab === 'docs' && <Documents key={`${baseId}:${process.id}`} processId={process.id} baseId={baseId} />}
     {tab === 'revisao' && <section className="card"><h2>Revisão humana</h2><p className="sub">Nenhuma revisão humana registrada. O registro de pareceres ainda não está disponível nesta versão.</p></section>}
     <div className="detail-footer"><Link className="link-a" to={selectionLink(`/processos/${process.id}`, location.search)}>Ver todos os itens da compra</Link></div>
