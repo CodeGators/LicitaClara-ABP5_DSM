@@ -72,7 +72,7 @@ function Detail({ item }) {
   const fmt = v => v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   return <div className="analysis-detail">
     <Link className="link-a back-link" to={back}><ArrowLeft size={16} />Voltar à consulta</Link>
-    <Head title={`Compra ${process.numero_compra} · Item ${item.numero_item}`} sub={`${item.descricao} · ${process.orgao_nome}`} action={<Link className="btn primary" to={reportLink(process.id, location.search)}><FilePlus2 size={16} />Incluir no relatório</Link>} />
+    <Head title={`Compra ${process.numero_compra} · Item ${item.numero_item}`} sub={`${item.descricao} · ${process.orgao_nome}`} action={<Link className="btn primary" to={reportLink(process.id, location.search)}><FilePlus2 size={16} />Gerar relatório da licitação</Link>} />
     <section className="card detail-hero" aria-label="Resumo do item">
       <div className="detail-body">
         <div>{requiresPriceReview(result?.valor_unitario_homologado, comparison?.mediana, comparison?.unidade_preco?.unidade_preco) && <PriceReview />}</div>
