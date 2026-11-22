@@ -1,4 +1,3 @@
-import FilterPanel from './components/FilterPanel.jsx'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useBase } from './BaseContext.jsx'
@@ -56,23 +55,34 @@ export function AnalysisGate({ children }) {
   return children
 }
 
+const modelName = m => m.algoritmo === 'autoencoder' ? 'Autoencoder' : m.algoritmo === 'isolation_forest' ? 'Isolation Forest' : m.algoritmo
+
+// Linha resumida: mostra a análise em uso e só abre as opções quando a pessoa pede.
 export function AnalysisSelector({ allModels = false }) {
   const s = useAnalysis()
-  return <FilterPanel title="Versão da análise" ariaLabel="Seleção da análise" twoColumns={!allModels} singleColumn={allModels} primary={<>
-      <Field label="Execução publicada"><select className="select" value={s.selected || 'nenhuma'} onChange={e => s.setSelection('execucao_id', e.target.value)}>
-        <option value="nenhuma">Consultar sem análise</option>
-        {s.executionId && !s.runs.data?.dados.some(r => r.id === s.executionId) && <option value={s.executionId}>Execução selecionada · {s.executionId.slice(0, 8)}</option>}
-        {(s.runs.data?.dados || []).map(r => <option key={r.id} value={r.id}>{new Date(r.concluido_em).toLocaleString('pt-BR')} · {r.id.slice(0, 8)}</option>)}
-      </select></Field>
-      {!allModels && <Field label="Modelo experimental"><select className="select" value={s.modelId} disabled={!s.executionId} onChange={e => s.setSelection('modelo_id', e.target.value)}>
-        {s.run.data?.roteamento_automatico && <option value="">Automático por item</option>}
-        {!s.run.data?.modelos.some(m => m.algoritmo === 'isolation_forest') && <option value="">Sem modelo selecionado</option>}
-        {s.modelId && !s.run.data?.modelos.some(m => m.id === s.modelId) && <option value={s.modelId}>Modelo fora desta execução</option>}
-        {(s.run.data?.modelos || []).filter(m => m.algoritmo === 'isolation_forest').map(m => <option key={m.id} value={m.id}>{m.algoritmo === 'autoencoder' ? 'Autoencoder' : m.algoritmo === 'isolation_forest' ? 'Isolation Forest' : m.algoritmo} · {m.catalogo ? `CATMAT ${m.catalogo} · ` : ""}{m.id.slice(0, 8)}</option>)}
-      </select></Field>}
-    </>}>
-    {s.runs.error && <p role="alert">Não foi possível carregar as versões. <button className="link-a" onClick={s.runs.retry}>Tentar novamente</button></p>}
-    {s.runs.data?.total_paginas > 1 && <div className="pager"><button disabled={s.page === 1} onClick={() => s.setPage(p => p - 1)}>Versões anteriores</button><span>{s.page}/{s.runs.data.total_paginas}</span><button disabled={s.page >= s.runs.data.total_paginas} onClick={() => s.setPage(p => p + 1)}>Mais versões</button></div>}
-    <p className="hint">{allModels ? "O relatório mostra a medida original do IF. O erro de reconstrução do Autoencoder, quando disponível, aparece separado e tem outra escala." : "Cada item usa o Isolation Forest do seu grupo. Medida original de 0 a 1: maior indica maior anomalia. Não é percentil ou probabilidade. Grupos sem IF disponível ficam sem medida."}</p>
-  </FilterPanel>
+  const model = s.run.data?.modelos.find(m => m.id === s.modelId)
+  const when = s.run.data?.concluido_em ? new Date(s.run.data.concluido_em).toLocaleDateString('pt-BR') : null
+  const summary = !s.executionId ? 'Sem análise: só dados importados'
+    : [when && `versão de ${when}`, allModels ? 'todos os modelos' : model ? modelName(model) : s.run.data?.roteamento_automatico ? 'modelo automático por item' : null].filter(Boolean).join(' · ') || 'carregando…'
+  return <details className="card analysis-bar" aria-label="Seleção da análise">
+    <summary><span className="ab-label">Versão da análise</span><span className="ab-value">{summary}</span><span className="ab-change">Alterar</span></summary>
+    <div className="ab-body">
+      <div className="ab-fields">
+        <Field label="Execução publicada"><select className="select" value={s.selected || 'nenhuma'} onChange={e => s.setSelection('execucao_id', e.target.value)}>
+          <option value="nenhuma">Consultar sem análise</option>
+          {s.executionId && !s.runs.data?.dados.some(r => r.id === s.executionId) && <option value={s.executionId}>Execução selecionada · {s.executionId.slice(0, 8)}</option>}
+          {(s.runs.data?.dados || []).map(r => <option key={r.id} value={r.id}>{new Date(r.concluido_em).toLocaleString('pt-BR')} · {r.id.slice(0, 8)}</option>)}
+        </select></Field>
+        {!allModels && <Field label="Modelo experimental"><select className="select" value={s.modelId} disabled={!s.executionId} onChange={e => s.setSelection('modelo_id', e.target.value)}>
+          {s.run.data?.roteamento_automatico && <option value="">Automático por item</option>}
+          {!s.run.data?.modelos.some(m => m.algoritmo === 'isolation_forest') && <option value="">Sem modelo selecionado</option>}
+          {s.modelId && !s.run.data?.modelos.some(m => m.id === s.modelId) && <option value={s.modelId}>Modelo fora desta execução</option>}
+          {(s.run.data?.modelos || []).filter(m => m.algoritmo === 'isolation_forest').map(m => <option key={m.id} value={m.id}>{modelName(m)} · {m.catalogo ? `CATMAT ${m.catalogo} · ` : ''}{m.id.slice(0, 8)}</option>)}
+        </select></Field>}
+      </div>
+      {s.runs.error && <p role="alert">Não foi possível carregar as versões. <button className="link-a" onClick={s.runs.retry}>Tentar novamente</button></p>}
+      {s.runs.data?.total_paginas > 1 && <div className="pager"><button className="btn ghost sm" disabled={s.page === 1} onClick={() => s.setPage(p => p - 1)}>Versões anteriores</button><span>{s.page}/{s.runs.data.total_paginas}</span><button className="btn ghost sm" disabled={s.page >= s.runs.data.total_paginas} onClick={() => s.setPage(p => p + 1)}>Mais versões</button></div>}
+      <p className="hint">{allModels ? 'O relatório mostra a medida original do IF e, separadamente, o erro de reconstrução do Autoencoder, em outra escala.' : 'Cada item usa o Isolation Forest do seu grupo. Medida original de 0 a 1: maior indica maior anomalia. Não é percentil ou probabilidade. Grupos sem IF disponível ficam sem medida.'}</p>
+    </div>
+  </details>
 }

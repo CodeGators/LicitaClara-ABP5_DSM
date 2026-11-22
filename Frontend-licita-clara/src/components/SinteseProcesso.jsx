@@ -15,11 +15,11 @@ export default function SinteseProcesso({ processId }) {
   if (!enabled) return <NoAnalysis />
   const process = query.data?.dados[0]
   return <section className="card">
-    <h2>Síntese experimental da licitação</h2>
-    {!process?.cobertura_agrupada && <p className="sub">Uma análise integral exige conhecer todos os itens e resultados do universo oficial consultado. A média dos sinais disponíveis descreve apenas a parte analisada. Não representa probabilidade de fraude ou prioridade validada.</p>}
+    <h2>Síntese da licitação</h2>
+    {!process?.cobertura_agrupada && <p className="sub">Uma análise integral exige conhecer todos os itens da licitação. A média dos sinais descreve só a parte analisada e não é probabilidade de fraude.</p>}
     <QueryState query={query} loading="Consultando a cobertura da licitação…" />
     {process?.cobertura_agrupada && <>
-      <p className="sub">Cada item é comparado com seu próprio grupo de produtos. Medidas de grupos diferentes não têm calibração comum de gravidade. O resumo é apenas descritivo.</p>
+      <p className="sub">Cada item é comparado com o seu próprio grupo de produtos. Medidas IF de grupos diferentes não têm calibração comum de gravidade.</p>
       <div className="stats">
         <Info label="Itens com análise / importados">{process.cobertura_agrupada.itens_com_analise} / {process.cobertura_agrupada.itens_importados}</Info>
         <Info label="Resultados com análise / ativos importados">{process.cobertura_agrupada.resultados_com_analise} / {process.cobertura_agrupada.resultados_ativos_importados}</Info>
@@ -36,7 +36,7 @@ export default function SinteseProcesso({ processId }) {
         <Info label="Média dos sinais disponíveis">{ifMeasure(result.medida_if_observada)}</Info>
         <Info label="Itens integralmente analisados / itens oficiais">{result.cobertura.itens_oficiais === null ? 'Universo não confirmado' : `${result.cobertura.itens_integralmente_analisados} / ${result.cobertura.itens_oficiais}`}</Info>
       </div>
-      {result.medida_if_processo === null && <p className="note">{result.motivo === 'UNIVERSO_OFICIAL_NAO_CONFIRMADO' ? 'Falta confirmar o universo oficial de itens desta licitação.' : 'A cobertura é insuficiente para concluir uma análise da licitação inteira.'}</p>}
+      {result.medida_if_processo === null && <p className="note">{result.motivo === 'UNIVERSO_OFICIAL_NAO_CONFIRMADO' ? 'Falta confirmar o universo oficial de itens desta licitação.' : 'A cobertura é insuficiente para concluir a análise da licitação inteira.'}</p>}
       {result.limite_inferior !== null && result.medida_if_processo === null && <p className="hint">Se todos os itens pudessem receber medidas IF comparáveis, a média integral estaria entre {decimal(result.limite_inferior)} e {decimal(result.limite_superior)}. Esses limites não são uma estimativa de risco nem um intervalo de confiança.</p>}
       {!!result.sinais.itens.length && <><h4>Itens que sustentam os sinais observados</h4><ul className="document-list">{result.sinais.itens.map(item => {
         const context = new URLSearchParams(params)

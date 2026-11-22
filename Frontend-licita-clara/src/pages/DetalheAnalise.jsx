@@ -17,27 +17,26 @@ function Comparison({ item, result, score }) {
   const median = numeric(comparison?.mediana)
   const price = numeric(result?.valor_unitario_homologado)
   const estimate = numeric(item.valor_unitario_estimado)
-  const bars = [[`Mediana do grupo de treino${basis ? ` (R$/${basis})` : ''}`, median, 'var(--petroleo)'], ['Estimado do item', estimate, 'var(--secundario)'], ['Homologado do resultado', price, 'var(--alta)']]
+  const bars = [[`Mediana de itens parecidos${basis ? ` (R$/${basis})` : ''}`, median, 'var(--petroleo)'], ['Estimado para o item', estimate, 'var(--secundario)'], ['Homologado neste resultado', price, 'var(--alta)']]
   const max = Math.max(1, ...bars.map(([, value]) => value || 0)) * 1.1
-  return <section className="card detail-comparison"><h2>Comparação com itens similares</h2><p className="sub">Preços por unidade de fornecimento · referência histórica do modelo selecionado</p>
+  return <section className="card detail-comparison"><h2>Preço pago e referência</h2><p className="sub">Preço por unidade, comparado com a mediana de itens parecidos.</p>
     <p className="detail-unit-basis"><strong>Unidade da mediana: {basis || 'Não informada'}</strong><br />Unidade registrada no item: {item.unidade_medida || 'Não informada'}</p>
     <p className="detail-item-description">{item.descricao}</p><p className="hint">{item.catalogo || 'Catálogo não informado'} {item.codigo_catalogo} · {item.unidade_medida || 'Unidade não informada'} · Quantidade: {decimal(result?.quantidade_homologada ?? item.quantidade)}</p>
     {comparison ? <p className="hint">{comparison.n_treino != null ? `${Number(comparison.n_treino).toLocaleString('pt-BR')} observações no treino` : 'Quantidade do treino não informada'}</p> : <p className="hint">Referência de treino indisponível para este resultado.</p>}
     <div className="detail-bars">{bars.map(([label, value, color]) => <div key={label}><div className="mini"><span>{label}</span><strong title={value == null ? undefined : `Valor original: ${exactDecimal(value)}`} style={{ color }}>{value == null ? 'Não informado' : money(value)}</strong></div>{value != null && <Progress pct={value} max={max} cor={color} />}</div>)}</div>
-    {median > 0 && price != null && <p className="detail-price-ratio"><span className="pill ana">{(price / median).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}× a mediana</span> {((price / median - 1) * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}% em relação à mediana do treino</p>}
-    <p className="hint">As unidades e embalagens são conferidas antes da comparação. A equivalência de especificações e condições de entrega ainda exige conferência documental. Não se presume peso por unidade.</p>
+    <p className="hint">Confira especificações, embalagem e condições de entrega nos documentos antes de concluir qualquer coisa.</p>
     <details className="detail-result-data"><summary>Ver resultados e dados do item</summary><Results results={item.resultados} /><div className="stats"><Info label="Total homologado do item">{money(item.valor_homologado_item)}</Info><Info label="Quantidade do item">{decimal(item.quantidade)}</Info><Info label="Unidade">{item.unidade_medida || 'Não informada'}</Info></div></details>
   </section>
 }
 
-function Explanation({ score, result, children }) {
+function Explanation({ score, result }) {
   const parts = score?.explicacao?.status === 'disponivel' ? score.explicacao.parcelas || [] : []
   const total = parts.reduce((sum, part) => sum + Math.max(0, numeric(part.parcela_score_bruto) || 0), 0)
-  return <section className="card detail-explanation"><h2>Por que este item foi sinalizado?</h2><p className="sub">Dados utilizados e explicação disponível da análise</p>{children}
+  return <section className="card detail-explanation"><h2>Por que foi sinalizado?</h2><p className="sub">O que o modelo usou para chegar a esta medida IF.</p>
     <div className="detail-observations"><Info label="Modelo">{score ? algorithm(score.algoritmo) : 'Sem medida IF disponível'}</Info><Info label="Quantidade homologada">{decimal(result?.quantidade_homologada)}</Info><Info label="Preço unitário homologado" title={`Valor original: ${exactDecimal(result?.valor_unitario_homologado)}`}>{money(result?.valor_unitario_homologado)}</Info></div>
-    {parts.length ? <><h3>Parcelas do erro de reconstrução</h3><div className="detail-bars">{parts.map(part => <div key={part.atributo}><div className="mini"><span>{({ log_quantidade: 'Quantidade', log_preco_mediana: 'Preço relativo à mediana' })[part.atributo] || part.atributo}</span><strong>{decimal(part.parcela_score_bruto)}</strong></div><Progress pct={Math.max(0, numeric(part.parcela_score_bruto) || 0)} max={total || 1} cor="var(--media)" /><p className="hint">{total > 0 ? `${(100 * Number(part.parcela_score_bruto) / total).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}% do erro bruto` : 'Sem erro de reconstrução'}</p></div>)}</div><p className="hint">Parcelas do Autoencoder são erros de reconstrução. Não representam causas ou importância dos atributos do Isolation Forest.</p></> : <p className="detail-unavailable">{score ? 'Contribuição por atributo indisponível para este modelo.' : 'Este resultado não possui medida IF na execução selecionada.'}</p>}
-    {score && <p className="hint">Medida original do IF: {ifMeasure(score.medida_if)} · Escala de 0 a 1, maior indica maior anomalia. Não é percentil nem probabilidade.</p>}
-    <div className="note"><b>Próxima etapa da revisão</b>Conferir preços, quantidade, especificações e documentos antes de qualquer conclusão.</div>
+    {parts.length ? <><h3>De onde vem a medida IF</h3><div className="detail-bars">{parts.map(part => <div key={part.atributo}><div className="mini"><span>{({ log_quantidade: 'Quantidade', log_preco_mediana: 'Preço relativo à mediana' })[part.atributo] || part.atributo}</span><strong>{decimal(part.parcela_score_bruto)}</strong></div><Progress pct={Math.max(0, numeric(part.parcela_score_bruto) || 0)} max={total || 1} cor="var(--media)" /><p className="hint">{total > 0 ? `${(100 * Number(part.parcela_score_bruto) / total).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}% do erro bruto` : 'Sem erro de reconstrução'}</p></div>)}</div><p className="hint">São parcelas do erro de reconstrução do Autoencoder. Não indicam causa nem a importância dos atributos no Isolation Forest.</p></> : <p className="detail-unavailable">{score ? 'Contribuição por atributo indisponível para este modelo.' : 'Este resultado não possui medida IF na execução selecionada.'}</p>}
+    {score && <p className="hint">Medida original do IF: {ifMeasure(score.medida_if)}. Escala de 0 a 1, maior indica maior anomalia. Não é percentil nem probabilidade.</p>}
+
   </section>
 }
 
@@ -76,24 +75,45 @@ function Detail({ item }) {
   const mainProcess = processQuery.data?.processo
   const back = /^\/(painel|ranking|licitacoes|fornecedores)(\/[^?]*)?\?/.test(origin) ? origin : selectionLink('/ranking', location.search)
   const controls = <div className="detail-selection">{results.length > 1 && <Field label="Resultado do fornecedor"><select className="select" value={result?.id || ''} onChange={e => { setResult(e.target.value) }}>{results.map(r => <option key={r.id} value={r.id}>{r.fornecedor_nome} · Resultado {r.sequencial_resultado}</option>)}</select></Field>}{!invalidModel && (scores.length > 1 || (scores.length === 1 && !activeScore)) && <Field label="Modelo da comparação"><select className="select" value={activeScore?.modelo_id || ''} onChange={e => selection.setSelection('modelo_id', e.target.value)}>{!activeScore && <option value="" disabled>Modelo selecionado sem medida IF</option>}{scores.map(s => <option key={s.id} value={s.modelo_id}>{algorithm(s.algoritmo)}</option>)}</select></Field>}</div>
+  const comparison = activeScore?.atributos?.comparacao
+  const median = numeric(comparison?.mediana)
+  const price = numeric(result?.valor_unitario_homologado)
+  const ratio = median > 0 && price != null ? price / median : null
+  const fmt = v => v.toLocaleString('pt-BR', { maximumFractionDigits: 2 })
+  const idx = activeScore ? Math.max(0, Math.min(1, Number(activeScore.medida_if) || 0)) : null
   return <div className="analysis-detail">
-    <Head kicker="Ranking / Detalhe do item" title={`Compra ${process.numero_compra} · Item ${item.numero_item}`} sub={`${item.descricao} · ${process.orgao_nome} · ${process.modalidade_nome || 'Modalidade não informada'}`} action={<Link className="btn primary" to={reportLink(process.id, location.search)}><FilePlus2 size={16} />Incluir no relatório</Link>} />
-    <section className="card detail-summary"><div className="detail-facts">
-      <Info label="Valor estimado da compra">{money(mainProcess?.valor_estimado_processo)}</Info><Info label="Valor homologado da compra">{money(mainProcess?.valor_homologado_processo)}</Info><Info label="Fornecedor do resultado">{result?.fornecedor_nome || 'Não informado'}</Info>
-      <Info label="Publicação → resultado do item">{date(process.data_publicacao)} → {date(result?.data_resultado)}</Info><Info label="Total homologado do resultado">{money(result?.valor_total_homologado)}</Info><Info label="Situação da revisão">Não registrada</Info>
-      <p className="hint detail-summary-note">Valores da compra e do resultado são distintos. O score ao lado pertence ao resultado do item, sem medida IF agregado da licitação.</p><QueryState query={processQuery} loading="Consultando valores da compra…" />
-    </div><div className="detail-score"><span className="pill ana">Medida IF do item · experimental</span><div className="detail-score-number">{activeScore ? ifMeasure(activeScore.medida_if) : '—'}</div><p className="hint">{activeScore ? algorithm(activeScore.algoritmo) : 'Sem medida IF disponível'}</p><p className="hint">{!invalidModel && scores.filter(s => s !== activeScore).map(s => `${algorithm(s.algoritmo)}: ${ifMeasure(s.medida_if)}`).join(' · ')}</p></div></section>
-    <Aviso detalhe />
-    <nav className="tabs" aria-label="Seções da análise">{[['sinais', 'Sinais e comparação'], ['docs', 'Documentos'], ['revisao', 'Registro da revisão']].map(([key, label]) => <button key={key} className={tab === key ? 'on' : ''} aria-pressed={tab === key} onClick={() => setTab(key)}>{label}</button>)}</nav>
+    <Link className="link-a back-link" to={back}><ArrowLeft size={16} />Voltar à consulta</Link>
+    <Head title={`Compra ${process.numero_compra} · Item ${item.numero_item}`} sub={`${item.descricao} · ${process.orgao_nome}`} action={<Link className="btn primary" to={reportLink(process.id, location.search)}><FilePlus2 size={16} />Incluir no relatório</Link>} />
+    <section className="card detail-hero" aria-label="Resumo do item">
+      <div className="detail-score">
+        <span className="pill">Medida IF do item</span>
+        <div className="detail-score-number">{activeScore ? ifMeasure(activeScore.medida_if) : '—'}</div>
+        {idx != null && <><div className="score-ruler" aria-hidden="true"><i style={{ width: `${idx * 100}%` }} /><b style={{ left: `${idx * 100}%` }} /></div><div className="score-scale" aria-hidden="true"><span>0</span><span>1</span></div></>}
+        <p className="hint">{activeScore ? algorithm(activeScore.algoritmo) : 'Sem medida IF disponível'}{!invalidModel && scores.filter(s => s !== activeScore).length > 0 && ` · ${scores.filter(s => s !== activeScore).map(s => `${algorithm(s.algoritmo)}: ${ifMeasure(s.medida_if)}`).join(' · ')}`}</p>
+      </div>
+      <div className="detail-body">
+        <p className="detail-headline">{ratio != null ? <>O preço unitário homologado foi <span className="pill ana">{fmt(ratio)}× a mediana</span> de itens parecidos ({money(median)}).</> : 'Não há referência de preço suficiente para comparar este resultado.'}</p>
+        <div className="detail-facts">
+          <Info label="Fornecedor do resultado">{result?.fornecedor_nome || 'Não informado'}</Info>
+          <Info label="Total homologado do resultado">{money(result?.valor_total_homologado)}</Info>
+          <Info label="Publicação → resultado">{date(process.data_publicacao)} → {date(result?.data_resultado)}</Info>
+          <Info label="Valor homologado da compra">{money(mainProcess?.valor_homologado_processo)}</Info>
+        </div>
+        <QueryState query={processQuery} loading="Consultando valores da compra…" />
+        {controls}
+        <p className="hint">A medida IF pertence a este resultado do item. Não existe medida IF agregado da licitação.</p>
+      </div>
+    </section>
+    <Aviso />
+    <nav className="tabs" aria-label="Seções da análise">{[['sinais', 'Preço e sinais'], ['docs', 'Documentos'], ['revisao', 'Revisão']].map(([key, label]) => <button key={key} className={tab === key ? 'on' : ''} aria-pressed={tab === key} onClick={() => setTab(key)}>{label}</button>)}</nav>
     <QueryState query={analysis} loading="Consultando análise do item…" />
     {invalidModel && <p className="note" role="alert">Modelo fora da execução selecionada. Nenhum score de outro modelo será usado.</p>}
     {tab === 'sinais' && <>
       {!activeScore && !analysis.loading && !analysis.error && <p className="note">Nenhuma medida IF disponível para este resultado no modelo selecionado. {[...new Set((data?.cobertura || []).filter(c => (!selection.modelId || c.modelo_id === selection.modelId) && (!c.resultado_item_id || c.resultado_item_id === result?.id)).map(c => c.motivo?.replaceAll('_', ' ').toLowerCase()).filter(Boolean))].join('; ')}. Ausência de medida IF não representa regularidade.</p>}
-      <div className="detail-panels"><Comparison item={item} result={result} score={activeScore} /><Explanation score={activeScore} result={result}>{controls}</Explanation></div></>}
+      <div className="detail-panels"><Comparison item={item} result={result} score={activeScore} /><Explanation score={activeScore} result={result} /></div></>}
     {tab === 'docs' && <Documents key={`${baseId}:${process.id}`} processId={process.id} baseId={baseId} />}
-    {tab === 'revisao' && <section className="card"><h2>Registro da revisão</h2><p className="sub">Nenhuma revisão humana registrada. A persistência de pareceres ainda não está disponível nesta versão.</p></section>}
-    <section className="card detail-review"><div><h2>Revisão humana</h2><p className="sub">A análise estatística exige conferência documental. Nenhuma conclusão de auditoria registrada.</p></div><span className="pill rev">Não registrada</span></section>
-    <div className="detail-footer"><Link className="link-a" to={back}><ArrowLeft size={14} />Voltar à consulta</Link><Link className="link-a" to={selectionLink(`/processos/${process.id}`, location.search)}>Ver todos os itens da compra</Link></div>
+    {tab === 'revisao' && <section className="card"><h2>Revisão humana</h2><p className="sub">Nenhuma revisão humana registrada. O registro de pareceres ainda não está disponível nesta versão.</p></section>}
+    <div className="detail-footer"><Link className="link-a" to={selectionLink(`/processos/${process.id}`, location.search)}>Ver todos os itens da compra</Link></div>
   </div>
 }
 

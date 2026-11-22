@@ -8,6 +8,11 @@ const MODEL = '88888888-8888-4888-8888-888888888888'
 const OTHER_SUPPLIER = '99999999-9999-4999-8999-999999999999'
 const AE = '88888888-8888-4888-8888-999999999999'
 
+async function abrirAnalise(page) {
+  const bar = page.locator('details.analysis-bar')
+  if (!(await bar.evaluate(el => el.open))) await bar.locator('summary').click()
+}
+
 async function mockView(page, overrides = {}) {
   const state = await mockApi(page, { active: EXEC, scored: true, ...overrides, handler: async ({ url, path, send, error }) => {
     const done = async body => { await send(body); return true }
@@ -52,13 +57,13 @@ test('painel fixa versão/modelo, conserva filtros entre telas e distingue índi
   const state = await mockView(page)
   const errors = []; page.on('pageerror', e => errors.push(e.message))
   await page.goto('/painel')
-  await expect(page.getByRole('heading', { name: 'Clareza para priorizar a análise.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Painel geral' })).toBeVisible()
   await expect(page).toHaveURL(new RegExp(`execucao_id=${EXEC}`))
   await expect(page).toHaveURL(new RegExp(`modelo_id=${MODEL}`))
   await expect(page.getByText('Análise experimental · utilidade não validada')).toBeVisible()
   await expect(page.locator('.dashboard-kpis').getByText('R$ 0,10', { exact: true })).toBeVisible()
   await page.locator('.dashboard-start').getByRole('link', { name: 'Ver análise', exact: true }).first().click()
-  await expect(page.locator('.crumb')).toContainText('Ranking')
+  await expect(page.locator('.crumb')).toContainText('Detalhe do item')
   await expect(page.getByRole('link', { name: 'Itens Sinalizados', exact: true })).not.toHaveClass(/active/)
   await expect(page.getByRole('link', { name: 'Itens Sinalizados', exact: true })).not.toHaveAttribute('aria-current', 'page')
   await expect(page.getByRole('heading', { name: 'Compra 00001 · Item 00001' })).toBeVisible()
@@ -109,6 +114,7 @@ test('troca de modelo, paginação, erro e retentativa mantêm seleção explíc
   await expect(page.getByRole('link', { name: 'Borracha do recorte', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Próxima', exact: true }).click()
   await expect(page.getByRole('link', { name: 'Caneta do recorte', exact: true })).toBeVisible()
+  await abrirAnalise(page)
   await page.getByLabel('Modelo experimental').selectOption(MODEL)
   await expect(page).not.toHaveURL(/pagina=2/)
   state.viewOffline = true
@@ -126,6 +132,7 @@ test('execução inexistente não troca silenciosamente para a ativa e permite e
   await page.goto(`/ranking?base_id=${BASE}&execucao_id=00000000-0000-4000-8000-000000000000`)
   await expect(page.getByRole('heading', { name: 'Registro não encontrado' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Borracha do recorte', exact: true })).toHaveCount(0)
+  await abrirAnalise(page)
   await page.getByLabel('Execução publicada').selectOption(EXEC)
   await expect(page.getByRole('heading', { name: '2 item(ns) no ranking' })).toBeVisible()
   await page.goto(`/itens/${ITEM}?base_id=${BASE}&execucao_id=${EXEC}&modelo_id=00000000-0000-4000-8000-000000000000`)
@@ -147,7 +154,7 @@ test('painel real é utilizável em tela pequena e tema escuro', async ({ page }
 test('modelo automático preserva roteamento por item e cobertura sem média entre grupos', async ({ page }) => {
   await mockView(page, { automatic: true })
   await page.goto(`/painel?base_id=${BASE}`)
-  await expect(page.getByRole('heading', { name: 'Clareza para priorizar a análise.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Painel geral' })).toBeVisible()
   await expect(page.getByLabel('Modelo experimental')).toHaveCount(0)
   expect(new URL(page.url()).searchParams.get('modelo_id')).toBeNull()
   await page.getByRole('link', { name: 'Itens Sinalizados', exact: true }).click()
@@ -166,7 +173,7 @@ test('painel segue composição do Figma e compara modelos do mesmo resultado se
   await page.setViewportSize({ width: 1062, height: 880 })
   await mockView(page, { bothModels: true })
   await page.goto('/painel')
-  await expect(page.getByRole('heading', { name: 'Clareza para priorizar a análise.', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Painel geral', exact: true })).toBeVisible()
   await expect(page.locator('.dashboard-kpis .kpi')).toHaveCount(4)
   const positions = await page.locator('.dashboard-kpis .kpi').evaluateAll(cards => cards.map(card => card.getBoundingClientRect().top))
   expect(new Set(positions).size).toBe(1)
@@ -222,10 +229,10 @@ test('detalhe sinalizado separa resultado, referência de treino e explicação 
   await expect(page.locator('.detail-score-number')).not.toContainText('/ 100')
   await page.getByRole('button', { name: 'Documentos', exact: true }).click()
   await expect(page.getByRole('link', { name: 'Edital da compra', exact: false })).toBeVisible()
-  await page.getByRole('button', { name: 'Registro da revisão', exact: true }).click()
+  await page.getByRole('button', { name: 'Revisão', exact: true }).click()
   await expect(page.getByText('Nenhuma revisão humana registrada.', { exact: false })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Incluir no relatório', exact: true })).toHaveAttribute('href', new RegExp(`processo_id=${PROCESS}`))
-  await page.getByRole('button', { name: 'Sinais e comparação', exact: true }).click()
+  await page.getByRole('button', { name: 'Preço e sinais', exact: true }).click()
   const { default: AxeBuilder } = await import('@axe-core/playwright')
   expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([])
   await page.screenshot({ path: testInfo.outputPath('detalhe-desktop.png'), fullPage: true })
@@ -271,6 +278,8 @@ test('detalhe automático conserva preferência do grupo e escolhe maior resulta
   ] }] } }))
   await page.goto(`/ranking/${ITEM}?base_id=${BASE}&execucao_id=${EXEC}`)
   await expect(page.locator('.detail-score-number')).toHaveText('0,8800')
+  await expect(page.locator('.score-ruler i')).toHaveAttribute('style', /width: 88%/)
+  await expect(page.locator('.score-scale')).toHaveText('01')
   await expect(page.getByLabel('Resultado do fornecedor')).toHaveValue('segundo-ativo')
   await expect(page.locator('.detail-score')).not.toContainText('99')
 })

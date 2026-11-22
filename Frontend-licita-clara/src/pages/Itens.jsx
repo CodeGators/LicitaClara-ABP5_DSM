@@ -30,7 +30,7 @@ export default function Itens() {
     const next = new URLSearchParams(previous); next.set('pagina', String(value)); return next
   })
   return <>
-    <Head kicker="Consulta / Itens de compras públicas" title="Consultar itens" sub="Dados oficiais do recorte importado. Cada linha representa um item; abra o detalhe para consultar seus resultados e o processo da compra." />
+    <Head title="Consultar itens" sub="Dados oficiais importados. Cada linha é um item; abra um para ver resultados, documentos e a compra." />
     <ItemFilters official draft={draft} change={change} apply={apply} baseId={baseId} params={params} clear={() => {
       setDraft(readFilters(new URLSearchParams()))
       setParams(previous => {
@@ -39,8 +39,8 @@ export default function Itens() {
         return next
       })
     }}>
-      {filters.processo_id && <p className="sub">Consulta restrita ao processo selecionado. Use “Limpar filtros” para consultar toda a base.</p>}
-      <p className="hint">O período considera resultados não cancelados. Valores são totais do item, não da compra inteira.</p>
+      {filters.processo_id && <p className="hint">Mostrando só a compra selecionada. Use “Limpar filtros” para ver toda a base.</p>}
+
     </ItemFilters>
     <NoAnalysis />
     <QueryState query={query} loading="Carregando itens…" />
